@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
+/* ===== 基本 ===== */
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -25,11 +26,11 @@ header {
   padding: 8px 12px;
 }
 
-.header-title h1 {
+header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
 }
-.header-title small {
+header small {
   font-size: 12px;
 }
 
@@ -51,22 +52,20 @@ nav a {
   white-space: nowrap;
 }
 
-/* ===== フォント操作 ===== */
-.font-controls-nav {
+/* ===== 操作UI ===== */
+.controls {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-left: 8px;
 }
-.font-btn-nav {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+.controls button {
   border: 1px solid #e0cfa0;
   background: #fffdf4;
+  border-radius: 999px;
+  padding: 4px 8px;
   cursor: pointer;
 }
-.font-btn-nav.active {
+.controls button.active {
   background: #f0b344;
   color: #fff;
 }
@@ -77,51 +76,54 @@ main {
 }
 
 section {
-  position: relative;
-  margin: 24px 0 32px 32px;
+  margin: 24px 0 32px;
   padding: 14px;
   background: #fff;
   border-radius: 10px;
   border: 1px solid #eee0c8;
 }
 
-/* ===== 見出し ===== */
-h2 {
+/* 見出しは必ず先頭 */
+section > h2 {
   margin: 0 0 8px;
   border-left: 4px solid #f0b344;
   padding-left: 8px;
   color: #d89c2c;
 }
 
-/* ===== ノート ===== */
+/* 情報コンテナ */
+.section-content > * + * {
+  margin-top: 12px;
+}
+
+/* 写真参照 */
+.photo-reference {
+  background: #fff8e6;
+  border-left: 6px solid #e0b85c;
+  padding: 12px;
+  border-radius: 8px;
+}
+.photo-page {
+  font-size: 22px;
+  font-weight: bold;
+  color: #d89c2c;
+}
+
+/* 指導ポイント */
 .note-box {
   background: #f5efe4;
   padding: 12px;
   border-radius: 8px;
-  margin-top: 12px;
 }
 
-/* ===== バインダー ===== */
-.ring-binder {
-  position: absolute;
-  left: -26px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-.ring {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #d8d8d8;
-  border: 2px solid #999;
-}
-
-/* ===== モバイル ===== */
-@media (max-width:600px) {
-  section { margin-left: 28px; }
+/* ===== 印刷 ===== */
+@media print {
+  header, .controls {
+    display: none;
+  }
+  .note-box {
+    display: none;
+  }
 }
 </style>
 </head>
@@ -129,10 +131,7 @@ h2 {
 <body>
 
 <header>
-  <div class="header-title">
-    <h1>リモコンカー 写真参照ガイド <small>（指導員用）</small></h1>
-  </div>
-
+  <h1>リモコンカー 写真参照ガイド <small>（指導員用）</small></h1>
   <nav>
     <a href="#battery-box">電池BOX</a>
     <a href="#wire">電線</a>
@@ -140,10 +139,11 @@ h2 {
     <a href="#test">テスト</a>
     <a href="#complete">完成</a>
 
-    <div class="font-controls-nav">
-      <button class="font-btn-nav" id="font-small">小</button>
-      <button class="font-btn-nav active" id="font-medium">中</button>
-      <button class="font-btn-nav" id="font-large">大</button>
+    <div class="controls">
+      <button id="font-s">小</button>
+      <button id="font-m" class="active">中</button>
+      <button id="font-l">大</button>
+      <button id="toggle-note">指導ポイント</button>
     </div>
   </nav>
 </header>
@@ -151,33 +151,74 @@ h2 {
 <main>
 
 <section id="battery-box">
-  <div class="ring-binder"><div class="ring"></div><div class="ring"></div></div>
-  <h2>📦 電池BOX</h2>
-  <div class="note-box">電池の向きを確認させる</div>
+  <h2>📦 電池BOXをつくろう！</h2>
+  <div class="section-content">
+    <div class="photo-reference">
+      <div class="photo-page">写真 P25</div>
+      電池の向き・固定方法を確認
+    </div>
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・＋－を必ず確認<br>
+      ・銅テープで固定
+    </div>
+  </div>
 </section>
 
 <section id="wire">
-  <div class="ring-binder"><div class="ring"></div><div class="ring"></div></div>
-  <h2>🔌 電線作り</h2>
-  <div class="note-box">磁石と銅線を使う</div>
+  <h2>🔌 電線を作ろう！</h2>
+  <div class="section-content">
+    <div class="photo-reference">
+      <div class="photo-page">写真 P30</div>
+      磁石と銅線のしくみ
+    </div>
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・端子にしっかり接触
+    </div>
+  </div>
 </section>
 
 <section id="switch">
-  <div class="ring-binder"><div class="ring"></div><div class="ring"></div></div>
-  <h2>🎮 スイッチ</h2>
-  <div class="note-box">左右で向きが変わる</div>
+  <h2>🎮 スイッチ完成図</h2>
+  <div class="section-content">
+    <div class="photo-reference">
+      <div class="photo-page">写真 P62 / P72</div>
+      配線ルートと構造
+    </div>
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・左右で向きが変わる
+    </div>
+  </div>
 </section>
 
 <section id="test">
-  <div class="ring-binder"><div class="ring"></div><div class="ring"></div></div>
-  <h2>🔬 テスト</h2>
-  <div class="note-box">回転方向を確認</div>
+  <h2>🔬 テスト実験</h2>
+  <div class="section-content">
+    <div class="photo-reference">
+      <div class="photo-page">写真 P81</div>
+      回転方向の確認
+    </div>
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・つながらない時は接触確認
+    </div>
+  </div>
 </section>
 
 <section id="complete">
-  <div class="ring-binder"><div class="ring"></div><div class="ring"></div></div>
-  <h2>🏆 完成</h2>
-  <div class="note-box">バランスを確認</div>
+  <h2>🏆 完成品</h2>
+  <div class="section-content">
+    <div class="photo-reference">
+      <div class="photo-page">写真 P50</div>
+      完成形を確認
+    </div>
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・配線とバランス調整
+    </div>
+  </div>
 </section>
 
 </main>
@@ -186,36 +227,31 @@ h2 {
 document.addEventListener('DOMContentLoaded', () => {
   const header = document.querySelector('header');
   const sections = document.querySelectorAll('section');
-  const buttons = {
-    small: document.getElementById('font-small'),
-    medium: document.getElementById('font-medium'),
-    large: document.getElementById('font-large')
-  };
+  const notes = document.querySelectorAll('.note-box');
 
-  const applySize = size => {
-    const scale = size === 'small' ? 0.9 : size === 'large' ? 1.15 : 1;
-    document.body.style.fontSize = 16 * scale + 'px';
-    localStorage.setItem('fontSize', size);
-    Object.keys(buttons).forEach(k =>
-      buttons[k].classList.toggle('active', k === size)
-    );
-    updateAnchor();
-  };
-
-  const updateAnchor = () => {
+  const setAnchor = () => {
     const h = header.offsetHeight + 8;
     document.documentElement.style.scrollPaddingTop = h + 'px';
     sections.forEach(s => s.style.scrollMarginTop = h + 'px');
   };
 
-  Object.keys(buttons).forEach(k =>
-    buttons[k].onclick = () => applySize(k)
-  );
+  const setFont = scale => {
+    document.body.style.fontSize = 16 * scale + 'px';
+    setAnchor();
+  };
 
-  applySize(localStorage.getItem('fontSize') || 'medium');
-  window.addEventListener('resize', updateAnchor);
+  document.getElementById('font-s').onclick = () => setFont(0.9);
+  document.getElementById('font-m').onclick = () => setFont(1);
+  document.getElementById('font-l').onclick = () => setFont(1.15);
+
+  document.getElementById('toggle-note').onclick = () => {
+    notes.forEach(n => n.style.display =
+      n.style.display === 'none' ? '' : 'none');
+  };
+
+  window.addEventListener('resize', setAnchor);
+  setAnchor();
 });
 </script>
 
-</body>
-</html>
+</b
