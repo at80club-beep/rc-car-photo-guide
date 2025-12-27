@@ -54,11 +54,6 @@ nav a {
   white-space: nowrap;
 }
 
-nav .font-label {
-  font-size: 12px;
-  margin-left: 8px;
-}
-
 nav button {
   border: 1px solid #e0cfa0;
   background: #fffdf4;
@@ -73,15 +68,16 @@ main {
   padding: 12px;
 }
 
+/* セクションの余白は下だけ */
 section {
-  margin: 28px 0;
+  margin: 0 0 32px;
   padding: 14px;
   background: #fff;
   border-radius: 10px;
   border: 1px solid #eee0c8;
 }
 
-/* 見出し */
+/* 見出しがアンカー基準 */
 section > h2 {
   margin: 0 0 8px;
   border-left: 4px solid #f0b344;
@@ -114,9 +110,8 @@ section > h2 {
 
 /* ===== 印刷 ===== */
 @media print {
-  header {
-    display: none;
-  }
+  header { display: none; }
+  .note-box { display: none; }
 }
 </style>
 </head>
@@ -132,10 +127,12 @@ section > h2 {
     <a href="#test">テスト</a>
     <a href="#complete">完成</a>
 
-    <span class="font-label">文字</span>
+    <span style="margin-left:8px;font-size:12px;">文字</span>
     <button id="font-s">小</button>
     <button id="font-m">中</button>
     <button id="font-l">大</button>
+
+    <button id="toggle-note">指導ポイント</button>
   </nav>
 </header>
 
@@ -148,9 +145,8 @@ section > h2 {
     電池の向き、固定方法を確認します。
   </div>
   <div class="note-box">
-    <strong>📌 指導のポイント</strong><br>
     ・＋と－の向きを確認<br>
-    ・銅テープでしっかり固定
+    ・銅テープで固定
   </div>
 </section>
 
@@ -158,11 +154,10 @@ section > h2 {
   <h2>🔌 電線を作ろう！</h2>
   <div class="photo-reference">
     <div class="photo-page">写真 P30</div>
-    磁石と銅線の仕組みを理解します。
+    磁石と銅線の仕組み
   </div>
   <div class="note-box">
-    <strong>📌 指導のポイント</strong><br>
-    ・端子に確実に接触させる
+    ・端子に確実に接触
   </div>
 </section>
 
@@ -170,10 +165,9 @@ section > h2 {
   <h2>🎮 スイッチ完成図</h2>
   <div class="photo-reference">
     <div class="photo-page">写真 P62 / P72</div>
-    配線と構造を確認します。
+    配線と構造
   </div>
   <div class="note-box">
-    <strong>📌 指導のポイント</strong><br>
     ・左右で電気の向きが変わる
   </div>
 </section>
@@ -182,11 +176,10 @@ section > h2 {
   <h2>🔬 テスト実験</h2>
   <div class="photo-reference">
     <div class="photo-page">写真 P81</div>
-    回転方向を確認します。
+    回転方向を確認
   </div>
   <div class="note-box">
-    <strong>📌 指導のポイント</strong><br>
-    ・動かない時は接触確認
+    ・接触不良を確認
   </div>
 </section>
 
@@ -194,30 +187,29 @@ section > h2 {
   <h2>🏆 完成品</h2>
   <div class="photo-reference">
     <div class="photo-page">写真 P50</div>
-    完成形を確認します。
+    完成形
   </div>
   <div class="note-box">
-    <strong>📌 指導のポイント</strong><br>
-    ・配線とバランスを調整
+    ・配線とバランス調整
   </div>
 </section>
 
 </main>
 
 <script>
-/* ===== アンカーずれ防止 + 文字サイズ切替（安全版） ===== */
 (function () {
   const header = document.querySelector('header');
-  const sections = document.querySelectorAll('section');
+  const headings = document.querySelectorAll('section > h2');
+  const notes = document.querySelectorAll('.note-box');
   const body = document.body;
 
-  if (!header || sections.length === 0) return;
+  if (!header) return;
 
   function updateAnchorOffset() {
     const h = header.getBoundingClientRect().height + 8;
     document.documentElement.style.scrollPaddingTop = h + 'px';
-    sections.forEach(sec => {
-      sec.style.scrollMarginTop = h + 'px';
+    headings.forEach(hd => {
+      hd.style.scrollMarginTop = h + 'px';
     });
   }
 
@@ -226,13 +218,16 @@ section > h2 {
     setTimeout(updateAnchorOffset, 0);
   }
 
-  const fs = document.getElementById('font-s');
-  const fm = document.getElementById('font-m');
-  const fl = document.getElementById('font-l');
+  document.getElementById('font-s').onclick = () => setFont(0.9);
+  document.getElementById('font-m').onclick = () => setFont(1);
+  document.getElementById('font-l').onclick = () => setFont(1.15);
 
-  if (fs) fs.onclick = () => setFont(0.9);
-  if (fm) fm.onclick = () => setFont(1);
-  if (fl) fl.onclick = () => setFont(1.15);
+  document.getElementById('toggle-note').onclick = () => {
+    notes.forEach(n => {
+      n.style.display = n.style.display === 'none' ? '' : 'none';
+    });
+    setTimeout(updateAnchorOffset, 0);
+  };
 
   window.addEventListener('resize', updateAnchorOffset);
   updateAnchorOffset();
