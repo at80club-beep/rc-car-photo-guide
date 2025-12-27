@@ -2,10 +2,127 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>テスト</title>
+<title>リモコンカー 写真参照ガイド</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #faf7f2;
+  color: #333;
+  font-size: 16px;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background: #fff7dd;
+  border-bottom: 1px solid #e0d7c2;
+  padding: 8px 12px;
+  z-index: 100;
+}
+
+nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+nav a {
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e0cfa0;
+  background: #fff;
+  color: #554018;
+  white-space: nowrap;
+}
+
+.controls button {
+  margin-left: 4px;
+}
+
+main {
+  padding: 12px;
+}
+
+section {
+  background: #fff;
+  border: 1px solid #eee0c8;
+  border-radius: 10px;
+  padding: 14px;
+  margin: 28px 0;
+}
+
+h2 {
+  margin: 0 0 8px;
+  border-left: 4px solid #f0b344;
+  padding-left: 8px;
+  color: #d89c2c;
+}
+
+.photo-reference {
+  background: #fff8e6;
+  padding: 12px;
+  border-left: 6px solid #e0b85c;
+  border-radius: 8px;
+}
+
+.note-box {
+  background: #f5efe4;
+  padding: 12px;
+  border-radius: 8px;
+}
+</style>
 </head>
+
 <body>
-<h1>表示されています</h1>
-<p>GitHub Pages は正常です。</p>
+
+<header>
+  <h1>リモコンカー 写真参照ガイド</h1>
+  <nav>
+    <a href="#battery">電池</a>
+    <a href="#wire">電線</a>
+    <a href="#switch">スイッチ</a>
+  </nav>
+</header>
+
+<main>
+<section id="battery">
+  <h2>📦 電池BOX</h2>
+  <div class="photo-reference">写真 P25</div>
+  <div class="note-box">＋－を確認</div>
+</section>
+
+<section id="wire">
+  <h2>🔌 電線</h2>
+  <div class="photo-reference">写真 P30</div>
+</section>
+
+<section id="switch">
+  <h2>🎮 スイッチ</h2>
+  <div class="photo-reference">写真 P62</div>
+</section>
+</main>
+
+<script>
+(() => {
+  const header = document.querySelector('header');
+  const sections = document.querySelectorAll('section');
+
+  if (!header || sections.length === 0) return;
+
+  function updateOffset() {
+    const h = header.getBoundingClientRect().height + 8;
+    document.documentElement.style.scrollPaddingTop = h + 'px';
+    sections.forEach(s => s.style.scrollMarginTop = h + 'px');
+  }
+
+  window.addEventListener('resize', updateOffset);
+  updateOffset();
+})();
+</script>
+
 </body>
 </html>
