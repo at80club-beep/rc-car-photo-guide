@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>リモコンカー 写真参照ガイド</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      background: #faf7f2;
+      color: #333;
+      font-size: 16px;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff7dd;
+      border-bottom: 1px solid #e0d7c2;
+      padding: 8px 12px;
+      margin-bottom: 60px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    .header-title h1 {
+      font-size: 24px;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .header-title h1 small {
+      font-size: 12px;
+      font-weight: normal;
+    }
+    nav {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+    nav a {
+      text-decoration: none;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #e0cfa0;
+      background: #fffdf4;
+      color: #554018;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    nav a:active {
+      background: #ffe8a0;
+    }
+    .font-controls-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      margin-left: 4px;
+      padding-left: 8px;
+      border-left: 1px dashed #e0cfa0;
+    }
+    .font-label {
+      font-size: 11px;
+      color: #7a6b4a;
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+    .font-btn-nav {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid #e0cfa0;
+      background: #fffdf4;
+      color: #554018;
+      border-radius: 50%;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .font-btn-nav.active {
+      background: #f0b344;
+      color: white;
+      border-color: #d89c2c;
+    }
+    .credit-nav {
+      font-size: 10px;
+      color: #7a6b4a;
+      white-space: nowrap;
+      padding: 4px 8px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      margin-left: 4px;
+      padding-left: 8px;
+      border-left: 1px dashed #e0cfa0;
+    }
+    main {
+      padding: 10px 12px 40px;
+    }
+    section {
+      margin-bottom: 24px;
+      padding: 12px 12px 10px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #eee0c8;
+      scroll-margin-top: 80px;
+    }
+    h2 {
+      font-size: 20px;
+      margin: 0 0 8px;
+      border-left: 4px solid #f0b344;
+      padding-left: 8px;
+      color: #d89c2c;
+    }
+    .photo-reference {
+      background: #fff8e6;
+      border-left: 6px solid #e0b85c;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    .photo-page {
+      display: inline-block;
+      font-size: 24px;
+      font-weight: bold;
+      color: #d89c2c;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 2px solid #f0b344;
+      margin: 8px 0;
+    }
+    .description {
+      font-size: 15px;
+      color: #555;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+    .note-box {
+      background: #f5efe4;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+    .ring-binder {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    .ring {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #d8d8d8;
+      border: 3px solid #999;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    section {
+      position: relative;
+      margin-left: 32px;
+    }
+    @media (max-width: 600px) {
+      .header-title h1 {
+        font-size: 20px;
+      }
+      section {
+        margin-left: 28px;
+      }
+      .ring-binder {
+        left: 6px;
+        gap: 25px;
+      }
+      .ring {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #999;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header id="top">
+  <div class="header-top">
+    <div class="header-title">
+      <h1>リモコンカー 写真参照ガイド<small>（指導員用）</small></h1>
+    </div>
+  </div>
+  <nav>
+    <a href="#battery-box">電池BOX</a>
+    <a href="#wire">電線作り</a>
+    <a href="#switch">スイッチ</a>
+    <a href="#test">テスト実験</a>
+    <a href="#complete">完成品</a>
+    
+    <div class="font-controls-nav">
+      <span class="font-label">文字:</span>
+      <button class="font-btn-nav" id="font-small-nav" title="小さい文字サイズ">小</button>
+      <button class="font-btn-nav active" id="font-medium-nav" title="標準文字サイズ">中</button>
+      <button class="font-btn-nav" id="font-large-nav" title="大きい文字サイズ">大</button>
+    </div>
+    
+    <div class="credit-nav">🐸by TreeFrog</div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- 電池BOX -->
+  <section id="battery-box">
+    <div class="ring-binder">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    
+    <h2>📦 電池BOXをつくろう！</h2>
+    
+    <div class="photo-reference">
+      <div class="photo-page">写真 P25</div>
+      <div class="description">
+        電池BOXの作り方と完成イメージを確認できます。<br>
+        電池の向き、配線の接続方法、固定のポイントが写真で分かります。
+      </div>
+    </div>
+    
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・電池の＋極と－極の向きを確認させる<br>
+      ・銅テープでしっかり固定するよう指導<br>
+      ・接触不良がないかチェック
+    </div>
+  </section>
+
+  <!-- 電線作り -->
+  <section id="wire">
+    <div class="ring-binder">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    
+    <h2>🔌 電池にひっつく"電線"を作ろう！</h2>
+    
+    <div class="photo-reference">
+      <div class="photo-page">写真 P30</div>
+      <div class="description">
+        磁石と銅線を使った電線の作り方が掲載されています。<br>
+        電池の端子に磁石でピタッとくっつく電線の仕組みが理解できます。
+      </div>
+    </div>
+    
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・小さな磁石を銅線に正しく配置<br>
+      ・電池の端子にしっかり接触させる<br>
+      ・磁力で簡単に着脱できることを体験させる
+    </div>
+  </section>
+
+  <!-- リモコンスイッチ -->
+  <section id="switch">
+    <div class="ring-binder">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    
+    <h2>🎮 リモコンスイッチ完成図</h2>
+    
+    <div class="photo-reference">
+      <div class="photo-page">写真 P62</div>
+      <div class="description">
+        または
+      </div>
+      <div class="photo-page">写真 P72</div>
+      <div class="description">
+        リモコンスイッチの完成形を確認できます。<br>
+        ボタンの配置、配線のルート、全体の構造が分かります。<br>
+        前進・後進を切り替える仕組みが理解できます。
+      </div>
+    </div>
+    
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・左右のボタンで電気の向きが変わることを説明<br>
+      ・銅テープの接触面が浮いていないか確認<br>
+      ・プラマイチェッカーで動作確認
+    </div>
+  </section>
+
+  <!-- テスト実験 -->
+  <section id="test">
+    <div class="ring-binder">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    
+    <h2>🔬 どうして動く？ 電池とスイッチのテスト実験！</h2>
+    
+    <div class="photo-reference">
+      <div class="photo-page">写真 P81</div>
+      <div class="description">
+        電池BOXとスイッチをつないでモーターを動かす実験の様子が掲載されています。<br>
+        電気の向きによってモーターの回転方向が変わることを確認できます。<br>
+        スイッチの動作原理を理解する重要なステップです。
+      </div>
+    </div>
+    
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・スイッチを切り替えてモーターの回転方向を確認<br>
+      ・電気の向きと動きの関係を体感させる<br>
+      ・つながらない場合は接触を確認
+    </div>
+  </section>
+
+  <!-- 完成品 -->
+  <section id="complete">
+    <div class="ring-binder">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+    
+    <h2>🏆 完成品</h2>
+    
+    <div class="photo-reference">
+      <div class="photo-page">写真 P50</div>
+      <div class="description">
+        リモコンカーの完成形が掲載されています。<br>
+        電池BOX、スイッチ、モーター、車体が全て組み合わさった状態を確認できます。<br>
+        理想的な配線の取り回しや、バランスの良い構造が参考になります。
+      </div>
+    </div>
+    
+    <div class="note-box">
+      <strong>📌 指導のポイント</strong><br>
+      ・完成イメージを見せてモチベーションを高める<br>
+      ・配線が車輪に絡まないよう配置を工夫<br>
+      ・まっすぐ走るようバランスを調整
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // 文字サイズ設定の管理
+  document.addEventListener('DOMContentLoaded', function() {
+    const body = document.body;
+    const fontSmall = document.getElementById('font-small-nav');
+    const fontMedium = document.getElementById('font-medium-nav');
+    const fontLarge = document.getElementById('font-large-nav');
+    const fontButtons = [fontSmall, fontMedium, fontLarge];
+    
+    // 保存された設定を取得
+    const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+    
+    // 初期設定を適用
+    applyFontSize(savedFontSize);
+    updateActiveButton(savedFontSize);
+    
+    // ボタンにクリックイベントを追加
+    fontButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const size = this.id.replace('font-small-nav', 'small')
+                          .replace('font-medium-nav', 'medium')
+                          .replace('font-large-nav', 'large');
+        applyFontSize(size);
+        updateActiveButton(size);
+        // 設定を保存
+        localStorage.setItem('fontSize', size);
+      });
+    });
+    
+    // 文字サイズを適用する関数
+    function applyFontSize(size) {
+      const baseSize = 16;
+      let multiplier;
+      
+      switch(size) {
+        case 'small':
+          multiplier = 0.875;
+          break;
+        case 'medium':
+          multiplier = 1;
+          break;
+        case 'large':
+          multiplier = 1.125;
+          break;
+        default:
+          multiplier = 1;
+      }
+      
+      body.style.fontSize = `${baseSize * multiplier}px`;
+      
+      const navLinks = document.querySelectorAll('nav a');
+      navLinks.forEach(link => {
+        if (size === 'small') {
+          link.style.fontSize = '13px';
+        } else if (size === 'medium') {
+          link.style.fontSize = '14px';
+        } else if (size === 'large') {
+          link.style.fontSize = '15px';
+        }
+      });
+      
+      const credit = document.querySelector('.credit-nav');
+      if (size === 'small') {
+        credit.style.fontSize = '9px';
+      } else if (size === 'medium') {
+        credit.style.fontSize = '10px';
+      } else if (size === 'large') {
+        credit.style.fontSize = '11px';
+      }
+      
+      const fontLabel = document.querySelector('.font-label');
+      if (size === 'small') {
+        fontLabel.style.fontSize = '10px';
+      } else if (size === 'medium') {
+        fontLabel.style.fontSize = '11px';
+      } else if (size === 'large') {
+        fontLabel.style.fontSize = '12px';
+      }
+    }
+    
+    // アクティブなボタンを更新する関数
+    function updateActiveButton(activeSize) {
+      fontButtons.forEach(button => {
+        let buttonSize = '';
+        if (button.id === 'font-small-nav') buttonSize = 'small';
+        else if (button.id === 'font-medium-nav') buttonSize = 'medium';
+        else if (button.id === 'font-large-nav') buttonSize = 'large';
+        
+        if (buttonSize === activeSize) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
