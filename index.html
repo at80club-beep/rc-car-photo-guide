@@ -2,166 +2,118 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>リモコンカー 写真参照ガイド</title>
+<title>リモコンカー進行ガイド</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* =========================
-   基本変数（ズレ防止）
-========================= */
 :root {
   --font-base: 18px;
   --header-height: 150px;
-  --main-color: #2f6fb1;
+  --main-color: #005bbb;
 }
 
-/* =========================
-   全体
-========================= */
+/* ===== 共通 ===== */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height);
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  background: #faf7f2;
-  color: #222;
+  font-family: sans-serif;
   font-size: var(--font-base);
   line-height: 1.8;
+  background: #f7f7f7;
 }
 
-/* =========================
-   ヘッダー
-========================= */
+/* ===== ヘッダー ===== */
 header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: #ffffff;
+  border-bottom: 4px solid var(--main-color);
   z-index: 1000;
-  background: #ffffff;
-  border-bottom: 2px solid #c8bfa6;
-  padding: 10px 12px;
+  padding: 10px;
 }
 
-header h1 {
-  margin: 0 0 8px;
-  font-size: 1.4em;
+.header-inner {
+  max-width: 1000px;
+  margin: auto;
 }
 
-/* =========================
-   ナビ（押し間違いゼロ）
-========================= */
-nav {
+/* ===== 文字サイズ ===== */
+.font-control {
   display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 6px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-nav a,
-nav button {
-  min-width: 88px;
-  text-align: center;
-  font-size: 1em;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 4px solid #9b9380;
-  background: #ffffff;
-  color: #222;
+.font-btn {
+  font-size: 16px;
+  padding: 10px 18px;
+  border: 3px solid #666;
+  background: #fff;
   cursor: pointer;
-  white-space: nowrap;
+  border-radius: 8px;
 }
 
-/* 現在地（色＋太枠） */
-nav a.active {
-  background: var(--main-color);
-  color: #ffffff;
-  border-color: #163a5f;
+.font-active {
+  background: #555;
+  color: #fff;
+  border-color: #222;
   font-weight: bold;
 }
 
-nav a:active {
-  background: #1f4e85;
+/* ===== ナビ ===== */
+nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* =========================
-   メイン
-========================= */
+nav a {
+  padding: 12px 18px;
+  border: 4px solid var(--main-color);
+  color: var(--main-color);
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+  background: #fff;
+}
+
+nav a.active {
+  background: var(--main-color);
+  color: #fff;
+}
+
+/* ===== メイン ===== */
 main {
-  padding: 16px;
+  padding-top: calc(var(--header-height) + 20px);
+  max-width: 900px;
+  margin: auto;
 }
 
-/* =========================
-   セクション
-========================= */
 section {
-  background: #ffffff;
-  border: 2px solid #eee0c8;
+  background: #fff;
+  border: 4px solid #ccc;
   border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 28px;
-
-  /* リンクずれ完全防止 */
-  scroll-margin-top: var(--header-height);
+  padding: 20px;
+  margin-bottom: 40px;
 }
 
 h2 {
-  margin: 0 0 10px;
-  font-size: 1.3em;
-  border-left: 6px solid var(--main-color);
-  padding-left: 10px;
+  margin-top: 0;
 }
 
-/* =========================
-   指導ポイント
-========================= */
+/* ===== 指導ポイント ===== */
 .note-box {
-  background: #f5efe4;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 12px;
-  font-size: 0.95em;
-}
-
-/* 上級者制御 */
-#toggle-note {
-  display: none;
-}
-
-.advanced #toggle-note {
-  display: inline-block;
-}
-
-.hide-note .note-box {
-  display: none;
-}
-
-/* =========================
-   印刷対応（高齢者配布用）
-========================= */
-@media print {
-  header, nav, button {
-    display: none !important;
-  }
-
-  body {
-    background: #ffffff;
-    color: #000;
-    font-size: 18px;
-    line-height: 1.9;
-  }
-
-  section {
-    border: 2px solid #000;
-    border-radius: 0;
-    page-break-inside: avoid;
-  }
-
-  h2 {
-    font-size: 22px;
-    border-left: 8px solid #000;
-  }
-
-  .note-box {
-    border: 2px dashed #000;
-    background: #fff;
-  }
+  border: 4px dashed #999;
+  padding: 15px;
+  margin-top: 15px;
+  background: #fafafa;
 }
 </style>
 </head>
@@ -169,125 +121,122 @@ h2 {
 <body>
 
 <header>
-  <h1>リモコンカー 写真参照ガイド</h1>
-  <nav>
-    <a href="#battery">電池BOX</a>
-    <a href="#wire">電線</a>
-    <a href="#switch">スイッチ</a>
-    <a href="#test">テスト</a>
-    <a href="#complete">完成</a>
-
-    <!-- 上級者のみ -->
-    <button id="toggle-note">指導ポイント ON / OFF</button>
+  <div class="header-inner">
 
     <!-- 文字サイズ -->
-    <button onclick="setFont(0.9)">小</button>
-    <button onclick="setFont(1)">中</button>
-    <button onclick="setFont(1.1)">大</button>
-  </nav>
+    <div class="font-control">
+      <button class="font-btn" data-scale="0.9" onclick="setFont(0.9,this)">小</button>
+      <button class="font-btn" data-scale="1" onclick="setFont(1,this)">中</button>
+      <button class="font-btn" data-scale="1.1" onclick="setFont(1.1,this)">大</button>
+    </div>
+
+    <!-- ナビ -->
+    <nav>
+      <a href="#battery">① 電池BOX</a>
+      <a href="#wire">② 電線</a>
+      <a href="#switch">③ スイッチ</a>
+      <a href="#test">④ テスト</a>
+      <a href="#complete">⑤ 完成</a>
+    </nav>
+
+  </div>
 </header>
 
 <main>
 
 <section id="battery">
-  <h2>📦 電池BOX</h2>
-  <p>写真 P25 を見ながら作ります。</p>
+  <h2>① 電池BOX</h2>
+  <p>写真P25を見ながら作ります。</p>
   <div class="note-box">
-    ・＋と－の向きを必ず確認<br>
-    ・銅テープは強く押さえる
+    ・＋と－の向きを確認<br>
+    ・銅テープはしっかり押す
   </div>
 </section>
 
 <section id="wire">
-  <h2>🔌 電線づくり</h2>
-  <p>写真 P30 を参考にします。</p>
-  <div class="note-box">
-    ・磁石の向きに注意<br>
-    ・外れないか確認
-  </div>
+  <h2>② 電線づくり</h2>
+  <p>写真P30を確認。</p>
 </section>
 
 <section id="switch">
-  <h2>🎮 スイッチ</h2>
-  <p>写真 P62 / P72</p>
-  <div class="note-box">
-    ・左右で電気の向きが変わる
-  </div>
+  <h2>③ スイッチ</h2>
+  <p>写真P62 / P72。</p>
 </section>
 
 <section id="test">
-  <h2>🔬 テスト</h2>
-  <p>写真 P81</p>
-  <div class="note-box">
-    ・回転方向を見比べる
-  </div>
+  <h2>④ テスト</h2>
+  <p>写真P81。</p>
 </section>
 
 <section id="complete">
-  <h2>🏆 完成</h2>
-  <p>写真 P50</p>
-  <div class="note-box">
-    ・配線がタイヤに当たらない
-  </div>
+  <h2>⑤ 完成</h2>
+  <p>写真P50。</p>
 </section>
 
 </main>
 
 <script>
-/* =========================
-   初心者 / 上級者切替
-========================= */
-const params = new URLSearchParams(location.search);
-if (params.get("mode") === "advanced") {
-  document.body.classList.add("advanced");
-}
+const BASE_FONT = 18;
+const BASE_HEADER = 150;
 
-/* =========================
-   指導ポイント切替
-========================= */
-const toggleBtn = document.getElementById("toggle-note");
-let noteVisible = true;
-
-toggleBtn?.addEventListener("click", () => {
-  noteVisible = !noteVisible;
-  document.body.classList.toggle("hide-note", !noteVisible);
-});
-
-/* =========================
-   文字サイズ（ズレ防止）
-========================= */
-function setFont(scale) {
+/* ===== 文字サイズ ===== */
+function setFont(scale, btn) {
   document.documentElement.style.setProperty(
-    "--font-base", `${18 * scale}px`
+    "--font-base", `${BASE_FONT * scale}px`
   );
   document.documentElement.style.setProperty(
-    "--header-height", `${150 * scale}px`
+    "--header-height", `${BASE_HEADER * scale}px`
   );
+
+  document.querySelectorAll(".font-btn").forEach(b => {
+    b.classList.remove("font-active");
+  });
+  btn.classList.add("font-active");
+
+  localStorage.setItem("fontScale", scale);
 }
 
-/* =========================
-   ナビ現在地ハイライト
-========================= */
-const navLinks = document.querySelectorAll("nav a");
-const sections = document.querySelectorAll("main section");
+function loadFontSetting() {
+  const scale = parseFloat(localStorage.getItem("fontScale")) || 1;
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id;
-      navLinks.forEach(link => {
-        link.classList.toggle(
-          "active",
-          link.getAttribute("href") === `#${id}`
-        );
-      });
+  document.documentElement.style.setProperty(
+    "--font-base", `${BASE_FONT * scale}px`
+  );
+  document.documentElement.style.setProperty(
+    "--header-height", `${BASE_HEADER * scale}px`
+  );
+
+  document.querySelectorAll(".font-btn").forEach(b => {
+    if (parseFloat(b.dataset.scale) === scale) {
+      b.classList.add("font-active");
     }
   });
-}, {
-  rootMargin: "-45% 0px -45% 0px"
-});
+}
 
-sections.forEach(section => observer.observe(section));
+/* ===== ナビの現在地表示 ===== */
+const links = document.querySelectorAll("nav a");
+const sections = document.querySelectorAll("section");
+
+function updateNav() {
+  let current = "";
+  sections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= 200) current = sec.id;
+  });
+
+  links.forEach(link => {
+    link.classList.toggle(
+      "active",
+      link.getAttribute("href") === "#" + current
+    );
+  });
+}
+
+window.addEventListener("scroll", updateNav);
+window.addEventListener("DOMContentLoaded", () => {
+  loadFontSetting();
+  updateNav();
+});
 </script>
 
 </body>
