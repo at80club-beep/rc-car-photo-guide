@@ -6,112 +6,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* ===== 基本 ===== */
+/* =====================
+   基本変数（ズレ防止の要）
+===================== */
+:root {
+  --font-base: 16px;
+  --header-height: 120px;
+}
+
+/* =====================
+   全体
+===================== */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: #faf7f2;
   color: #333;
-  font-size: 16px;
+  font-size: var(--font-base);
   line-height: 1.6;
 }
 
-/* ===== ヘッダー ===== */
+/* =====================
+   ヘッダー
+===================== */
 header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   background: #fff7dd;
   border-bottom: 1px solid #e0d7c2;
   padding: 8px 12px;
 }
 
 header h1 {
-  margin: 0;
-  font-size: 22px;
-}
-header small {
-  font-size: 12px;
+  margin: 0 0 6px;
+  font-size: 1.4em;
 }
 
-/* ===== ナビ ===== */
+/* =====================
+   ナビ
+===================== */
 nav {
   display: flex;
-  align-items: center;
   gap: 6px;
   overflow-x: auto;
-  padding: 6px 0;
 }
 
-nav a {
-  text-decoration: none;
-  font-size: 14px;
-  padding: 4px 8px;
+nav a,
+nav button {
+  font-size: 0.85em;
+  padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid #e0cfa0;
-  background: #fffdf4;
+  background: #fff;
   color: #554018;
+  cursor: pointer;
   white-space: nowrap;
 }
 
-nav button {
-  border: 1px solid #e0cfa0;
-  background: #fffdf4;
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-/* ===== メイン ===== */
+/* =====================
+   メイン
+===================== */
 main {
   padding: 12px;
 }
 
-/* セクションの余白は下だけ */
+/* =====================
+   セクション（リンクずれ対策）
+===================== */
 section {
-  margin: 0 0 32px;
-  padding: 14px;
   background: #fff;
-  border-radius: 10px;
   border: 1px solid #eee0c8;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 24px;
+
+  /* ★ ここが最重要 */
+  scroll-margin-top: var(--header-height);
 }
 
-/* 見出しがアンカー基準 */
-section > h2 {
+h2 {
   margin: 0 0 8px;
+  font-size: 1.2em;
   border-left: 4px solid #f0b344;
   padding-left: 8px;
   color: #d89c2c;
 }
 
-/* 写真参照 */
-.photo-reference {
-  background: #fff8e6;
-  border-left: 6px solid #e0b85c;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-.photo-page {
-  font-size: 20px;
-  font-weight: bold;
-  color: #d89c2c;
-}
-
-/* 指導ポイント */
+/* =====================
+   指導ポイント
+===================== */
 .note-box {
   background: #f5efe4;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   margin-top: 10px;
+  font-size: 0.9em;
 }
 
-/* ===== 印刷 ===== */
-@media print {
-  header { display: none; }
-  .note-box { display: none; }
+/* 上級者モード制御 */
+#toggle-note {
+  display: none;
+}
+
+.advanced #toggle-note {
+  display: inline-block;
+}
+
+.hide-note .note-box {
+  display: none;
 }
 </style>
 </head>
@@ -119,54 +122,47 @@ section > h2 {
 <body>
 
 <header>
-  <h1>リモコンカー 写真参照ガイド <small>（指導員用）</small></h1>
+  <h1>リモコンカー 写真参照ガイド</h1>
   <nav>
-    <a href="#battery-box">電池BOX</a>
+    <a href="#battery">電池BOX</a>
     <a href="#wire">電線</a>
     <a href="#switch">スイッチ</a>
     <a href="#test">テスト</a>
     <a href="#complete">完成</a>
 
-    <span style="margin-left:8px;font-size:12px;">文字</span>
-    <button id="font-s">小</button>
-    <button id="font-m">中</button>
-    <button id="font-l">大</button>
+    <!-- 上級者のみ -->
+    <button id="toggle-note">指導ポイント ON / OFF</button>
 
-    <button id="toggle-note">指導ポイント</button>
+    <!-- 文字サイズ -->
+    <button onclick="setFont(0.9)">小</button>
+    <button onclick="setFont(1)">中</button>
+    <button onclick="setFont(1.1)">大</button>
   </nav>
 </header>
 
 <main>
 
-<section id="battery-box">
-  <h2>📦 電池BOXをつくろう！</h2>
-  <div class="photo-reference">
-    <div class="photo-page">写真 P25</div>
-    電池の向き、固定方法を確認します。
-  </div>
+<section id="battery">
+  <h2>📦 電池BOX</h2>
+  <p>写真 P25 を参照</p>
   <div class="note-box">
-    ・＋と－の向きを確認<br>
-    ・銅テープで固定
+    ・＋－の向きを必ず確認<br>
+    ・銅テープは強めに押さえる
   </div>
 </section>
 
 <section id="wire">
-  <h2>🔌 電線を作ろう！</h2>
-  <div class="photo-reference">
-    <div class="photo-page">写真 P30</div>
-    磁石と銅線の仕組み
-  </div>
+  <h2>🔌 電線づくり</h2>
+  <p>写真 P30 を参照</p>
   <div class="note-box">
-    ・端子に確実に接触
+    ・磁石の位置を確認<br>
+    ・接触不良に注意
   </div>
 </section>
 
 <section id="switch">
-  <h2>🎮 スイッチ完成図</h2>
-  <div class="photo-reference">
-    <div class="photo-page">写真 P62 / P72</div>
-    配線と構造
-  </div>
+  <h2>🎮 スイッチ</h2>
+  <p>写真 P62 / P72</p>
   <div class="note-box">
     ・左右で電気の向きが変わる
   </div>
@@ -174,64 +170,55 @@ section > h2 {
 
 <section id="test">
   <h2>🔬 テスト実験</h2>
-  <div class="photo-reference">
-    <div class="photo-page">写真 P81</div>
-    回転方向を確認
-  </div>
+  <p>写真 P81</p>
   <div class="note-box">
-    ・接触不良を確認
+    ・回転方向を見比べる
   </div>
 </section>
 
 <section id="complete">
-  <h2>🏆 完成品</h2>
-  <div class="photo-reference">
-    <div class="photo-page">写真 P50</div>
-    完成形
-  </div>
+  <h2>🏆 完成</h2>
+  <p>写真 P50</p>
   <div class="note-box">
-    ・配線とバランス調整
+    ・配線がタイヤに当たらない
   </div>
 </section>
 
 </main>
 
 <script>
-(function () {
-  const header = document.querySelector('header');
-  const headings = document.querySelectorAll('section > h2');
-  const notes = document.querySelectorAll('.note-box');
-  const body = document.body;
+/* =====================
+   初心者 / 上級者 切替
+===================== */
+const params = new URLSearchParams(location.search);
+const isAdvanced = params.get("mode") === "advanced";
 
-  if (!header) return;
+if (isAdvanced) {
+  document.body.classList.add("advanced");
+}
 
-  function updateAnchorOffset() {
-    const h = header.getBoundingClientRect().height + 8;
-    document.documentElement.style.scrollPaddingTop = h + 'px';
-    headings.forEach(hd => {
-      hd.style.scrollMarginTop = h + 'px';
-    });
-  }
+/* =====================
+   指導ポイント ON / OFF
+===================== */
+const toggleBtn = document.getElementById("toggle-note");
+let noteVisible = true;
 
-  function setFont(scale) {
-    body.style.fontSize = (16 * scale) + 'px';
-    setTimeout(updateAnchorOffset, 0);
-  }
+toggleBtn?.addEventListener("click", () => {
+  noteVisible = !noteVisible;
+  document.body.classList.toggle("hide-note", !noteVisible);
+});
 
-  document.getElementById('font-s').onclick = () => setFont(0.9);
-  document.getElementById('font-m').onclick = () => setFont(1);
-  document.getElementById('font-l').onclick = () => setFont(1.15);
-
-  document.getElementById('toggle-note').onclick = () => {
-    notes.forEach(n => {
-      n.style.display = n.style.display === 'none' ? '' : 'none';
-    });
-    setTimeout(updateAnchorOffset, 0);
-  };
-
-  window.addEventListener('resize', updateAnchorOffset);
-  updateAnchorOffset();
-})();
+/* =====================
+   文字サイズ（ズレ完全防止）
+===================== */
+function setFont(scale) {
+  document.documentElement.style.setProperty(
+    "--font-base", `${16 * scale}px`
+  );
+  document.documentElement.style.setProperty(
+    "--header-height", `${120 * scale}px`
+  );
+}
 </script>
 
 </body>
