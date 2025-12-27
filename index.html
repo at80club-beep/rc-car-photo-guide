@@ -37,6 +37,7 @@ header small {
 /* ===== ナビ ===== */
 nav {
   display: flex;
+  align-items: center;
   gap: 6px;
   overflow-x: auto;
   padding: 6px 0;
@@ -51,6 +52,20 @@ nav a {
   background: #fffdf4;
   color: #554018;
   white-space: nowrap;
+}
+
+nav .font-label {
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+nav button {
+  border: 1px solid #e0cfa0;
+  background: #fffdf4;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 /* ===== メイン ===== */
@@ -116,6 +131,11 @@ section > h2 {
     <a href="#switch">スイッチ</a>
     <a href="#test">テスト</a>
     <a href="#complete">完成</a>
+
+    <span class="font-label">文字</span>
+    <button id="font-s">小</button>
+    <button id="font-m">中</button>
+    <button id="font-l">大</button>
   </nav>
 </header>
 
@@ -185,10 +205,11 @@ section > h2 {
 </main>
 
 <script>
-/* ===== アンカーずれ防止（安全版） ===== */
+/* ===== アンカーずれ防止 + 文字サイズ切替（安全版） ===== */
 (function () {
   const header = document.querySelector('header');
   const sections = document.querySelectorAll('section');
+  const body = document.body;
 
   if (!header || sections.length === 0) return;
 
@@ -199,6 +220,19 @@ section > h2 {
       sec.style.scrollMarginTop = h + 'px';
     });
   }
+
+  function setFont(scale) {
+    body.style.fontSize = (16 * scale) + 'px';
+    setTimeout(updateAnchorOffset, 0);
+  }
+
+  const fs = document.getElementById('font-s');
+  const fm = document.getElementById('font-m');
+  const fl = document.getElementById('font-l');
+
+  if (fs) fs.onclick = () => setFont(0.9);
+  if (fm) fm.onclick = () => setFont(1);
+  if (fl) fl.onclick = () => setFont(1.15);
 
   window.addEventListener('resize', updateAnchorOffset);
   updateAnchorOffset();
