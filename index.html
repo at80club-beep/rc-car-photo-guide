@@ -7,11 +7,11 @@
 
 <style>
 /* =========================
-   基本変数（ズレ完全防止）
+   基本変数（ズレ防止）
 ========================= */
 :root {
-  --font-base: 18px;        /* 高齢者向け大きめ */
-  --header-height: 150px;  /* 文字サイズ連動 */
+  --font-base: 18px;
+  --header-height: 150px;
   --main-color: #2f6fb1;
 }
 
@@ -40,45 +40,38 @@ header {
 }
 
 header h1 {
-  margin: 0;
+  margin: 0 0 8px;
   font-size: 1.4em;
 }
 
-/* 現在地表示（重要） */
-#current-section {
-  margin-top: 8px;
-  padding: 8px 10px;
-  background: #eef3f8;
-  border-left: 8px solid var(--main-color);
-  font-weight: bold;
-}
-
 /* =========================
-   ナビ
+   ナビ（押し間違いゼロ）
 ========================= */
 nav {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   overflow-x: auto;
-  margin-top: 10px;
+  padding-bottom: 6px;
 }
 
 nav a,
 nav button {
+  min-width: 88px;
+  text-align: center;
   font-size: 1em;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: 3px solid #c8bfa6;
-  background: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 4px solid #9b9380;
+  background: #ffffff;
   color: #222;
   cursor: pointer;
   white-space: nowrap;
 }
 
-/* 現在地（色＋枠＋文字） */
+/* 現在地（色＋太枠） */
 nav a.active {
   background: var(--main-color);
-  color: #fff;
+  color: #ffffff;
   border-color: #163a5f;
   font-weight: bold;
 }
@@ -104,7 +97,7 @@ section {
   padding: 14px;
   margin-bottom: 28px;
 
-  /* ★リンクズレ完全防止 */
+  /* リンクずれ完全防止 */
   scroll-margin-top: var(--header-height);
 }
 
@@ -138,6 +131,38 @@ h2 {
 .hide-note .note-box {
   display: none;
 }
+
+/* =========================
+   印刷対応（高齢者配布用）
+========================= */
+@media print {
+  header, nav, button {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000;
+    font-size: 18px;
+    line-height: 1.9;
+  }
+
+  section {
+    border: 2px solid #000;
+    border-radius: 0;
+    page-break-inside: avoid;
+  }
+
+  h2 {
+    font-size: 22px;
+    border-left: 8px solid #000;
+  }
+
+  .note-box {
+    border: 2px dashed #000;
+    background: #fff;
+  }
+}
 </style>
 </head>
 
@@ -145,9 +170,6 @@ h2 {
 
 <header>
   <h1>リモコンカー 写真参照ガイド</h1>
-
-  <div id="current-section">現在：電池BOX</div>
-
   <nav>
     <a href="#battery">電池BOX</a>
     <a href="#wire">電線</a>
@@ -172,7 +194,7 @@ h2 {
   <p>写真 P25 を見ながら作ります。</p>
   <div class="note-box">
     ・＋と－の向きを必ず確認<br>
-    ・銅テープはしっかり押さえる
+    ・銅テープは強く押さえる
   </div>
 </section>
 
@@ -213,7 +235,7 @@ h2 {
 
 <script>
 /* =========================
-   初心者 / 上級者
+   初心者 / 上級者切替
 ========================= */
 const params = new URLSearchParams(location.search);
 if (params.get("mode") === "advanced") {
@@ -232,36 +254,33 @@ toggleBtn?.addEventListener("click", () => {
 });
 
 /* =========================
-   文字サイズ（ズレ完全防止）
+   文字サイズ（ズレ防止）
 ========================= */
 function setFont(scale) {
-  document.documentElement.style.setProperty("--font-base", `${18 * scale}px`);
-  document.documentElement.style.setProperty("--header-height", `${150 * scale}px`);
+  document.documentElement.style.setProperty(
+    "--font-base", `${18 * scale}px`
+  );
+  document.documentElement.style.setProperty(
+    "--header-height", `${150 * scale}px`
+  );
 }
 
 /* =========================
-   現在地ハイライト（高齢者向け）
+   ナビ現在地ハイライト
 ========================= */
 const navLinks = document.querySelectorAll("nav a");
 const sections = document.querySelectorAll("main section");
-const currentLabel = document.getElementById("current-section");
 
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const id = entry.target.id;
-      const title = entry.target.querySelector("h2")?.innerText;
-
       navLinks.forEach(link => {
         link.classList.toggle(
           "active",
           link.getAttribute("href") === `#${id}`
         );
       });
-
-      if (title) {
-        currentLabel.textContent = "現在：" + title;
-      }
     }
   });
 }, {
