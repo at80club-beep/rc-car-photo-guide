@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>リモコンカー 写真参照ガイド（指導員用）</title>
+<title>リモコンカー作り 写真で確認シート（指導員用）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -10,11 +10,11 @@
    サイズ制御用変数
 ===================== */
 :root{
-  --font-base:16px;
-  --btn-font:16px;
-  --btn-padding:8px 14px;
-  --btn-border:3px;
-  --title-weight:800;
+  --font-base:19px;
+  --btn-font:20px;
+  --btn-padding:12px 18px;
+  --btn-border:5px;
+  --title-weight:900;
 }
 
 /* =====================
@@ -22,7 +22,7 @@
 ===================== */
 body{
   margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
   background:#faf7f2;
   color:#333;
   font-size:var(--font-base);
@@ -46,7 +46,7 @@ header{
   display:flex;
   align-items:center;
   gap:10px;
-  overflow-x:auto;
+  flex-wrap:wrap;
 }
 
 .title{
@@ -73,9 +73,9 @@ header{
 }
 
 .font-controls button{
-  min-width:44px;
-  padding:6px 10px;
-  font-size:14px;
+  min-width:50px;
+  padding:8px 12px;
+  font-size:16px;
   border:2px solid #999;
   background:#fff;
   border-radius:8px;
@@ -93,13 +93,15 @@ header{
 ===================== */
 nav{
   display:flex;
+  flex-wrap:wrap;
   gap:8px;
-  overflow-x:auto;
-  padding:6px 0 4px;
+  padding:8px 0 6px;
 }
 
 nav button{
-  flex:0 0 auto;
+  flex:1 1 auto;
+  min-width:120px;
+  min-height:50px;
   font-size:var(--btn-font);
   padding:var(--btn-padding);
   border:var(--btn-border) solid #a6842c;
@@ -107,6 +109,7 @@ nav button{
   border-radius:12px;
   cursor:pointer;
   font-weight:700;
+  margin-bottom:5px;
 }
 
 nav button.active{
@@ -123,16 +126,18 @@ main{
 }
 
 .section-title{
-  font-size:1.25em;
+  font-size:1.3em;
   font-weight:800;
-  margin-bottom:10px;
+  margin-bottom:12px;
+  padding-bottom:5px;
+  border-bottom:3px solid #f0b344;
 }
 
 .photo-box{
   background:#fff;
   border:4px solid #e0cfa0;
   border-radius:14px;
-  padding:12px;
+  padding:15px;
 }
 
 /* 写真 */
@@ -150,14 +155,26 @@ main{
   transform:scale(0.98);
 }
 
+/* スマホ向けヒント */
+.photo-hint{
+  text-align:center;
+  color:#666;
+  font-size:0.9em;
+  margin:5px 0 15px;
+  padding:8px;
+  background:#f0f0f0;
+  border-radius:8px;
+  border-left:4px solid #f0b344;
+}
+
 /* OKメッセージ */
 .ok-box{
   background:#e8f6e8;
   border:3px solid #4caf50;
   border-radius:10px;
-  padding:10px;
-  margin:10px 0;
-  font-size:1.05em;
+  padding:12px;
+  margin:15px 0;
+  font-size:1.1em;
   font-weight:800;
   text-align:center;
 }
@@ -165,28 +182,95 @@ main{
 /* 補足 */
 .note{
   background:#f5efe4;
-  padding:10px;
+  padding:12px;
   border-radius:8px;
-  font-size:0.95em;
+  font-size:1em;
+  border-left:4px solid #a6842c;
 }
 
 /* =====================
-   写真拡大
+   写真拡大（スマホ最適化）
 ===================== */
 .overlay{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.85);
+  background:rgba(0,0,0,0.95);
   z-index:999;
   align-items:center;
   justify-content:center;
+  touch-action:none;
 }
 
 .overlay img{
   max-width:95%;
   max-height:95%;
   border-radius:12px;
+  transition:transform 0.3s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* 閉じるボタン */
+.close-btn{
+  position:absolute;
+  top:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  background:rgba(0,0,0,0.7);
+  color:white;
+  font-size:40px;
+  line-height:60px;
+  text-align:center;
+  border-radius:50%;
+  z-index:1000;
+  cursor:pointer;
+  border:3px solid white;
+}
+
+/* スマホ縦向きの場合 */
+@media (max-width:768px) and (orientation:portrait){
+  .overlay img{
+    max-width:90vh;
+    max-height:90vw;
+    transform:rotate(90deg);
+    transform-origin:center;
+  }
+  
+  .rotate-hint{
+    position:absolute;
+    top:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.7);
+    color:white;
+    padding:12px 25px;
+    border-radius:25px;
+    font-size:18px;
+    z-index:1000;
+    animation:fadeInOut 4s ease-in-out forwards;
+    text-align:center;
+    line-height:1.4;
+  }
+  
+  @keyframes fadeInOut{
+    0%{ opacity:0; }
+    20%{ opacity:1; }
+    80%{ opacity:1; }
+    100%{ opacity:0; }
+  }
+}
+
+/* タブレット・PC・スマホ横向き */
+@media (min-width:769px), (orientation:landscape){
+  .overlay img{
+    max-width:95%;
+    max-height:95%;
+  }
+  
+  .rotate-hint{
+    display:none;
+  }
 }
 
 /* =====================
@@ -197,19 +281,31 @@ main{
     display:none;
   }
 
-  .photo-img{
+  .photo-img, .photo-hint{
     display:none;
   }
 
   body{
     background:#fff;
-    font-size:12pt;
+    font-size:14pt;
   }
 
   .photo-box{
     border:none;
     padding:0;
   }
+}
+
+/* =====================
+   フッター
+===================== */
+footer{
+  text-align:center;
+  padding:15px;
+  font-size:0.9em;
+  color:#666;
+  border-top:2px solid #e0cfa0;
+  margin-top:20px;
 }
 </style>
 </head>
@@ -219,23 +315,23 @@ main{
 <header>
   <div class="header-row">
     <h1 class="title">
-      リモコンカー 写真参照ガイド
+      リモコンカー作り 写真で確認シート
       <span class="subtitle">（指導員用）</span>
     </h1>
 
     <div class="font-controls">
       <button data-size="small">小</button>
       <button data-size="medium">中</button>
-      <button data-size="large">大</button>
+      <button data-size="large" class="active">大</button>
     </div>
   </div>
 
   <nav id="nav">
     <button data-target="battery" class="active">電池BOX完成</button>
-    <button data-target="wire">電池にくっつく電線</button>
-    <button data-target="switch">前後が切り替わるスイッチ</button>
-    <button data-target="test">モーターが回るテスト</button>
-    <button data-target="complete">完成したリモコンカー</button>
+    <button data-target="wire">電池につける電線</button>
+    <button data-target="switch">前後切り替えスイッチ</button>
+    <button data-target="test">モーターのテスト</button>
+    <button data-target="complete">完成品</button>
   </nav>
 </header>
 
@@ -247,6 +343,10 @@ main{
 
   <div class="photo-box">
     <img id="photo" src="images/battery_box.jpg" alt="電池BOX完成" class="photo-img">
+    
+    <p class="photo-hint">
+      📱スマホの場合は写真をタップすると画面いっぱいに拡大表示されます
+    </p>
 
     <div class="ok-box" id="okMessage">
       ✅ この写真と同じになっていれば OK です
@@ -259,8 +359,14 @@ main{
 
 </main>
 
+<footer>
+  <p>このシートはリモコンカー作りの指導員用です。写真を見比べて確認しましょう。</p>
+</footer>
+
 <!-- 写真拡大 -->
-<div id="overlay" class="overlay" onclick="closePhoto()">
+<div id="overlay" class="overlay">
+  <div class="close-btn" onclick="closePhoto()">×</div>
+  <div class="rotate-hint">画面を横向きにしてご覧ください</div>
   <img id="overlayImg">
 </div>
 
@@ -276,111 +382,8 @@ const sections = {
     note:"電池の＋－向きが合っているかを確認します。"
   },
   wire:{
-    title:"電池にくっつく電線",
+    title:"電池につける電線",
     img:"images/wire_magnet.jpg",
     ok:"この形になっていれば OK です",
     note:"磁石が端子にピタッと付いているか確認します。"
-  },
-  switch:{
-    title:"前後が切り替わるスイッチ",
-    img:"images/switch_complete.jpg",
-    ok:"この配置になっていれば OK です",
-    note:"左右のボタンで動きが変わることを確認します。"
-  },
-  test:{
-    title:"モーターが回るテスト",
-    img:"images/motor_test.jpg",
-    ok:"写真のように回れば OK です",
-    note:"回らない場合は接触を確認します。"
-  },
-  complete:{
-    title:"完成したリモコンカー",
-    img:"images/car_complete.jpg",
-    ok:"この状態なら完成です",
-    note:"配線がタイヤに絡んでいないか確認します。"
-  }
-};
-
-/* =====================
-   工程切替
-===================== */
-const buttons = document.querySelectorAll("nav button");
-buttons.forEach(btn=>{
-  btn.onclick=()=>{
-    buttons.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-
-    const key = btn.dataset.target;
-    document.getElementById("sectionTitle").textContent = sections[key].title;
-    document.getElementById("photo").src = sections[key].img;
-    document.getElementById("photo").alt = sections[key].title;
-    document.getElementById("okMessage").innerHTML = "✅ " + sections[key].ok;
-    document.getElementById("note").innerHTML = sections[key].note;
-  };
-});
-
-/* =====================
-   写真拡大
-===================== */
-const photo = document.getElementById("photo");
-const overlay = document.getElementById("overlay");
-const overlayImg = document.getElementById("overlayImg");
-
-photo.onclick = () => {
-  overlayImg.src = photo.src;
-  overlay.style.display = "flex";
-};
-
-function closePhoto(){
-  overlay.style.display = "none";
-}
-
-/* =====================
-   文字サイズ切替（保存）
-===================== */
-const sizeButtons = document.querySelectorAll(".font-controls button");
-
-function applySize(size){
-  if(size === "small"){
-    document.documentElement.style.setProperty("--font-base","14px");
-    document.documentElement.style.setProperty("--btn-font","14px");
-    document.documentElement.style.setProperty("--btn-padding","6px 10px");
-    document.documentElement.style.setProperty("--btn-border","2px");
-    document.documentElement.style.setProperty("--title-weight","700");
-  }
-  else if(size === "medium"){
-    document.documentElement.style.setProperty("--font-base","16px");
-    document.documentElement.style.setProperty("--btn-font","16px");
-    document.documentElement.style.setProperty("--btn-padding","8px 14px");
-    document.documentElement.style.setProperty("--btn-border","3px");
-    document.documentElement.style.setProperty("--title-weight","800");
-  }
-  else if(size === "large"){
-    document.documentElement.style.setProperty("--font-base","19px");
-    document.documentElement.style.setProperty("--btn-font","20px");
-    document.documentElement.style.setProperty("--btn-padding","12px 18px");
-    document.documentElement.style.setProperty("--btn-border","5px");
-    document.documentElement.style.setProperty("--title-weight","900");
-  }
-  localStorage.setItem("fontSize", size);
-}
-
-// ボタンクリック時の処理
-sizeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    sizeButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    applySize(btn.dataset.size);
-  });
-});
-
-// 起動時の初期化
-const saved = localStorage.getItem("fontSize") || "medium";
-sizeButtons.forEach(b => b.classList.remove("active"));
-document.querySelector(`.font-controls button[data-size="${saved}"]`).classList.add("active");
-applySize(saved);
-
-</script>
-
-</body>
-</html>
+ 
