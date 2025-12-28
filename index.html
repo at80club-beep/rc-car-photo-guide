@@ -6,225 +6,350 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-:root {
-  --font-base: 18px;
-  --nav-font: 18px;
-  --btn-pad: 10px;
-  --btn-border: 3px;
-  --header-h: 140px;
+/* =====================
+   サイズ制御用変数
+===================== */
+:root{
+  --font-base:16px;
+  --btn-font:16px;
+  --btn-padding:10px 16px;
+  --btn-border:3px;
 }
 
-/* ===== 基本 ===== */
-body {
-  margin: 0;
+/* =====================
+   共通
+===================== */
+body{
+  margin:0;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: var(--font-base);
-  line-height: 1.7;
-  background: #faf7f2;
-  color: #333;
+  background:#faf7f2;
+  color:#333;
+  font-size:var(--font-base);
+  line-height:1.7;
 }
 
-/* ===== ヘッダー ===== */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #fff7dd;
-  border-bottom: 4px solid #e0cfa0;
-  padding: 10px;
+/* =====================
+   ヘッダー
+===================== */
+header{
+  position:sticky;
+  top:0;
+  background:#fff7dd;
+  border-bottom:4px solid #e0cfa0;
+  padding:8px 10px;
+  z-index:100;
 }
 
-h1 {
-  margin: 0 0 8px;
-  font-size: 24px;
+h1{
+  font-size:1.3em;
+  margin:0 0 6px;
 }
 
-/* ===== 文字サイズボタン ===== */
-.font-controls {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
+/* =====================
+   ナビ（工程ボタン）
+===================== */
+nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:6px;
 }
 
-.font-btn {
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 2px solid #999;
-  background: #fff;
-  cursor: pointer;
-  font-weight: bold;
+nav button{
+  flex:0 0 auto;
+  font-size:var(--btn-font);
+  padding:var(--btn-padding);
+  border:var(--btn-border) solid #a6842c;
+  background:#fff;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:600;
 }
 
-.font-btn.active {
-  background: #333;
-  color: #fff;
+nav button.active{
+  background:#f0b344;
+  color:#000;
+  border-color:#000;
 }
 
-/* ===== ナビ（縦1列） ===== */
-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* =====================
+   文字サイズ切替
+===================== */
+.font-controls{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
 }
 
-nav a {
-  text-decoration: none;
-  font-size: var(--nav-font);
-  padding: var(--btn-pad);
-  border: var(--btn-border) solid #333;
-  border-radius: 10px;
-  background: #fff;
-  color: #000;
-  font-weight: bold;
+.font-controls button{
+  padding:6px 10px;
+  font-size:14px;
+  border:2px solid #999;
+  background:#fff;
+  border-radius:8px;
+  cursor:pointer;
 }
 
-nav a.active {
-  background: #333;
-  color: #fff;
+.font-controls button.active{
+  background:#333;
+  color:#fff;
+  border-color:#000;
 }
 
-/* ===== メイン ===== */
-main {
-  padding: 12px;
+/* =====================
+   メイン
+===================== */
+main{
+  padding:12px;
 }
 
-section {
-  background: #fff;
-  border: 2px solid #e0d7c2;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 16px;
-  scroll-margin-top: var(--header-h);
+.section-title{
+  font-size:1.25em;
+  font-weight:800;
+  margin-bottom:10px;
 }
 
-h2 {
-  margin-top: 0;
-  font-size: 22px;
+.photo-box{
+  background:#fff;
+  border:4px solid #e0cfa0;
+  border-radius:14px;
+  padding:12px;
 }
 
-/* ===== 写真枠 ===== */
-.photo {
-  border: 3px solid #f0b344;
-  padding: 10px;
-  margin: 10px 0;
-  font-weight: bold;
-  font-size: 20px;
+/* 写真 */
+.photo-img{
+  width:100%;
+  max-width:640px;
+  display:block;
+  margin:0 auto 10px;
+  border-radius:12px;
+  border:4px solid #e0cfa0;
+  cursor:pointer;
 }
 
-/* ===== 指導ポイント ===== */
-.note {
-  background: #f5efe4;
-  padding: 10px;
-  border-left: 6px solid #999;
+.photo-img:active{
+  transform:scale(0.98);
+}
+
+/* OKメッセージ */
+.ok-box{
+  background:#e8f6e8;
+  border:3px solid #4caf50;
+  border-radius:10px;
+  padding:10px;
+  margin:10px 0;
+  font-size:1.05em;
+  font-weight:800;
+  text-align:center;
+}
+
+/* 補足 */
+.note{
+  background:#f5efe4;
+  padding:10px;
+  border-radius:8px;
+  font-size:0.95em;
+}
+
+/* =====================
+   写真拡大
+===================== */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+}
+
+.overlay img{
+  max-width:95%;
+  max-height:95%;
+  border-radius:12px;
+}
+
+/* =====================
+   印刷対応
+===================== */
+@media print{
+  header{
+    display:none;
+  }
+
+  .photo-img{
+    display:none;
+  }
+
+  body{
+    background:#fff;
+    font-size:12pt;
+  }
+
+  .photo-box{
+    border:none;
+    padding:0;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header id="header">
+<header>
   <h1>リモコンカー 写真参照ガイド（指導員用）</h1>
 
-  <div class="font-controls">
-    <button class="font-btn" onclick="setFont('small')">小</button>
-    <button class="font-btn active" onclick="setFont('medium')">中</button>
-    <button class="font-btn" onclick="setFont('large')">大</button>
-  </div>
-
-  <nav>
-    <a href="#battery">📦 電池BOX</a>
-    <a href="#wire">🔌 電線</a>
-    <a href="#switch">🎮 スイッチ</a>
-    <a href="#test">🔬 テスト</a>
-    <a href="#complete">🏆 完成</a>
+  <nav id="nav">
+    <button data-target="battery" class="active">電池BOX完成</button>
+    <button data-target="wire">電池にくっつく電線</button>
+    <button data-target="switch">前後が切り替わるスイッチ</button>
+    <button data-target="test">モーターが回るテスト</button>
+    <button data-target="complete">完成したリモコンカー</button>
   </nav>
+
+  <div class="font-controls">
+    <button data-size="small">小</button>
+    <button data-size="medium" class="active">中</button>
+    <button data-size="large">大</button>
+  </div>
 </header>
 
 <main>
 
-<section id="battery">
-  <h2>📦 電池BOX</h2>
-  <div class="photo">写真 P25</div>
-  <div class="note">
-    ・＋－の向き確認<br>
-    ・銅テープを押す
+  <div class="section-title" id="sectionTitle">
+    電池BOX完成
   </div>
-</section>
 
-<section id="wire">
-  <h2>🔌 電線</h2>
-  <div class="photo">写真 P30</div>
-  <div class="note">
-    ・磁石は直接<br>
-    ・外れていない？
+  <div class="photo-box">
+    <img id="photo" src="images/battery_box.jpg" alt="電池BOX完成" class="photo-img">
+
+    <div class="ok-box" id="okMessage">
+      ✅ この写真と同じになっていれば OK です
+    </div>
+
+    <div class="note" id="note">
+      電池の＋－向きが合っているかを確認します。
+    </div>
   </div>
-</section>
-
-<section id="switch">
-  <h2>🎮 スイッチ</h2>
-  <div class="photo">写真 P62 / P72</div>
-  <div class="note">
-    ・押すとどこがつながる？
-  </div>
-</section>
-
-<section id="test">
-  <h2>🔬 テスト</h2>
-  <div class="photo">写真 P81</div>
-  <div class="note">
-    ・回転方向を確認
-  </div>
-</section>
-
-<section id="complete">
-  <h2>🏆 完成</h2>
-  <div class="photo">写真 P50</div>
-</section>
 
 </main>
 
+<!-- 写真拡大 -->
+<div id="overlay" class="overlay" onclick="closePhoto()">
+  <img id="overlayImg">
+</div>
+
 <script>
-const root = document.documentElement;
-const buttons = document.querySelectorAll(".font-btn");
-
-function setFont(mode) {
-  buttons.forEach(b => b.classList.remove("active"));
-  event.target.classList.add("active");
-
-  if (mode === "small") {
-    root.style.setProperty("--font-base", "15px");
-    root.style.setProperty("--nav-font", "16px");
-    root.style.setProperty("--btn-pad", "6px");
-    root.style.setProperty("--btn-border", "2px");
+/* =====================
+   工程データ
+===================== */
+const sections = {
+  battery:{
+    title:"電池BOX完成",
+    img:"images/battery_box.jpg",
+    ok:"この写真と同じになっていれば OK です",
+    note:"電池の＋－向きが合っているかを確認します。"
+  },
+  wire:{
+    title:"電池にくっつく電線",
+    img:"images/wire_magnet.jpg",
+    ok:"この形になっていれば OK です",
+    note:"磁石が端子にピタッと付いているか確認します。"
+  },
+  switch:{
+    title:"前後が切り替わるスイッチ",
+    img:"images/switch_complete.jpg",
+    ok:"この配置になっていれば OK です",
+    note:"左右のボタンで動きが変わることを確認します。"
+  },
+  test:{
+    title:"モーターが回るテスト",
+    img:"images/motor_test.jpg",
+    ok:"写真のように回れば OK です",
+    note:"回らない場合は接触を確認します。"
+  },
+  complete:{
+    title:"完成したリモコンカー",
+    img:"images/car_complete.jpg",
+    ok:"この状態なら完成です",
+    note:"配線がタイヤに絡んでいないか確認します。"
   }
+};
 
-  if (mode === "medium") {
-    root.style.setProperty("--font-base", "18px");
-    root.style.setProperty("--nav-font", "18px");
-    root.style.setProperty("--btn-pad", "10px");
-    root.style.setProperty("--btn-border", "3px");
-  }
+/* =====================
+   工程切替
+===================== */
+const buttons = document.querySelectorAll("nav button");
+buttons.forEach(btn=>{
+  btn.onclick=()=>{
+    buttons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
 
-  if (mode === "large") {
-    root.style.setProperty("--font-base", "22px");
-    root.style.setProperty("--nav-font", "22px");
-    root.style.setProperty("--btn-pad", "14px");
-    root.style.setProperty("--btn-border", "5px");
-  }
+    const key = btn.dataset.target;
+    document.getElementById("sectionTitle").textContent = sections[key].title;
+    document.getElementById("photo").src = sections[key].img;
+    document.getElementById("photo").alt = sections[key].title;
+    document.getElementById("okMessage").innerHTML = "✅ " + sections[key].ok;
+    document.getElementById("note").innerHTML = sections[key].note;
+  };
+});
 
-  localStorage.setItem("fontMode", mode);
+/* =====================
+   写真拡大
+===================== */
+const photo = document.getElementById("photo");
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+
+photo.onclick = () => {
+  overlayImg.src = photo.src;
+  overlay.style.display = "flex";
+};
+
+function closePhoto(){
+  overlay.style.display = "none";
 }
 
-/* 初期化 */
-window.addEventListener("DOMContentLoaded", () => {
-  const saved = localStorage.getItem("fontMode") || "medium";
-  document.querySelector(`.font-btn:nth-child(${saved==="small"?1:saved==="medium"?2:3})`).click();
+/* =====================
+   文字サイズ切替（保存）
+===================== */
+const sizeButtons = document.querySelectorAll(".font-controls button");
 
-  const header = document.getElementById("header");
-  root.style.setProperty("--header-h", header.offsetHeight + "px");
+function applySize(size){
+  if(size==="small"){
+    document.documentElement.style.setProperty("--font-base","14px");
+    document.documentElement.style.setProperty("--btn-font","14px");
+    document.documentElement.style.setProperty("--btn-padding","6px 10px");
+    document.documentElement.style.setProperty("--btn-border","2px");
+  }
+  if(size==="medium"){
+    document.documentElement.style.setProperty("--font-base","16px");
+    document.documentElement.style.setProperty("--btn-font","16px");
+    document.documentElement.style.setProperty("--btn-padding","10px 16px");
+    document.documentElement.style.setProperty("--btn-border","3px");
+  }
+  if(size==="large"){
+    document.documentElement.style.setProperty("--font-base","19px");
+    document.documentElement.style.setProperty("--btn-font","20px");
+    document.documentElement.style.setProperty("--btn-padding","14px 20px");
+    document.documentElement.style.setProperty("--btn-border","5px");
+  }
+  localStorage.setItem("fontSize",size);
+}
+
+sizeButtons.forEach(btn=>{
+  btn.onclick=()=>{
+    sizeButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    applySize(btn.dataset.size);
+  };
 });
+
+const saved = localStorage.getItem("fontSize") || "medium";
+applySize(saved);
+document.querySelector(`.font-controls button[data-size="${saved}"]`).classList.add("active");
 </script>
 
 </body>
 </html>
-
