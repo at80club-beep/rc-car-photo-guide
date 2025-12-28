@@ -370,7 +370,6 @@ footer{
   <img id="overlayImg">
 </div>
 
-<script>
 /* =====================
    工程データ
 ===================== */
@@ -386,4 +385,65 @@ const sections = {
     img:"images/wire_magnet.jpg",
     ok:"この形になっていれば OK です",
     note:"磁石が端子にピタッと付いているか確認します。"
+  },
+  switch:{
+    title:"前後切り替えスイッチ",
+    img:"images/switch_complete.jpg",
+    ok:"スイッチがしっかり固定されていれば OK です",
+    note:"左右に倒して切り替わるか確認します。"
+  },
+  test:{
+    title:"モーターのテスト",
+    img:"images/motor_test.jpg",
+    ok:"モーターが回れば OK です",
+    note:"回らない場合は電池と配線を確認します。"
+  },
+  complete:{
+    title:"完成品",
+    img:"images/car_complete.jpg",
+    ok:"完成です！",
+    note:"安全に気をつけて走らせましょう。"
+  }
+};
+
+/* =====================
+   ナビ操作
+===================== */
+const navButtons = document.querySelectorAll("#nav button");
+const photo = document.getElementById("photo");
+const sectionTitle = document.getElementById("sectionTitle");
+const okMessage = document.getElementById("okMessage");
+const note = document.getElementById("note");
+
+navButtons.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    navButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const key = btn.dataset.target;
+    const data = sections[key];
+
+    sectionTitle.textContent = data.title;
+    photo.src = data.img;
+    photo.alt = data.title;
+    okMessage.textContent = "✅ " + data.ok;
+    note.textContent = data.note;
+  });
+});
+
+/* =====================
+   写真拡大
+===================== */
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+
+photo.addEventListener("click",()=>{
+  overlay.style.display = "flex";
+  overlayImg.src = photo.src;
+});
+
+function closePhoto(){
+  overlay.style.display = "none";
+}
+</script>
  
