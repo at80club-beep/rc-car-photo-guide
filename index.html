@@ -225,7 +225,7 @@ main{
 
     <div class="font-controls">
       <button data-size="small">小</button>
-      <button data-size="medium" class="active">中</button>
+      <button data-size="medium">中</button>
       <button data-size="large">大</button>
     </div>
   </div>
@@ -341,41 +341,45 @@ function closePhoto(){
 const sizeButtons = document.querySelectorAll(".font-controls button");
 
 function applySize(size){
-  if(size==="small"){
+  if(size === "small"){
     document.documentElement.style.setProperty("--font-base","14px");
     document.documentElement.style.setProperty("--btn-font","14px");
     document.documentElement.style.setProperty("--btn-padding","6px 10px");
     document.documentElement.style.setProperty("--btn-border","2px");
     document.documentElement.style.setProperty("--title-weight","700");
   }
-  if(size==="medium"){
+  else if(size === "medium"){
     document.documentElement.style.setProperty("--font-base","16px");
     document.documentElement.style.setProperty("--btn-font","16px");
     document.documentElement.style.setProperty("--btn-padding","8px 14px");
     document.documentElement.style.setProperty("--btn-border","3px");
     document.documentElement.style.setProperty("--title-weight","800");
   }
-  if(size==="large"){
+  else if(size === "large"){
     document.documentElement.style.setProperty("--font-base","19px");
     document.documentElement.style.setProperty("--btn-font","20px");
     document.documentElement.style.setProperty("--btn-padding","12px 18px");
     document.documentElement.style.setProperty("--btn-border","5px");
     document.documentElement.style.setProperty("--title-weight","900");
   }
-  localStorage.setItem("fontSize",size);
+  localStorage.setItem("fontSize", size);
 }
 
-sizeButtons.forEach(btn=>{
-  btn.onclick=()=>{
-    sizeButtons.forEach(b=>b.classList.remove("active"));
+// ボタンクリック時の処理
+sizeButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    sizeButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     applySize(btn.dataset.size);
-  };
+  });
 });
 
+// 起動時の初期化
 const saved = localStorage.getItem("fontSize") || "medium";
-applySize(saved);
+sizeButtons.forEach(b => b.classList.remove("active"));
 document.querySelector(`.font-controls button[data-size="${saved}"]`).classList.add("active");
+applySize(saved);
+
 </script>
 
 </body>
