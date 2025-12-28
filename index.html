@@ -10,7 +10,7 @@
    サイズ制御用変数
 ===================== */
 :root{
-  --font-base:19px;
+  --font-base:20px;
   --btn-font:20px;
   --btn-padding:12px 18px;
   --btn-border:5px;
@@ -370,6 +370,7 @@ footer{
   <img id="overlayImg">
 </div>
 
+<script>
 /* =====================
    工程データ
 ===================== */
@@ -389,61 +390,164 @@ const sections = {
   switch:{
     title:"前後切り替えスイッチ",
     img:"images/switch_complete.jpg",
-    ok:"スイッチがしっかり固定されていれば OK です",
-    note:"左右に倒して切り替わるか確認します。"
+    ok:"この配置になっていれば OK です",
+    note:"左右のボタンで動きが変わることを確認します。"
   },
   test:{
     title:"モーターのテスト",
     img:"images/motor_test.jpg",
-    ok:"モーターが回れば OK です",
-    note:"回らない場合は電池と配線を確認します。"
+    ok:"写真のように回れば OK です",
+    note:"回らない場合は接触を確認します。"
   },
   complete:{
     title:"完成品",
     img:"images/car_complete.jpg",
-    ok:"完成です！",
-    note:"安全に気をつけて走らせましょう。"
+    ok:"この状態なら完成です",
+    note:"配線がタイヤに絡んでいないか確認します。"
   }
 };
 
 /* =====================
-   ナビ操作
+   工程切替
 ===================== */
-const navButtons = document.querySelectorAll("#nav button");
-const photo = document.getElementById("photo");
-const sectionTitle = document.getElementById("sectionTitle");
-const okMessage = document.getElementById("okMessage");
-const note = document.getElementById("note");
-
-navButtons.forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    navButtons.forEach(b=>b.classList.remove("active"));
+const buttons = document.querySelectorAll("nav button");
+buttons.forEach(btn => {
+  btn.onclick = () => {
+    buttons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
     const key = btn.dataset.target;
-    const data = sections[key];
-
-    sectionTitle.textContent = data.title;
-    photo.src = data.img;
-    photo.alt = data.title;
-    okMessage.textContent = "✅ " + data.ok;
-    note.textContent = data.note;
-  });
+    document.getElementById("sectionTitle").textContent = sections[key].title;
+    document.getElementById("photo").src = sections[key].img;
+    document.getElementById("photo").alt = sections[key].title;
+    document.getElementById("okMessage").innerHTML = "✅ " + sections[key].ok;
+    document.getElementById("note").innerHTML = sections[key].note;
+    
+    // ボタンにフォーカスを当てる（スクリーンリーダー用）
+    btn.focus();
+  };
 });
 
 /* =====================
-   写真拡大
+   写真拡大（スマホ最適化）
 ===================== */
+const photo = document.getElementById("photo");
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
+let currentScale = 1;
 
-photo.addEventListener("click",()=>{
-  overlay.style.display = "flex";
+// 写真クリックで拡大
+photo.onclick = () => {
   overlayImg.src = photo.src;
+  overlay.style.display = "flex";
+  
+  // スクロール禁止
+  document.body.style.overflow = "hidden";
+  
+  // スマホの場合、拡大画像をリセット
+  currentScale = 1;
+  updateImageTransform();
+};
+
+// 拡大画像を閉じる
+function closePhoto() {
+  overlay.style.display = "none";
+  document.body.style.overflow = "auto";
+  
+  // 画像の状態をリセット
+  currentScale = 1;
+  updateImageTransform();
+}
+
+// オーバーレイクリックで閉じる（閉じるボタン以外の部分）
+overlay.onclick = (e) => {
+  if (e.target === overlay || e.target.classList.contains('rotate-hint')) {
+    closePhoto();
+  }
+};
+
+// 画像の変形を更新
+function updateImageTransform() {
+  if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+    // スマホ縦向き
+    overlayImg.style.transform = `rotate(90deg) scale(${currentScale})`;
+  } else {
+    // その他（PC、タブレット、スマホ横向き）
+    overlayImg.style.transform = `scale(${currentScale})`;
+  }
+}
+
+// ダブルタップでズームイン/アウト
+overlayImg.ondblclick = (e) => {
+  e.stopPropagation();
+  currentScale = currentScale === 1 ? 1.5 : 1;
+  updateImageTransform();
+};
+
+// スマホの回転イベントに対応
+window.addEventListener("orientationchange", function() {
+  // 回転後に調整
+  setTimeout(() => {
+    if (overlay.style.display === "flex") {
+      updateImageTransform();
+    }
+  }, 300);
 });
 
-function closePhoto(){
-  overlay.style.display = "none";
+// ESCキーでも閉じられるように
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && overlay.style.display === "flex") {
+    closePhoto();
+  }
+});
+
+/* =====================
+   文字サイズ切替（保存）
+===================== */
+const sizeButtons = document.querySelectorAll(".font-controls button");
+
+function applySize(size) {
+  // ボタンのアクティブ状態
+  sizeButtons.forEach(b => b.classList.remove("active"));
+  
+  // CSS変数の設定
+  if (size === "small") {
+    document.documentElement.style.setProperty("--font-base", "16px");
+    document.documentElement.style.setProperty("--btn-font", "16px");
+    document.documentElement.style.setProperty("--btn-padding", "8px 14px");
+    document.documentElement.style.setProperty("--btn-border", "3px");
+    document.documentElement.style.setProperty("--title-weight", "700");
+  } else if (size === "medium") {
+    document.documentElement.style.setProperty("--font-base", "18px");
+    document.documentElement.style.setProperty("--btn-font", "18px");
+    document.documentElement.style.setProperty("--btn-padding", "10px 16px");
+    document.documentElement.style.setProperty("--btn-border", "4px");
+    document.documentElement.style.setProperty("--title-weight", "800");
+  } else if (size === "large") {
+    document.documentElement.style.setProperty("--font-base", "20px");
+    document.documentElement.style.setProperty("--btn-font", "20px");
+    document.documentElement.style.setProperty("--btn-padding", "12px 18px");
+    document.documentElement.style.setProperty("--btn-border", "5px");
+    document.documentElement.style.setProperty("--title-weight", "900");
+  }
+  
+  // 保存
+  localStorage.setItem("fontSize", size);
+  
+  // アクティブボタンを設定
+  document.querySelector(`.font-controls button[data-size="${size}"]`).classList.add("active");
 }
+
+sizeButtons.forEach(btn => {
+  btn.onclick = () => {
+    applySize(btn.dataset.size);
+  };
+});
+
+// 保存された設定を適用（デフォルトは「大」）
+const saved = localStorage.getItem("fontSize") || "large";
+applySize(saved);
 </script>
- 
+
+</body>
+</html>
