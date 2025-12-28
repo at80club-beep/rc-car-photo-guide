@@ -138,21 +138,49 @@ main{
   border:4px solid #e0cfa0;
   border-radius:14px;
   padding:15px;
+  text-align:center;
 }
 
-/* 写真 */
+/* 写真コンテナ */
+.photo-container{
+  position:relative;
+  max-width:640px;
+  margin:0 auto 15px;
+}
+
 .photo-img{
   width:100%;
-  max-width:640px;
+  height:auto;
   display:block;
-  margin:0 auto 10px;
   border-radius:12px;
   border:4px solid #e0cfa0;
   cursor:pointer;
+  background:#f5f5f5;
 }
 
 .photo-img:active{
   transform:scale(0.98);
+}
+
+/* 画像がない場合のプレースホルダー */
+.photo-placeholder{
+  width:100%;
+  height:300px;
+  background:#f5f5f5;
+  border-radius:12px;
+  border:4px dashed #e0cfa0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#666;
+  font-size:1.1em;
+}
+
+.photo-placeholder i{
+  font-size:3em;
+  margin-bottom:15px;
+  color:#a6842c;
 }
 
 /* スマホ向けヒント */
@@ -307,6 +335,25 @@ footer{
   border-top:2px solid #e0cfa0;
   margin-top:20px;
 }
+
+/* 画像エラースタイル */
+.img-error{
+  position:relative;
+}
+
+.img-error::after{
+  content:"画像が見つかりません";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  color:#ff6b6b;
+  font-weight:bold;
+  text-align:center;
+  padding:10px;
+  background:rgba(255,255,255,0.9);
+  border-radius:8px;
+}
 </style>
 </head>
 
@@ -336,13 +383,15 @@ footer{
 </header>
 
 <main>
-
   <div class="section-title" id="sectionTitle">
     電池BOX完成
   </div>
 
   <div class="photo-box">
-    <img id="photo" src="images/battery_box.jpg" alt="電池BOX完成" class="photo-img">
+    <div class="photo-container">
+      <img id="photo" src="images/battery_box.jpg" alt="電池BOX完成" class="photo-img" 
+           onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"480\" viewBox=\"0 0 640 480\"><rect width=\"640\" height=\"480\" fill=\"%23f5f5f5\"/><text x=\"320\" y=\"240\" font-family=\"Arial\" font-size=\"24\" fill=\"%23666\" text-anchor=\"middle\">画像を準備中</text></svg>'; this.classList.add(\"img-error\");">
+    </div>
     
     <p class="photo-hint">
       📱スマホの場合は写真をタップすると画面いっぱいに拡大表示されます
@@ -356,7 +405,6 @@ footer{
       電池の＋－向きが合っているかを確認します。
     </div>
   </div>
-
 </main>
 
 <footer>
@@ -367,7 +415,7 @@ footer{
 <div id="overlay" class="overlay">
   <div class="close-btn" onclick="closePhoto()">×</div>
   <div class="rotate-hint">画面を横向きにしてご覧ください</div>
-  <img id="overlayImg">
+  <img id="overlayImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"480\" viewBox=\"0 0 640 480\"><rect width=\"640\" height=\"480\" fill=\"%23f5f5f5\"/><text x=\"320\" y=\"240\" font-family=\"Arial\" font-size=\"24\" fill=\"%23666\" text-anchor=\"middle\">拡大画像を読み込めません</text></svg>';">
 </div>
 
 <script>
@@ -411,17 +459,35 @@ const sections = {
    工程切替
 ===================== */
 const buttons = document.querySelectorAll("nav button");
+const photo = document.getElementById("photo");
+
 buttons.forEach(btn => {
   btn.onclick = () => {
     buttons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
     const key = btn.dataset.target;
-    document.getElementById("sectionTitle").textContent = sections[key].title;
-    document.getElementById("photo").src = sections[key].img;
-    document.getElementById("photo").alt = sections[key].title;
-    document.getElementById("okMessage").innerHTML = "✅ " + sections[key].ok;
-    document.getElementById("note").innerHTML = sections[key].note;
+    const section = sections[key];
+    
+    document.getElementById("sectionTitle").textContent = section.title;
+    
+    // 画像が読み込めない場合のフォールバック用
+    const testImage = new Image();
+    testImage.onload = function() {
+      photo.src = section.img;
+      photo.alt = section.title;
+      photo.classList.remove("img-error");
+    };
+    testImage.onerror = function() {
+      // 画像が見つからない場合はプレースホルダーを表示
+      photo.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="%23f5f5f5"/><text x="320" y="240" font-family="Arial" font-size="24" fill="%23666" text-anchor="middle">${section.title}</text></svg>`;
+      photo.alt = `${section.title}（画像準備中）`;
+      photo.classList.add("img-error");
+    };
+    testImage.src = section.img;
+    
+    document.getElementById("okMessage").innerHTML = "✅ " + section.ok;
+    document.getElementById("note").innerHTML = section.note;
     
     // ボタンにフォーカスを当てる（スクリーンリーダー用）
     btn.focus();
@@ -431,13 +497,13 @@ buttons.forEach(btn => {
 /* =====================
    写真拡大（スマホ最適化）
 ===================== */
-const photo = document.getElementById("photo");
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
 let currentScale = 1;
 
 // 写真クリックで拡大
 photo.onclick = () => {
+  // 現在表示されている画像を拡大表示
   overlayImg.src = photo.src;
   overlay.style.display = "flex";
   
@@ -456,7 +522,7 @@ function closePhoto() {
   
   // 画像の状態をリセット
   currentScale = 1;
-  updateImageTransform();
+  overlayImg.style.transform = "";
 }
 
 // オーバーレイクリックで閉じる（閉じるボタン以外の部分）
@@ -535,7 +601,10 @@ function applySize(size) {
   localStorage.setItem("fontSize", size);
   
   // アクティブボタンを設定
-  document.querySelector(`.font-controls button[data-size="${size}"]`).classList.add("active");
+  const activeBtn = document.querySelector(`.font-controls button[data-size="${size}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add("active");
+  }
 }
 
 sizeButtons.forEach(btn => {
@@ -547,6 +616,28 @@ sizeButtons.forEach(btn => {
 // 保存された設定を適用（デフォルトは「大」）
 const saved = localStorage.getItem("fontSize") || "large";
 applySize(saved);
+
+/* =====================
+   画像の事前読み込み
+===================== */
+window.addEventListener('load', function() {
+  // 全ての画像を事前読み込み
+  Object.values(sections).forEach(section => {
+    const img = new Image();
+    img.src = section.img;
+  });
+  
+  // 初期画像の読み込み状態を確認
+  const initialImage = new Image();
+  initialImage.onload = function() {
+    console.log('初期画像が正常に読み込まれました');
+  };
+  initialImage.onerror = function() {
+    console.warn('初期画像が見つかりません。画像パスを確認してください。');
+    console.log('期待されるパス:', sections.battery.img);
+  };
+  initialImage.src = sections.battery.img;
+});
 </script>
 
 </body>
