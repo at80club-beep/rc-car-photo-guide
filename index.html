@@ -177,7 +177,9 @@ main{
   cursor:pointer;
   background:#f9f9f9;
   margin:0 auto;
-  touch-action:none;
+  touch-action:pan-y;
+  -webkit-user-drag:none;
+  user-drag:none;
 }
 
 .photo-img:active{
@@ -259,7 +261,7 @@ main{
   max-height:100%;
   transform-origin:center center;
   transition:transform 0.1s ease;
-  cursor:grab;
+  cursor:move;
   user-select:none;
   -webkit-user-drag:none;
   -webkit-touch-callout:none;
@@ -540,7 +542,7 @@ buttons.forEach(btn => {
 });
 
 /* =====================
-   写真拡大 - スマホズーム問題修正版
+   写真拡大 - 修正版（ドラッグ操作の方向問題解決）
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
@@ -616,7 +618,7 @@ function resetZoomAndPosition() {
 function updateTransform() {
   let transform;
   if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-    // スマホ縦向き
+    // スマホ縦向き - 回転を考慮した移動
     transform = `rotate(90deg) translate(${posX}px, ${posY}px) scale(${scale})`;
   } else {
     // その他
@@ -732,13 +734,27 @@ function getMidpoint(touch1, touch2) {
 }
 
 /* =====================
-   タッチイベント（スマホ用）
+   タッチイベント（スマホ用）- 修正版
 ===================== */
 let initialTouches = [];
 let touchStartTime = 0;
 let touchStartX = 0;
 let touchStartY = 0;
 
+// 初期画面の写真はドラッグさせないようにする
+photo.addEventListener('touchstart', function(e) {
+  // 拡大前の写真はドラッグさせない
+  // タッチイベントの伝播を止める
+  e.stopPropagation();
+}, { passive: true });
+
+photo.addEventListener('touchmove', function(e) {
+  // 拡大前の写真はドラッグさせない
+  e.preventDefault();
+  e.stopPropagation();
+}, { passive: false });
+
+// 拡大写真のタッチイベント
 overlayImg.addEventListener('touchstart', function(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -750,8 +766,17 @@ overlayImg.addEventListener('touchstart', function(e) {
     // 1本指でのタッチ開始（ドラッグ開始）
     isDragging = true;
     const touch = e.touches[0];
-    startX = touch.clientX - posX;
-    startY = touch.clientY - posY;
+    
+    // スマホ縦向きの場合は座標変換を考慮
+    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+      // 縦向きの場合、座標系が回転しているので調整
+      startX = touch.clientY - posX;  // XとYを入れ替え
+      startY = touch.clientX - posY;  // XとYを入れ替え、符号調整
+    } else {
+      // 通常の場合
+      startX = touch.clientX - posX;
+      startY = touch.clientY - posY;
+    }
     
     // シングルタップ判定のためのタイマーをセット
     touchStartTime = Date.now();
@@ -765,8 +790,15 @@ overlayImg.addEventListener('touchstart', function(e) {
     
     // ピンチの中心点を保存
     const midpoint = getMidpoint(e.touches[0], e.touches[1]);
-    startX = midpoint.x - posX;
-    startY = midpoint.y - posY;
+    
+    // スマホ縦向きの場合は座標変換を考慮
+    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+      startX = midpoint.y - posX;  // XとYを入れ替え
+      startY = midpoint.x - posY;  // XとYを入れ替え
+    } else {
+      startX = midpoint.x - posX;
+      startY = midpoint.y - posY;
+    }
   }
 }, { passive: false });
 
@@ -777,8 +809,54 @@ overlayImg.addEventListener('touchmove', function(e) {
   if (e.touches.length === 1 && isDragging) {
     // 1本指での移動（ドラッグ）
     const touch = e.touches[0];
-    posX = touch.clientX - startX;
-    posY = touch.clientY - startY;
+    
+    // スマホ縦向きの場合は座標変換
+    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+      // 縦向きの場合：回転を考慮した座標変換
+      // タッチのX移動 → 画像のY移動（符号反転）
+      // タッチのY移動 → 画像のX移動
+      const newPosX = touch.clientY - startX;
+      const newPosY = -(touch.clientX - startY);  // 符号反転
+      
+      // 移動範囲を制限（ズーム時のみ）
+      if (scale > 1) {
+        const imgWidth = overlayImg.naturalWidth * scale;
+        const imgHeight = overlayImg.naturalHeight * scale;
+        const containerWidth = window.innerWidth;
+        const containerHeight = window.innerHeight;
+        
+        const maxX = Math.max(0, (imgWidth - containerHeight) / 2);  // 回転しているのでWidthとHeightを入れ替え
+        const maxY = Math.max(0, (imgHeight - containerWidth) / 2);  // 回転しているのでWidthとHeightを入れ替え
+        
+        posX = Math.max(Math.min(newPosX, maxX), -maxX);
+        posY = Math.max(Math.min(newPosY, maxY), -maxY);
+      } else {
+        posX = newPosX;
+        posY = newPosY;
+      }
+    } else {
+      // 通常の場合
+      const newPosX = touch.clientX - startX;
+      const newPosY = touch.clientY - startY;
+      
+      // 移動範囲を制限（ズーム時のみ）
+      if (scale > 1) {
+        const imgWidth = overlayImg.naturalWidth * scale;
+        const imgHeight = overlayImg.naturalHeight * scale;
+        const containerWidth = window.innerWidth;
+        const containerHeight = window.innerHeight;
+        
+        const maxX = Math.max(0, (imgWidth - containerWidth) / 2);
+        const maxY = Math.max(0, (imgHeight - containerHeight) / 2);
+        
+        posX = Math.max(Math.min(newPosX, maxX), -maxX);
+        posY = Math.max(Math.min(newPosY, maxY), -maxY);
+      } else {
+        posX = newPosX;
+        posY = newPosY;
+      }
+    }
+    
     updateTransform();
   } else if (e.touches.length === 2 && isPinching) {
     // 2本指での移動（ピンチズーム）
@@ -792,8 +870,16 @@ overlayImg.addEventListener('touchmove', function(e) {
     const midpoint = getMidpoint(e.touches[0], e.touches[1]);
     
     // 拡大中心を調整
-    posX = midpoint.x - startX;
-    posY = midpoint.y - startY;
+    const scaleChange = scale / (scale / (currentDistance / startDistance));
+    
+    // スマホ縦向きの場合は座標変換
+    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+      posX = midpoint.y - startX;
+      posY = midpoint.x - startY;
+    } else {
+      posX = midpoint.x - startX;
+      posY = midpoint.y - startY;
+    }
     
     updateTransform();
     
@@ -841,8 +927,15 @@ overlayImg.addEventListener('touchend', function(e) {
     isDragging = true;
     isPinching = false;
     const touch = e.touches[0];
-    startX = touch.clientX - posX;
-    startY = touch.clientY - posY;
+    
+    // スマホ縦向きの場合は座標変換
+    if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+      startX = touch.clientY - posX;
+      startY = touch.clientX - posY;
+    } else {
+      startX = touch.clientX - posX;
+      startY = touch.clientY - posY;
+    }
   } else if (e.touches.length === 2) {
     // 新しい2本指の状態で距離を再計算
     startDistance = getDistance(e.touches[0], e.touches[1]);
@@ -850,13 +943,27 @@ overlayImg.addEventListener('touchend', function(e) {
 }, { passive: false });
 
 /* =====================
-   マウスイベント（PC用）
+   マウスイベント（PC用）- 修正版
 ===================== */
 let isMouseDown = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
 let lastClickTime = 0;
 
+// 初期画面の写真はドラッグさせない（クリックのみ）
+photo.addEventListener('mousedown', function(e) {
+  // 左クリックのみ許可、ドラッグはさせない
+  if (e.button === 0) {
+    e.stopPropagation();
+  }
+});
+
+photo.addEventListener('mousemove', function(e) {
+  // 拡大前の写真はドラッグさせない
+  e.stopPropagation();
+});
+
+// 拡大写真のマウスイベント
 overlayImg.addEventListener('mousedown', function(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -922,13 +1029,13 @@ document.addEventListener('mousemove', function(e) {
 document.addEventListener('mouseup', function(e) {
   if (e.button === 0) {
     isMouseDown = false;
-    overlayImg.style.cursor = 'grab';
+    overlayImg.style.cursor = 'move';
   }
 });
 
 overlayImg.addEventListener('mouseleave', function() {
   isMouseDown = false;
-  overlayImg.style.cursor = 'grab';
+  overlayImg.style.cursor = 'move';
 });
 
 // マウスホイールでズーム（PC用）
@@ -962,7 +1069,7 @@ overlayImg.addEventListener('load', function() {
   if (overlay.style.display === 'block') {
     adjustForMobile();
     updateTransform();
-    overlayImg.style.cursor = 'grab';
+    overlayImg.style.cursor = 'move';
   }
 });
 
