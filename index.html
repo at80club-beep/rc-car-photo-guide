@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>リモコンカー作り 写真で確認シート（指導員用）</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <style>
 /* =====================
@@ -29,6 +29,17 @@ body{
   font-size:var(--font-base);
   line-height:1.7;
   overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  touch-action:pan-y;
+}
+
+/* 拡大写真表示中のbody用クラス */
+body.photo-expanded{
+  overflow:hidden;
+  position:fixed;
+  width:100%;
+  height:100%;
 }
 
 /* =====================
@@ -166,6 +177,7 @@ main{
   cursor:pointer;
   background:#f9f9f9;
   margin:0 auto;
+  touch-action:none;
 }
 
 .photo-img:active{
@@ -218,6 +230,7 @@ main{
   background:rgba(0,0,0,0.95);
   z-index:999;
   overflow:hidden;
+  touch-action:none;
 }
 
 .overlay-content{
@@ -237,6 +250,7 @@ main{
   display:flex;
   align-items:center;
   justify-content:center;
+  touch-action:none;
 }
 
 .overlay-img{
@@ -250,6 +264,8 @@ main{
   -webkit-user-drag:none;
   -webkit-touch-callout:none;
   touch-action:none;
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
 }
 
 .overlay-img:active{
@@ -259,7 +275,7 @@ main{
 /* スマホ向け：縦向きの場合は横向き表示 */
 @media (max-width: 768px) and (orientation: portrait) {
   .overlay-img {
-    transform: rotate(90deg);
+    transform: rotate(90deg) translate(0px, 0px) scale(1);
   }
 }
 
@@ -296,17 +312,6 @@ main{
   background:rgba(0,0,0,0.5);
   opacity:0.8;
   user-select:none;
-}
-
-/* タップで閉じるエリア */
-.tap-to-close{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:998;
-  display:block;
 }
 
 /* =====================
@@ -426,8 +431,6 @@ footer{
     <div class="instruction" id="instruction">
       指2本で拡大縮小・1本指で移動・タップで閉じる
     </div>
-    <!-- タップで閉じる透明なエリア -->
-    <div class="tap-to-close" id="tapToClose"></div>
     <div class="overlay-img-container">
       <img id="overlayImg" class="overlay-img">
     </div>
@@ -537,12 +540,11 @@ buttons.forEach(btn => {
 });
 
 /* =====================
-   写真拡大 - ズーム状態リセット対応
+   写真拡大 - スマホズーム問題修正版
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
 const instruction = document.getElementById("instruction");
-const tapToClose = document.getElementById("tapToClose");
 const closeBtn = document.getElementById("closeBtn");
 
 // 状態変数
@@ -559,8 +561,16 @@ let isPinching = false;
 photo.onclick = () => {
   overlayImg.src = photo.src;
   overlay.style.display = "block";
-  document.body.style.overflow = "hidden";
-  document.documentElement.style.overflow = "hidden";
+  
+  // スマホの場合はbodyにクラスを追加してスクロールを制御
+  if (isMobile) {
+    document.body.classList.add("photo-expanded");
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+    document.body.style.height = "100%";
+  }
   
   // 初期状態に完全リセット
   resetZoomAndPosition();
@@ -615,31 +625,85 @@ function updateTransform() {
   overlayImg.style.transform = transform;
 }
 
-// 拡大画像を閉じる（完全リセット）
+// 拡大画像を閉じる（スマホズーム問題修正）
 function closePhoto() {
+  console.log("写真拡大を閉じます...");
+  
   // まず完全にリセット
   resetZoomAndPosition();
   
-  // 閉じるアニメーション
-  setTimeout(() => {
-    overlay.style.display = "none";
-    document.body.style.overflow = "auto";
-    document.documentElement.style.overflow = "auto";
-    instruction.style.display = "none";
+  // オーバーレイを非表示
+  overlay.style.display = "none";
+  
+  // スマホの場合はbodyの状態を完全にリセット
+  if (isMobile) {
+    console.log("スマホモード：body状態をリセット");
     
-    // さらに確実にリセット
-    overlayImg.style.transform = "";
-    overlayImg.style.cursor = "grab";
+    // bodyの状態を完全リセット
+    document.body.classList.remove("photo-expanded");
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    document.body.style.height = "";
     
-    console.log("写真拡大を閉じました（完全リセット）");
-  }, 50);
+    // 強制的にviewportをリセット
+    resetViewport();
+    
+    // スクロール位置をリセット
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 10);
+    
+    // さらに遅延して再設定
+    setTimeout(() => {
+      // 強制的に再描画
+      document.body.style.display = 'none';
+      document.body.offsetHeight; // リフローを強制
+      document.body.style.display = 'block';
+      
+      // もう一度スクロール位置をリセット
+      window.scrollTo(0, 0);
+    }, 100);
+  } else {
+    // PCの場合
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
+  
+  instruction.style.display = "none";
+  
+  console.log("写真拡大を閉じました");
+}
+
+// スマホ用viewportリセット
+function resetViewport() {
+  // viewport metaタグを一時的に変更してズームをリセット
+  const viewport = document.querySelector('meta[name="viewport"]');
+  if (viewport) {
+    const originalContent = viewport.getAttribute("content");
+    
+    // viewportを一時的に変更
+    viewport.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no");
+    
+    // 少し遅らせて元に戻す
+    setTimeout(() => {
+      viewport.setAttribute("content", originalContent);
+    }, 100);
+  }
 }
 
 // 閉じるボタンのイベント
 closeBtn.onclick = closePhoto;
 
-// タップで閉じるエリアのイベント
-tapToClose.onclick = closePhoto;
+// オーバーレイクリックでも閉じる
+overlay.addEventListener('click', function(e) {
+  if (e.target === overlay || e.target.classList.contains('instruction')) {
+    closePhoto();
+  }
+});
 
 // ESCキーでも閉じられるように
 document.addEventListener('keydown', function(e) {
@@ -763,7 +827,6 @@ overlayImg.addEventListener('touchend', function(e) {
       posX = 0;
       posY = 0;
       updateTransform();
-      console.log("ズームをリセットしました（元のサイズに戻る）");
       return;
     }
   }
@@ -909,6 +972,11 @@ window.addEventListener('orientationchange', function() {
     if (overlay.style.display === 'block') {
       adjustForMobile();
       updateTransform();
+    } else {
+      // 拡大写真が表示されていない場合もリセット
+      if (isMobile) {
+        resetViewport();
+      }
     }
   }, 300);
 });
