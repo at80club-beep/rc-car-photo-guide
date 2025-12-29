@@ -616,7 +616,7 @@ function adjustScrollHint() {
 }
 
 /* =====================
-   写真拡大 - 修正版
+   写真拡大 - 修正版（スマホ縦向き対応）
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
@@ -629,11 +629,11 @@ let posX = 0;
 let posY = 0;
 let isDragging = false;
 let isPinching = false;
-let lastPosX = 0;
-let lastPosY = 0;
-let startX = 0;
-let startY = 0;
-let startDistance = 0;
+
+// 縦向き判定
+function isPortrait() {
+  return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+}
 
 // 2点間の距離を計算
 function getDistance(touch1, touch2) {
@@ -662,9 +662,9 @@ function clampPosition() {
   const containerWidth = overlay.clientWidth;
   const containerHeight = overlay.clientHeight;
   
-  // スマホ縦向きの場合は回転を考慮
-  if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-    // 回転時は画像の幅と高さが入れ替わる
+  if (isPortrait()) {
+    // 縦向きの場合：回転を考慮
+    // 写真が90度回転しているので、幅と高さを入れ替える
     const rotatedWidth = imgDisplayHeight;
     const rotatedHeight = imgDisplayWidth;
     
@@ -689,11 +689,11 @@ function clampPosition() {
 // トランスフォームを更新
 function updateTransform() {
   let transform;
-  if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-    // スマホ縦向き
+  if (isPortrait()) {
+    // スマホ縦向き：90度回転 + 移動 + スケール
     transform = `rotate(90deg) translate(${posX}px, ${posY}px) scale(${scale})`;
   } else {
-    // その他
+    // その他：移動 + スケール
     transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
   overlayImg.style.transform = transform;
@@ -780,9 +780,6 @@ function openPhoto() {
   // 初期状態に完全リセット
   resetZoomAndPosition();
   
-  // スマホの場合は横向きに調整
-  adjustForMobile();
-  
   // 操作説明を表示（5秒後にフェードアウト）
   instruction.style.opacity = "1";
   instruction.style.display = "block";
@@ -792,17 +789,6 @@ function openPhoto() {
   }, 5000);
 }
 
-// スマホ表示用の調整
-function adjustForMobile() {
-  if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-    // スマホ縦向きの場合は横向き表示
-    overlayImg.style.transform = "rotate(90deg) translate(0px, 0px) scale(1)";
-  } else {
-    // その他の場合は通常表示
-    overlayImg.style.transform = "translate(0px, 0px) scale(1)";
-  }
-}
-
 // ズーム状態と位置を完全リセット
 function resetZoomAndPosition() {
   scale = 1;
@@ -810,13 +796,18 @@ function resetZoomAndPosition() {
   posY = 0;
   isDragging = false;
   isPinching = false;
-  lastPosX = 0;
-  lastPosY = 0;
   
   // CSS変数もリセット
   overlayImg.style.transform = "";
   overlayImg.style.transformOrigin = "center center";
   overlayImg.style.transition = "transform 0.1s ease";
+  
+  // 縦向きの場合は横向きに調整
+  if (isPortrait()) {
+    overlayImg.style.transform = "rotate(90deg) translate(0px, 0px) scale(1)";
+  } else {
+    overlayImg.style.transform = "translate(0px, 0px) scale(1)";
+  }
 }
 
 // 拡大画像を閉じる
@@ -890,8 +881,11 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* =====================
-   拡大写真のタッチイベント（スマホ用）
+   拡大写真のタッチイベント（スマホ用 - 修正版）
 ===================== */
+let lastTouchX = 0;
+let lastTouchY = 0;
+let initialTouches = [];
 let touchStartTime = 0;
 let touchStartX = 0;
 let touchStartY = 0;
@@ -901,6 +895,7 @@ overlayImg.addEventListener('touchstart', function(e) {
   e.stopPropagation();
   
   const touches = Array.from(e.touches);
+  initialTouches = touches;
   
   if (touches.length === 1) {
     // 1本指でのタッチ開始（ドラッグ開始）
@@ -908,14 +903,8 @@ overlayImg.addEventListener('touchstart', function(e) {
     isPinching = false;
     
     const touch = touches[0];
-    
-    // 現在の位置を保存
-    lastPosX = posX;
-    lastPosY = posY;
-    
-    // 開始位置を保存（画面座標）
-    startX = touch.clientX;
-    startY = touch.clientY;
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
     
     // シングルタップ判定のための情報を保存
     touchStartTime = Date.now();
@@ -931,14 +920,10 @@ overlayImg.addEventListener('touchstart', function(e) {
     // 開始時の距離を保存
     startDistance = getDistance(touches[0], touches[1]);
     
-    // 現在の位置を保存
-    lastPosX = posX;
-    lastPosY = posY;
-    
-    // ピンチの中心点を計算
+    // ピンチの中心点を保存
     const midpoint = getMidpoint(touches[0], touches[1]);
-    startX = midpoint.x;
-    startY = midpoint.y;
+    lastTouchX = midpoint.x;
+    lastTouchY = midpoint.y;
   }
 }, { passive: false });
 
@@ -953,46 +938,69 @@ overlayImg.addEventListener('touchmove', function(e) {
     const touch = touches[0];
     
     // 移動量を計算
-    const deltaX = touch.clientX - startX;
-    const deltaY = touch.clientY - startY;
+    const deltaX = touch.clientX - lastTouchX;
+    const deltaY = touch.clientY - lastTouchY;
     
-    // 新しい位置を計算
-    posX = lastPosX + deltaX;
-    posY = lastPosY + deltaY;
+    if (isPortrait()) {
+      // 縦向きの場合：写真が90度回転しているので座標変換が必要
+      // 指を右に動かす → 写真を右に動かす（下に表示）
+      // 指を左に動かす → 写真を左に動かす（上に表示）
+      // 指を上に動かす → 写真を上に動かす（右に表示）
+      // 指を下に動かす → 写真を下に動かす（左に表示）
+      
+      // 変換：指の移動を写真の座標系に変換
+      // 写真のX移動（横方向） = -指のY移動（縦方向）
+      // 写真のY移動（縦方向） = 指のX移動（横方向）
+      posX += -deltaY;
+      posY += deltaX;
+    } else {
+      // 通常（横向き/PC）の場合：直接移動
+      posX += deltaX;
+      posY += deltaY;
+    }
     
     // 移動範囲を制限
     clampPosition();
-    
     updateTransform();
+    
+    // 最後のタッチ位置を更新
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
   } else if (touches.length === 2 && isPinching) {
     // 2本指での移動（ピンチズーム）
     const currentDistance = getDistance(touches[0], touches[1]);
+    
+    // スケール計算
     const newScale = Math.max(0.5, Math.min(5, scale * (currentDistance / startDistance)));
     
-    // スケールの変化量
-    const scaleChange = newScale / scale;
-    
-    // ピンチの中心点
-    const midpoint = getMidpoint(touches[0], touches[1]);
-    
-    // 拡大中心を調整（中心点を基準に拡大縮小）
-    if (scaleChange !== 1) {
-      // 中心点に対する相対位置を計算
-      const relativeX = (midpoint.x - window.innerWidth / 2 - posX) / scale;
-      const relativeY = (midpoint.y - window.innerHeight / 2 - posY) / scale;
+    if (newScale !== scale) {
+      // ピンチの中心点
+      const midpoint = getMidpoint(touches[0], touches[1]);
       
-      // 新しい位置を計算
-      posX = midpoint.x - window.innerWidth / 2 - relativeX * newScale;
-      posY = midpoint.y - window.innerHeight / 2 - relativeY * newScale;
+      if (isPortrait()) {
+        // 縦向きの場合：中心点も座標変換
+        // 中心点の移動量
+        const deltaCenterX = midpoint.x - lastTouchX;
+        const deltaCenterY = midpoint.y - lastTouchY;
+        
+        // 座標変換を適用
+        posX += -deltaCenterY;
+        posY += deltaCenterX;
+      } else {
+        // 通常の場合
+        posX += (midpoint.x - lastTouchX);
+        posY += (midpoint.y - lastTouchY);
+      }
       
       scale = newScale;
       
       // 移動範囲を制限
       clampPosition();
-      
       updateTransform();
       
-      // 次の計算のために開始距離を更新
+      // 最後の中心点を更新
+      lastTouchX = midpoint.x;
+      lastTouchY = midpoint.y;
       startDistance = currentDistance;
     }
   }
@@ -1036,24 +1044,20 @@ overlayImg.addEventListener('touchend', function(e) {
     isDragging = false;
     isPinching = false;
     overlayImg.style.cursor = 'move';
+    initialTouches = [];
   } else if (remainingTouches.length === 1) {
-    // 2本指から1本指になった場合、ドラッグモードに切り替え
+    // 2本指から1本指になった場合
     isDragging = true;
     isPinching = false;
     const touch = remainingTouches[0];
-    
-    // 現在の位置を保存
-    lastPosX = posX;
-    lastPosY = posY;
-    
-    // 開始位置を更新
-    startX = touch.clientX;
-    startY = touch.clientY;
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
   } else if (remainingTouches.length === 2) {
-    // 新しい2本指の状態で距離を再計算
+    // 新しい2本指の状態
+    const midpoint = getMidpoint(remainingTouches[0], remainingTouches[1]);
+    lastTouchX = midpoint.x;
+    lastTouchY = midpoint.y;
     startDistance = getDistance(remainingTouches[0], remainingTouches[1]);
-    isPinching = true;
-    isDragging = false;
   }
 }, { passive: false });
 
@@ -1105,11 +1109,16 @@ document.addEventListener('mousemove', function(e) {
     const deltaX = e.clientX - lastMouseX;
     const deltaY = e.clientY - lastMouseY;
     
-    // 画像の移動
-    posX += deltaX;
-    posY += deltaY;
+    if (isPortrait() && overlay.style.display === 'block') {
+      // 縦向きで拡大写真表示中の場合は座標変換
+      posX += -deltaY;
+      posY += deltaX;
+    } else {
+      // 通常の場合
+      posX += deltaX;
+      posY += deltaY;
+    }
     
-    // 移動範囲を制限
     clampPosition();
     updateTransform();
     
@@ -1161,7 +1170,6 @@ overlayImg.addEventListener('wheel', function(e) {
 overlayImg.addEventListener('load', function() {
   if (overlay.style.display === 'block') {
     resetZoomAndPosition();
-    adjustForMobile();
     overlayImg.style.cursor = 'move';
   }
 });
@@ -1176,7 +1184,6 @@ window.addEventListener('orientationchange', function() {
   setTimeout(() => {
     if (overlay.style.display === 'block') {
       resetZoomAndPosition();
-      adjustForMobile();
     } else {
       // 拡大写真が表示されていない場合もリセット
       if (isMobile) {
@@ -1192,7 +1199,6 @@ window.addEventListener('orientationchange', function() {
 window.addEventListener('resize', function() {
   if (overlay.style.display === 'block') {
     clampPosition();
-    adjustForMobile();
     updateTransform();
   }
   // リサイズ後にスクロールヒントを再調整
