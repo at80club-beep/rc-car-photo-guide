@@ -182,16 +182,16 @@ main{
   </h1>
 
   <nav id="nav">
-    <button data-target="battery" class="active">電池BOX完成</button>
-    <button data-target="wire">電線</button>
+    <button data-target="battery" class="active">電池BOX</button>
+    <button data-target="wire">電池の線</button>
     <button data-target="switch">スイッチ</button>
     <button data-target="test">モーターテスト</button>
-    <button data-target="complete">完成</button>
+    <button data-target="complete">動かす線</button>
   </nav>
 </header>
 
 <main>
-  <div class="section-title" id="sectionTitle">電池BOX完成</div>
+  <div class="section-title" id="sectionTitle">電池BOX</div>
 
   <div class="photo-box">
     <img id="photo" src="images/battery_box.jpg" class="photo-img">
@@ -211,7 +211,7 @@ main{
 <script>
 const sections={
   battery:{
-    title:"電池BOX完成",
+    title:"電池BOX",
     img:"images/battery_box.jpg",
     ok:"この写真と同じなら OK",
     note:"電池の＋－向きを確認します。"
@@ -226,7 +226,7 @@ const sections={
     title:"前後切り替えスイッチ",
     img:"images/switch_complete.jpg",
     ok:"固定できていれば OK",
-    note:"左右に倒して切り替わるか確認。"
+    note:"左右SWを押して切り替わるか確認。"
   },
   test:{
     title:"モーターのテスト",
@@ -235,10 +235,10 @@ const sections={
     note:"回らない場合は配線を確認。"
   },
   complete:{
-    title:"完成品",
+    title:"動かす線",
     img:"images/car_complete.jpg",
-    ok:"完成です！",
-    note:"安全に走らせましょう。"
+    ok:"リモコンの合図が車にとどく！つなぎ線をチェックしよう",
+    note:"完成品を見てね。安全に走らせましょう。"
   }
 };
 
