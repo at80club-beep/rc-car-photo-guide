@@ -5,6 +5,7 @@
 <title>リモコンカー作り 写真で確認シート（指導員用）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+
 <style>
 /* =====================
    基本
@@ -17,6 +18,7 @@ body{
   line-height:1.7;
 }
 
+
 header{
   position:sticky;
   top:0;
@@ -26,16 +28,19 @@ header{
   z-index:100;
 }
 
+
 .title{
   font-size:1.3em;
   font-weight:900;
   margin:0;
 }
 
+
 .subtitle{
   font-size:0.6em;
   color:#555;
 }
+
 
 nav{
   display:flex;
@@ -43,6 +48,7 @@ nav{
   gap:8px;
   margin-top:8px;
 }
+
 
 nav button{
   flex:1;
@@ -54,14 +60,17 @@ nav button{
   border-radius:12px;
 }
 
+
 nav button.active{
   background:#f0b344;
   border-color:#000;
 }
 
+
 main{
   padding:12px;
 }
+
 
 .section-title{
   font-size:1.3em;
@@ -70,12 +79,14 @@ main{
   margin-bottom:12px;
 }
 
+
 .photo-box{
   background:#fff;
   border:4px solid #e0cfa0;
   border-radius:14px;
   padding:14px;
 }
+
 
 .photo-img{
   width:100%;
@@ -87,6 +98,7 @@ main{
   cursor:pointer;
 }
 
+
 .photo-hint{
   text-align:center;
   font-size:0.9em;
@@ -95,6 +107,7 @@ main{
   padding:8px;
   border-radius:8px;
 }
+
 
 .ok-box{
   background:#e8f6e8;
@@ -106,12 +119,14 @@ main{
   text-align:center;
 }
 
+
 .note{
   background:#f5efe4;
   padding:12px;
   border-radius:8px;
   border-left:4px solid #a6842c;
 }
+
 
 /* =====================
    拡大表示（横向き固定）
@@ -126,6 +141,7 @@ main{
   justify-content:center;
 }
 
+
 .overlay img{
   max-height:90vw;
   max-width:90vh;
@@ -133,6 +149,7 @@ main{
   border-radius:12px;
   box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
+
 
 .close-btn{
   position:absolute;
@@ -150,6 +167,7 @@ main{
   cursor:pointer;
 }
 
+
 .rotate-hint{
   position:absolute;
   top:20px;
@@ -162,6 +180,7 @@ main{
   font-size:16px;
 }
 
+
 /* PC・横向きでは回転しない */
 @media (orientation:landscape){
   .overlay img{
@@ -173,7 +192,9 @@ main{
 </style>
 </head>
 
+
 <body>
+
 
 <header>
   <h1 class="title">
@@ -181,17 +202,20 @@ main{
     <span class="subtitle">（指導員用）</span>
   </h1>
 
+
   <nav id="nav">
-    <button data-target="battery" class="active">電池BOX完成</button>
-    <button data-target="wire">電線</button>
+    <button data-target="battery" class="active">電池BOX</button>
+    <button data-target="wire">電池の線</button>
     <button data-target="switch">スイッチ</button>
     <button data-target="test">モーターテスト</button>
-    <button data-target="complete">完成</button>
+    <button data-target="complete">うごかす線</button>
   </nav>
 </header>
 
+
 <main>
   <div class="section-title" id="sectionTitle">電池BOX完成</div>
+
 
   <div class="photo-box">
     <img id="photo" src="images/battery_box.jpg" class="photo-img">
@@ -201,12 +225,14 @@ main{
   </div>
 </main>
 
+
 <!-- 拡大表示 -->
 <div id="overlay" class="overlay">
   <div class="close-btn" onclick="closePhoto()">×</div>
   <div class="rotate-hint">横向き表示</div>
   <img id="overlayImg">
 </div>
+
 
 <script>
 const sections={
@@ -226,27 +252,29 @@ const sections={
     title:"前後切り替えスイッチ",
     img:"images/switch_complete.jpg",
     ok:"固定できていれば OK",
-    note:"左右に倒して切り替わるか確認。"
+    note:"左右のSWを押して切り替わるか確認。"
   },
   test:{
     title:"モーターのテスト",
     img:"images/motor_test.jpg",
-    ok:"回れば OK（又はLEDチェッカー）",
+    ok:"回れば OK",
     note:"回らない場合は配線を確認。"
   },
   complete:{
-    title:"完成品",
+    title:"リモコンと車をつなぐ線（動かすための電気の道）",
     img:"images/car_complete.jpg",
-    ok:"完成です！",
-    note:"安全に走らせましょう。"
+    ok:"リモコンの合図が車にとどく！つなぎ線をチェックしよう",
+    note:”完成品を見てね。　安全に走らせましょう。"
   }
 };
+
 
 const navButtons=document.querySelectorAll("#nav button");
 const photo=document.getElementById("photo");
 const sectionTitle=document.getElementById("sectionTitle");
 const okMessage=document.getElementById("okMessage");
 const note=document.getElementById("note");
+
 
 navButtons.forEach(btn=>{
   btn.onclick=()=>{
@@ -260,18 +288,22 @@ navButtons.forEach(btn=>{
   };
 });
 
+
 const overlay=document.getElementById("overlay");
 const overlayImg=document.getElementById("overlayImg");
+
 
 photo.onclick=()=>{
   overlay.style.display="flex";
   overlayImg.src=photo.src;
 };
 
+
 function closePhoto(){
   overlay.style.display="none";
 }
 </script>
+
 
 </body>
 </html>
