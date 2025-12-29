@@ -537,7 +537,7 @@ buttons.forEach(btn => {
 });
 
 /* =====================
-   写真拡大 - シンプルで確実な実装
+   写真拡大 - ズーム状態リセット対応
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
@@ -562,8 +562,8 @@ photo.onclick = () => {
   document.body.style.overflow = "hidden";
   document.documentElement.style.overflow = "hidden";
   
-  // 初期状態にリセット
-  resetZoom();
+  // 初期状態に完全リセット
+  resetZoomAndPosition();
   
   // スマホの場合は横向きに調整
   adjustForMobile();
@@ -588,14 +588,18 @@ function adjustForMobile() {
   }
 }
 
-// ズーム状態をリセット
-function resetZoom() {
+// ズーム状態と位置を完全リセット
+function resetZoomAndPosition() {
   scale = 1;
   posX = 0;
   posY = 0;
   isDragging = false;
   isPinching = false;
-  updateTransform();
+  
+  // CSS変数もリセット
+  overlayImg.style.transform = "";
+  overlayImg.style.transformOrigin = "center center";
+  overlayImg.style.transition = "transform 0.1s ease";
 }
 
 // トランスフォームを更新
@@ -611,13 +615,24 @@ function updateTransform() {
   overlayImg.style.transform = transform;
 }
 
-// 拡大画像を閉じる
+// 拡大画像を閉じる（完全リセット）
 function closePhoto() {
-  overlay.style.display = "none";
-  document.body.style.overflow = "auto";
-  document.documentElement.style.overflow = "auto";
-  instruction.style.display = "none";
-  resetZoom();
+  // まず完全にリセット
+  resetZoomAndPosition();
+  
+  // 閉じるアニメーション
+  setTimeout(() => {
+    overlay.style.display = "none";
+    document.body.style.overflow = "auto";
+    document.documentElement.style.overflow = "auto";
+    instruction.style.display = "none";
+    
+    // さらに確実にリセット
+    overlayImg.style.transform = "";
+    overlayImg.style.cursor = "grab";
+    
+    console.log("写真拡大を閉じました（完全リセット）");
+  }, 50);
 }
 
 // 閉じるボタンのイベント
@@ -656,6 +671,9 @@ function getMidpoint(touch1, touch2) {
    タッチイベント（スマホ用）
 ===================== */
 let initialTouches = [];
+let touchStartTime = 0;
+let touchStartX = 0;
+let touchStartY = 0;
 
 overlayImg.addEventListener('touchstart', function(e) {
   e.preventDefault();
@@ -739,12 +757,13 @@ overlayImg.addEventListener('touchend', function(e) {
       return;
     }
     
-    // ズーム中で短時間タップなら元のサイズに戻る
+    // ズーム中で短時間タップなら元のサイズに戻る（閉じない）
     if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && scale > 1.1) {
       scale = 1;
       posX = 0;
       posY = 0;
       updateTransform();
+      console.log("ズームをリセットしました（元のサイズに戻る）");
       return;
     }
   }
@@ -773,6 +792,7 @@ overlayImg.addEventListener('touchend', function(e) {
 let isMouseDown = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
+let lastClickTime = 0;
 
 overlayImg.addEventListener('mousedown', function(e) {
   e.preventDefault();
@@ -893,6 +913,14 @@ window.addEventListener('orientationchange', function() {
   }, 300);
 });
 
+// ウィンドウリサイズ時にズーム状態を確認
+window.addEventListener('resize', function() {
+  if (overlay.style.display === 'block') {
+    adjustForMobile();
+    updateTransform();
+  }
+});
+
 /* =====================
    文字サイズ切替（保存）
 ===================== */
@@ -957,12 +985,6 @@ window.addEventListener('load', function() {
     console.log('📱 スマホデバイスを検出しました');
   }
 });
-
-// グローバル変数
-let touchStartTime = 0;
-let touchStartX = 0;
-let touchStartY = 0;
-let lastClickTime = 0;
 </script>
 
 </body>
