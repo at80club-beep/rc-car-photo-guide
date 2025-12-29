@@ -5,17 +5,15 @@
 <title>リモコンカー作り 写真で確認シート（指導員用）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+
 <style>
-/* =====================
-   基本
-===================== */
 body{
   margin:0;
-  font-family: "Hiragino Sans","メイリオ",sans-serif;
+  font-family:"Hiragino Sans","メイリオ",sans-serif;
   background:#faf7f2;
   color:#333;
-  line-height:1.7;
 }
+
 
 header{
   position:sticky;
@@ -26,16 +24,19 @@ header{
   z-index:100;
 }
 
+
 .title{
   font-size:1.3em;
   font-weight:900;
   margin:0;
 }
 
+
 .subtitle{
   font-size:0.6em;
   color:#555;
 }
+
 
 nav{
   display:flex;
@@ -43,6 +44,7 @@ nav{
   gap:8px;
   margin-top:8px;
 }
+
 
 nav button{
   flex:1;
@@ -54,14 +56,17 @@ nav button{
   border-radius:12px;
 }
 
+
 nav button.active{
   background:#f0b344;
   border-color:#000;
 }
 
+
 main{
   padding:12px;
 }
+
 
 .section-title{
   font-size:1.3em;
@@ -70,12 +75,14 @@ main{
   margin-bottom:12px;
 }
 
+
 .photo-box{
   background:#fff;
   border:4px solid #e0cfa0;
   border-radius:14px;
   padding:14px;
 }
+
 
 .photo-img{
   width:100%;
@@ -87,6 +94,7 @@ main{
   cursor:pointer;
 }
 
+
 .photo-hint{
   text-align:center;
   font-size:0.9em;
@@ -95,6 +103,7 @@ main{
   padding:8px;
   border-radius:8px;
 }
+
 
 .ok-box{
   background:#e8f6e8;
@@ -106,6 +115,7 @@ main{
   text-align:center;
 }
 
+
 .note{
   background:#f5efe4;
   padding:12px;
@@ -113,9 +123,8 @@ main{
   border-left:4px solid #a6842c;
 }
 
-/* =====================
-   拡大表示（横向き固定）
-===================== */
+
+/* ===== 拡大表示（横向き固定） ===== */
 .overlay{
   display:none;
   position:fixed;
@@ -124,15 +133,17 @@ main{
   z-index:999;
   align-items:center;
   justify-content:center;
+  touch-action:none;
 }
+
 
 .overlay img{
   max-height:90vw;
   max-width:90vh;
   transform:rotate(90deg);
   border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
+
 
 .close-btn{
   position:absolute;
@@ -147,22 +158,23 @@ main{
   line-height:56px;
   border-radius:50%;
   border:3px solid #fff;
-  cursor:pointer;
 }
 
-.rotate-hint{
+
+.swipe-hint{
   position:absolute;
-  top:20px;
+  bottom:20px;
   left:50%;
   transform:translateX(-50%);
   color:#fff;
   background:rgba(0,0,0,0.7);
-  padding:10px 20px;
+  padding:8px 20px;
   border-radius:20px;
-  font-size:16px;
+  font-size:14px;
 }
 
-/* PC・横向きでは回転しない */
+
+/* 横向きでは回転解除 */
 @media (orientation:landscape){
   .overlay img{
     transform:none;
@@ -173,7 +185,9 @@ main{
 </style>
 </head>
 
+
 <body>
+
 
 <header>
   <h1 class="title">
@@ -181,97 +195,119 @@ main{
     <span class="subtitle">（指導員用）</span>
   </h1>
 
+
   <nav id="nav">
     <button data-target="battery" class="active">電池BOX</button>
-    <button data-target="wire">電池の線</button>
+    <button data-target="wire">電線</button>
     <button data-target="switch">スイッチ</button>
-    <button data-target="test">モーターテスト</button>
-    <button data-target="complete">うごかす線</button>
+    <button data-target="test">テスト</button>
+    <button data-target="complete">完成</button>
   </nav>
 </header>
+
 
 <main>
   <div class="section-title" id="sectionTitle">電池BOX完成</div>
 
+
   <div class="photo-box">
     <img id="photo" src="images/battery_box.jpg" class="photo-img">
-    <div class="photo-hint">📱 写真をタップすると横向きで拡大表示されます</div>
+    <div class="photo-hint">📱 タップで拡大／スワイプで切り替え</div>
     <div class="ok-box" id="okMessage">✅ この写真と同じなら OK</div>
     <div class="note" id="note">電池の＋－向きを確認します。</div>
   </div>
 </main>
 
+
 <!-- 拡大表示 -->
 <div id="overlay" class="overlay">
   <div class="close-btn" onclick="closePhoto()">×</div>
-  <div class="rotate-hint">横向き表示</div>
+  <div class="swipe-hint">← → スワイプで写真切り替え</div>
   <img id="overlayImg">
 </div>
 
+
 <script>
+/* ===== 工程データ ===== */
+const order=["battery","wire","switch","test","complete"];
+
+
 const sections={
-  battery:{
-    title:"電池BOX",
-    img:"images/battery_box.jpg",
-    ok:"この写真と同じなら OK",
-    note:"電池の＋－向きを確認します。"
-  },
-  wire:{
-    title:"電池につける電線",
-    img:"images/wire_magnet.jpg",
-    ok:"この形なら OK",
-    note:"磁石がしっかり付いているか確認。"
-  },
-  switch:{
-    title:"前後切り替えスイッチ",
-    img:"images/switch_complete.jpg",
-    ok:"固定できていれば OK",
-    note:"左右のSWを押して切り替わるか確認。"
-  },
-  test:{
-    title:"モーターのテスト",
-    img:"images/motor_test.jpg",
-    ok:"回れば OK（又は、LEDチェッカーで調べる）",
-    note:"回らない（つかない）場合は配線を確認。"
-  },
-  complete:{
-    title:"リモコンと車をつなぐ線（動かすための電気の道）",
-    img:"images/car_complete.jpg",
-    ok:"リモコンの合図が車にとどく！　つなぎ線をチェックしよう",
-    note:"完成品を見てね。　安全に走らせましょう。"
-  }
+  battery:{title:"電池BOX完成",img:"images/battery_box.jpg",ok:"この写真と同じなら OK",note:"電池の＋－向きを確認します。"},
+  wire:{title:"電池につける電線",img:"images/wire_magnet.jpg",ok:"この形なら OK",note:"磁石が端子に付いているか確認。"},
+  switch:{title:"前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"固定できていれば OK",note:"左右に倒して切り替え確認。"},
+  test:{title:"モーターのテスト",img:"images/motor_test.jpg",ok:"回れば OK",note:"回らない場合は配線確認。"},
+  complete:{title:"完成品",img:"images/car_complete.jpg",ok:"完成です！",note:"安全に走らせましょう。"}
 };
 
-const navButtons=document.querySelectorAll("#nav button");
+
+let currentIndex=0;
+
+
 const photo=document.getElementById("photo");
+const overlay=document.getElementById("overlay");
+const overlayImg=document.getElementById("overlayImg");
 const sectionTitle=document.getElementById("sectionTitle");
 const okMessage=document.getElementById("okMessage");
 const note=document.getElementById("note");
+const navButtons=document.querySelectorAll("#nav button");
 
-navButtons.forEach(btn=>{
-  btn.onclick=()=>{
-    navButtons.forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const d=sections[btn.dataset.target];
-    sectionTitle.textContent=d.title;
-    photo.src=d.img;
-    okMessage.textContent="✅ "+d.ok;
-    note.textContent=d.note;
-  };
+
+function showSection(index){
+  currentIndex=index;
+  const key=order[index];
+  const d=sections[key];
+  sectionTitle.textContent=d.title;
+  photo.src=d.img;
+  overlayImg.src=d.img;
+  okMessage.textContent="✅ "+d.ok;
+  note.textContent=d.note;
+
+
+  navButtons.forEach(b=>b.classList.remove("active"));
+  navButtons[index].classList.add("active");
+}
+
+
+navButtons.forEach((btn,i)=>{
+  btn.onclick=()=>showSection(i);
 });
 
-const overlay=document.getElementById("overlay");
-const overlayImg=document.getElementById("overlayImg");
 
 photo.onclick=()=>{
   overlay.style.display="flex";
   overlayImg.src=photo.src;
 };
 
+
 function closePhoto(){
   overlay.style.display="none";
 }
+
+
+/* ===== スワイプ処理 ===== */
+let startX=0;
+
+
+overlay.addEventListener("touchstart",e=>{
+  startX=e.touches[0].clientX;
+});
+
+
+overlay.addEventListener("touchend",e=>{
+  const diffX=e.changedTouches[0].clientX-startX;
+  if(Math.abs(diffX)>50){
+    if(diffX<0 && currentIndex<order.length-1){
+      showSection(currentIndex+1);
+    }
+    if(diffX>0 && currentIndex>0){
+      showSection(currentIndex-1);
+    }
+  }
+});
 </script>
+
 
 </body>
 </html>
+
