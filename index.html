@@ -472,7 +472,7 @@ footer{
   <div class="overlay-content">
     <div class="close-btn" id="closeBtn">×</div>
     <div class="instruction" id="instruction">
-      指2本で拡大縮小・1本指で移動・タップで閉じる
+      指2本で拡大縮小・1本指で動かす・タップで閉じる
     </div>
     <div class="overlay-img-container">
       <img id="overlayImg" class="overlay-img">
@@ -616,7 +616,7 @@ function adjustScrollHint() {
 }
 
 /* =====================
-   写真拡大 - 修正版（スマホ縦向き対応）
+   写真拡大 - 直感的な操作に修正
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
@@ -629,28 +629,17 @@ let posX = 0;
 let posY = 0;
 let isDragging = false;
 let isPinching = false;
+let lastPosX = 0;
+let lastPosY = 0;
+let startPosX = 0;
+let startPosY = 0;
 
 // 縦向き判定
 function isPortrait() {
   return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
 }
 
-// 2点間の距離を計算
-function getDistance(touch1, touch2) {
-  const dx = touch1.clientX - touch2.clientX;
-  const dy = touch1.clientY - touch2.clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-// 2点間の中点を計算
-function getMidpoint(touch1, touch2) {
-  return {
-    x: (touch1.clientX + touch2.clientX) / 2,
-    y: (touch1.clientY + touch2.clientY) / 2
-  };
-}
-
-// 拡大写真の移動範囲を制限する関数
+// 移動範囲を制限する関数（修正版）
 function clampPosition() {
   if (!overlayImg || !overlay) return;
   
@@ -675,6 +664,14 @@ function clampPosition() {
     // 範囲内に制限
     posX = Math.max(Math.min(posX, maxX), -maxX);
     posY = Math.max(Math.min(posY, maxY), -maxY);
+    
+    // 画像がコンテナより小さい場合は中央に固定
+    if (rotatedWidth <= containerWidth) {
+      posX = 0;
+    }
+    if (rotatedHeight <= containerHeight) {
+      posY = 0;
+    }
   } else {
     // 通常の場合
     const maxX = Math.max(0, (imgDisplayWidth - containerWidth) / 2);
@@ -683,6 +680,14 @@ function clampPosition() {
     // 範囲内に制限
     posX = Math.max(Math.min(posX, maxX), -maxX);
     posY = Math.max(Math.min(posY, maxY), -maxY);
+    
+    // 画像がコンテナより小さい場合は中央に固定
+    if (imgDisplayWidth <= containerWidth) {
+      posX = 0;
+    }
+    if (imgDisplayHeight <= containerHeight) {
+      posY = 0;
+    }
   }
 }
 
@@ -881,11 +886,10 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* =====================
-   拡大写真のタッチイベント（スマホ用 - 修正版）
+   拡大写真のタッチイベント（修正版 - 直感的な操作）
 ===================== */
 let lastTouchX = 0;
 let lastTouchY = 0;
-let initialTouches = [];
 let touchStartTime = 0;
 let touchStartX = 0;
 let touchStartY = 0;
@@ -895,7 +899,6 @@ overlayImg.addEventListener('touchstart', function(e) {
   e.stopPropagation();
   
   const touches = Array.from(e.touches);
-  initialTouches = touches;
   
   if (touches.length === 1) {
     // 1本指でのタッチ開始（ドラッグ開始）
@@ -903,27 +906,26 @@ overlayImg.addEventListener('touchstart', function(e) {
     isPinching = false;
     
     const touch = touches[0];
+    
+    // 現在の位置を保存
+    lastPosX = posX;
+    lastPosY = posY;
+    
+    // タッチ開始位置を保存
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
     
-    // シングルタップ判定のための情報を保存
+    overlayImg.style.cursor = 'grabbing';
+    overlayImg.style.transition = 'none';
+    
+    // シングルタップ判定用
     touchStartTime = Date.now();
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
-    
-    overlayImg.style.cursor = 'grabbing';
   } else if (touches.length === 2) {
     // 2本指でのタッチ開始（ピンチズーム開始）
     isPinching = true;
     isDragging = false;
-    
-    // 開始時の距離を保存
-    startDistance = getDistance(touches[0], touches[1]);
-    
-    // ピンチの中心点を保存
-    const midpoint = getMidpoint(touches[0], touches[1]);
-    lastTouchX = midpoint.x;
-    lastTouchY = midpoint.y;
   }
 }, { passive: false });
 
@@ -934,75 +936,85 @@ overlayImg.addEventListener('touchmove', function(e) {
   const touches = Array.from(e.touches);
   
   if (touches.length === 1 && isDragging) {
-    // 1本指での移動（ドラッグ）
+    // 1本指での移動（ドラッグ） - 直感的な操作
     const touch = touches[0];
     
-    // 移動量を計算
-    const deltaX = touch.clientX - lastTouchX;
-    const deltaY = touch.clientY - lastTouchY;
+    // 移動量を計算（指の移動に合わせて写真を動かす）
+    let deltaX = touch.clientX - lastTouchX;
+    let deltaY = touch.clientY - lastTouchY;
     
     if (isPortrait()) {
-      // 縦向きの場合：写真が90度回転しているので座標変換が必要
-      // 指を右に動かす → 写真を右に動かす（下に表示）
-      // 指を左に動かす → 写真を左に動かす（上に表示）
-      // 指を上に動かす → 写真を上に動かす（右に表示）
-      // 指を下に動かす → 写真を下に動かす（左に表示）
+      // 【修正箇所】縦向きの場合：直感的な操作になるように修正
+      // 指を上に動かす（Y減少） → 写真を上に動かす（Y減少）
+      // 指を下に動かす（Y増加） → 写真を下に動かす（Y増加）
+      // 指を右に動かす（X増加） → 写真を右に動かす（X増加）
+      // 指を左に動かす（X減少） → 写真を左に動かす（X減少）
       
-      // 変換：指の移動を写真の座標系に変換
-      // 写真のX移動（横方向） = -指のY移動（縦方向）
-      // 写真のY移動（縦方向） = 指のX移動（横方向）
-      posX += -deltaY;
-      posY += deltaX;
-    } else {
-      // 通常（横向き/PC）の場合：直接移動
-      posX += deltaX;
-      posY += deltaY;
+      // 写真は90度回転しているが、ユーザーには回転後の写真が見えている
+      // なので、指の動きをそのまま写真の動きにする（座標変換不要）
+      // 実際の写真は回転しているので、移動方向は直感的になる
+      
+      // 座標系の変換：
+      // 指のX移動（画面座標） → 写真のY移動（写真座標系）※写真は回転している
+      // 指のY移動（画面座標） → 写真のX移動（写真座標系）※符号反転が必要
+      
+      // 正しい変換：
+      // 指を右に動かす → 写真を下に動かす（Y増加）
+      // 指を左に動かす → 写真を上に動かす（Y減少）
+      // 指を上に動かす → 写真を右に動かす（X増加）
+      // 指を下に動かす → 写真を左に動かす（X減少）
+      
+      const tempDeltaX = deltaX;
+      const tempDeltaY = deltaY;
+      
+      // 変換を修正
+      deltaX = -tempDeltaY;  // 指の縦移動を写真の横移動に
+      deltaY = tempDeltaX;   // 指の横移動を写真の縦移動に
     }
+    
+    // 写真を指の動きに合わせて移動
+    posX = lastPosX + deltaX;
+    posY = lastPosY + deltaY;
     
     // 移動範囲を制限
     clampPosition();
     updateTransform();
     
-    // 最後のタッチ位置を更新
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
   } else if (touches.length === 2 && isPinching) {
     // 2本指での移動（ピンチズーム）
-    const currentDistance = getDistance(touches[0], touches[1]);
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    
+    const currentDistance = Math.sqrt(
+      Math.pow(touch1.clientX - touch2.clientX, 2) + 
+      Math.pow(touch1.clientY - touch2.clientY, 2)
+    );
+    
+    // 中心点を計算
+    const centerX = (touch1.clientX + touch2.clientX) / 2;
+    const centerY = (touch1.clientY + touch2.clientY) / 2;
+    
+    // 初期距離が保存されていない場合は保存
+    if (!window._initialPinchDistance) {
+      window._initialPinchDistance = currentDistance;
+      window._initialPinchCenterX = centerX;
+      window._initialPinchCenterY = centerY;
+      window._initialScale = scale;
+      window._initialPosX = posX;
+      window._initialPosY = posY;
+    }
     
     // スケール計算
-    const newScale = Math.max(0.5, Math.min(5, scale * (currentDistance / startDistance)));
+    const newScale = Math.max(0.5, Math.min(5, 
+      window._initialScale * (currentDistance / window._initialPinchDistance)));
     
-    if (newScale !== scale) {
-      // ピンチの中心点
-      const midpoint = getMidpoint(touches[0], touches[1]);
-      
-      if (isPortrait()) {
-        // 縦向きの場合：中心点も座標変換
-        // 中心点の移動量
-        const deltaCenterX = midpoint.x - lastTouchX;
-        const deltaCenterY = midpoint.y - lastTouchY;
-        
-        // 座標変換を適用
-        posX += -deltaCenterY;
-        posY += deltaCenterX;
-      } else {
-        // 通常の場合
-        posX += (midpoint.x - lastTouchX);
-        posY += (midpoint.y - lastTouchY);
-      }
-      
-      scale = newScale;
-      
-      // 移動範囲を制限
-      clampPosition();
-      updateTransform();
-      
-      // 最後の中心点を更新
-      lastTouchX = midpoint.x;
-      lastTouchY = midpoint.y;
-      startDistance = currentDistance;
-    }
+    scale = newScale;
+    
+    // スケール変更に応じて位置を調整
+    clampPosition();
+    updateTransform();
   }
 }, { passive: false });
 
@@ -1012,6 +1024,16 @@ overlayImg.addEventListener('touchend', function(e) {
   
   const remainingTouches = Array.from(e.touches);
   const changedTouches = Array.from(e.changedTouches);
+  
+  // ピンチズーム終了時に初期値をリセット
+  if (window._initialPinchDistance && remainingTouches.length < 2) {
+    delete window._initialPinchDistance;
+    delete window._initialPinchCenterX;
+    delete window._initialPinchCenterY;
+    delete window._initialScale;
+    delete window._initialPosX;
+    delete window._initialPosY;
+  }
   
   // シングルタップ判定
   if (remainingTouches.length === 0 && changedTouches.length === 1) {
@@ -1044,7 +1066,6 @@ overlayImg.addEventListener('touchend', function(e) {
     isDragging = false;
     isPinching = false;
     overlayImg.style.cursor = 'move';
-    initialTouches = [];
   } else if (remainingTouches.length === 1) {
     // 2本指から1本指になった場合
     isDragging = true;
@@ -1052,12 +1073,6 @@ overlayImg.addEventListener('touchend', function(e) {
     const touch = remainingTouches[0];
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
-  } else if (remainingTouches.length === 2) {
-    // 新しい2本指の状態
-    const midpoint = getMidpoint(remainingTouches[0], remainingTouches[1]);
-    lastTouchX = midpoint.x;
-    lastTouchY = midpoint.y;
-    startDistance = getDistance(remainingTouches[0], remainingTouches[1]);
   }
 }, { passive: false });
 
@@ -1110,9 +1125,11 @@ document.addEventListener('mousemove', function(e) {
     const deltaY = e.clientY - lastMouseY;
     
     if (isPortrait() && overlay.style.display === 'block') {
-      // 縦向きで拡大写真表示中の場合は座標変換
-      posX += -deltaY;
-      posY += deltaX;
+      // 縦向きの場合：座標変換を適用
+      const tempDeltaX = deltaX;
+      const tempDeltaY = deltaY;
+      posX += -tempDeltaY;
+      posY += tempDeltaX;
     } else {
       // 通常の場合
       posX += deltaX;
