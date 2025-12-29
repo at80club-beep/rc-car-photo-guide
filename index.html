@@ -163,7 +163,7 @@ main{
   display:flex;
   justify-content:center;
   align-items:center;
-  min-height:200px; /* 最小高さを確保 */
+  min-height:200px;
 }
 
 .photo-img{
@@ -179,7 +179,6 @@ main{
   margin:0 auto;
   -webkit-user-drag:none;
   user-drag:none;
-  /* タッチ操作の改善 */
   touch-action:pan-y pinch-zoom;
   -webkit-touch-callout:none;
 }
@@ -222,7 +221,7 @@ main{
 }
 
 /* =====================
-   写真拡大（スマホ最適化）- ピンチズーム対応
+   写真拡大（スマホ最適化）
 ===================== */
 .overlay{
   display:none;
@@ -273,13 +272,6 @@ main{
   cursor:grabbing;
 }
 
-/* スマホ向け：縦向きの場合は横向き表示 */
-@media (max-width: 768px) and (orientation: portrait) {
-  .overlay-img {
-    transform: rotate(90deg) translate(0px, 0px) scale(1);
-  }
-}
-
 /* 閉じるボタン */
 .close-btn{
   position:absolute;
@@ -313,6 +305,28 @@ main{
   background:rgba(0,0,0,0.5);
   opacity:0.8;
   user-select:none;
+}
+
+/* スクロールヒント */
+.scroll-hint{
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.7);
+  color:white;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:14px;
+  z-index:10;
+  animation:bounce 2s infinite;
+  display:none;
+}
+
+@keyframes bounce{
+  0%, 20%, 50%, 80%, 100%{ transform:translateX(-50%) translateY(0); }
+  40%{ transform:translateX(-50%) translateY(-10px); }
+  60%{ transform:translateX(-50%) translateY(-5px); }
 }
 
 /* =====================
@@ -369,40 +383,17 @@ footer{
   border-radius:8px;
 }
 
-/* スクロールヒント */
-.scroll-hint{
-  position:absolute;
-  bottom:10px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(0,0,0,0.7);
-  color:white;
-  padding:6px 12px;
-  border-radius:20px;
-  font-size:14px;
-  z-index:10;
-  animation:bounce 2s infinite;
-  display:none;
-}
-
-@keyframes bounce{
-  0%, 20%, 50%, 80%, 100%{ transform:translateX(-50%) translateY(0); }
-  40%{ transform:translateX(-50%) translateY(-10px); }
-  60%{ transform:translateX(-50%) translateY(-5px); }
-}
-
 /* スマホ向け最適化 */
 @media (max-width: 768px){
   .scroll-hint{
     display:block;
   }
   
-  /* 写真が大きい場合はスクロール可能に */
   .photo-container{
     max-height:50vh;
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
-    padding-bottom:30px; /* スクロールヒントのスペース */
+    padding-bottom:30px;
   }
   
   .photo-img{
@@ -523,22 +514,18 @@ const sections = {
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 /* =====================
-   工程切替 - ページトップにスクロール（スマホ対応）
+   工程切替
 ===================== */
 const buttons = document.querySelectorAll("nav button");
 const photo = document.getElementById("photo");
 
-// 確実にページトップにスクロールする関数
 function scrollToTop() {
-  // 複数の方法で確実にトップに移動
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
-  // スマホ用に追加のスクロール方法
   if (isMobile) {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
     
-    // 少し遅らせてもう一度スクロール（確実性のため）
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
@@ -547,10 +534,8 @@ function scrollToTop() {
 
 buttons.forEach(btn => {
   btn.onclick = () => {
-    // まず確実にページトップにスクロール
     scrollToTop();
     
-    // 少し遅延させてから内容を変更
     setTimeout(() => {
       buttons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -562,14 +547,11 @@ buttons.forEach(btn => {
       document.getElementById("okMessage").innerHTML = "✅ " + section.ok;
       document.getElementById("note").innerHTML = section.note;
       
-      // 画像の読み込み
       const img = new Image();
       img.onload = function() {
         photo.src = section.img;
         photo.alt = section.title;
         photo.classList.remove("img-error");
-        
-        // 画像読み込み後にスクロールヒントを調整
         adjustScrollHint();
       };
       img.onerror = function() {
@@ -579,7 +561,6 @@ buttons.forEach(btn => {
       };
       img.src = section.img;
       
-      // ボタンにフォーカスを当てる
       btn.focus();
     }, 300);
   };
@@ -594,15 +575,12 @@ function adjustScrollHint() {
   
   if (!photoContainer || !scrollHint) return;
   
-  // 画像の高さとコンテナの高さを比較
   const imgHeight = photo.naturalHeight || photo.clientHeight;
   const containerHeight = photoContainer.clientHeight;
   
-  // 画像がコンテナより大きい場合のみスクロールヒントを表示
   if (imgHeight > containerHeight && isMobile) {
     scrollHint.style.display = 'block';
     
-    // 5秒後にフェードアウト
     setTimeout(() => {
       scrollHint.style.transition = 'opacity 1s';
       scrollHint.style.opacity = '0';
@@ -616,176 +594,65 @@ function adjustScrollHint() {
 }
 
 /* =====================
-   写真拡大 - 直感的な操作に修正
+   写真拡大
 ===================== */
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
 const instruction = document.getElementById("instruction");
 const closeBtn = document.getElementById("closeBtn");
 
-// 状態変数
 let scale = 1;
 let posX = 0;
 let posY = 0;
 let isDragging = false;
 let isPinching = false;
+let lastTouchX = 0;
+let lastTouchY = 0;
 let lastPosX = 0;
 let lastPosY = 0;
-let startPosX = 0;
-let startPosY = 0;
 
-// 縦向き判定
-function isPortrait() {
-  return window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
-}
-
-// 移動範囲を制限する関数（修正版）
 function clampPosition() {
   if (!overlayImg || !overlay) return;
   
-  // 画像の実際の表示サイズ（スケール考慮）
   const imgDisplayWidth = overlayImg.naturalWidth * scale;
   const imgDisplayHeight = overlayImg.naturalHeight * scale;
-  
-  // コンテナのサイズ
   const containerWidth = overlay.clientWidth;
   const containerHeight = overlay.clientHeight;
   
-  if (isPortrait()) {
-    // 縦向きの場合：回転を考慮
-    // 写真が90度回転しているので、幅と高さを入れ替える
-    const rotatedWidth = imgDisplayHeight;
-    const rotatedHeight = imgDisplayWidth;
-    
-    // 移動可能な範囲を計算
-    const maxX = Math.max(0, (rotatedWidth - containerWidth) / 2);
-    const maxY = Math.max(0, (rotatedHeight - containerHeight) / 2);
-    
-    // 範囲内に制限
-    posX = Math.max(Math.min(posX, maxX), -maxX);
-    posY = Math.max(Math.min(posY, maxY), -maxY);
-    
-    // 画像がコンテナより小さい場合は中央に固定
-    if (rotatedWidth <= containerWidth) {
-      posX = 0;
-    }
-    if (rotatedHeight <= containerHeight) {
-      posY = 0;
-    }
-  } else {
-    // 通常の場合
-    const maxX = Math.max(0, (imgDisplayWidth - containerWidth) / 2);
-    const maxY = Math.max(0, (imgDisplayHeight - containerHeight) / 2);
-    
-    // 範囲内に制限
-    posX = Math.max(Math.min(posX, maxX), -maxX);
-    posY = Math.max(Math.min(posY, maxY), -maxY);
-    
-    // 画像がコンテナより小さい場合は中央に固定
-    if (imgDisplayWidth <= containerWidth) {
-      posX = 0;
-    }
-    if (imgDisplayHeight <= containerHeight) {
-      posY = 0;
-    }
-  }
+  const maxX = Math.max(0, (imgDisplayWidth - containerWidth) / 2);
+  const maxY = Math.max(0, (imgDisplayHeight - containerHeight) / 2);
+  
+  posX = Math.max(Math.min(posX, maxX), -maxX);
+  posY = Math.max(Math.min(posY, maxY), -maxY);
+  
+  if (imgDisplayWidth <= containerWidth) posX = 0;
+  if (imgDisplayHeight <= containerHeight) posY = 0;
 }
 
-// トランスフォームを更新
 function updateTransform() {
-  let transform;
-  if (isPortrait()) {
-    // スマホ縦向き：90度回転 + 移動 + スケール
-    transform = `rotate(90deg) translate(${posX}px, ${posY}px) scale(${scale})`;
-  } else {
-    // その他：移動 + スケール
-    transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-  }
-  overlayImg.style.transform = transform;
+  overlayImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 }
 
-// 初期画面の写真でのタッチ操作
-let photoTouchStartTime = 0;
-let photoTouchStartX = 0;
-let photoTouchStartY = 0;
-let photoIsScrolling = false;
+function resetZoomAndPosition() {
+  scale = 1;
+  posX = 0;
+  posY = 0;
+  isDragging = false;
+  isPinching = false;
+  updateTransform();
+}
 
-// 写真のタッチ開始
-photo.addEventListener('touchstart', function(e) {
-  // タッチ開始時の情報を保存
-  const touch = e.touches[0];
-  photoTouchStartTime = Date.now();
-  photoTouchStartX = touch.clientX;
-  photoTouchStartY = touch.clientY;
-  photoIsScrolling = false;
-  
-  // デフォルト動作は許可（スクロール可能に）
-  // ただし、マルチタッチ（2本指以上）の場合はピンチズームを防ぐ
-  if (e.touches.length > 1) {
-    e.preventDefault();
-  }
-}, { passive: true });
-
-// 写真のタッチ移動
-photo.addEventListener('touchmove', function(e) {
-  if (e.touches.length === 1) {
-    const touch = e.touches[0];
-    const deltaX = Math.abs(touch.clientX - photoTouchStartX);
-    const deltaY = Math.abs(touch.clientY - photoTouchStartY);
-    
-    // 縦方向の移動が横方向より大きければスクロールと判定
-    if (deltaY > deltaX && deltaY > 10) {
-      photoIsScrolling = true;
-    }
-    
-    // スクロール中は何もしない（ブラウザのデフォルトスクロールを使用）
-  } else if (e.touches.length > 1) {
-    // マルチタッチの場合は拡大写真表示でのみ許可
-    e.preventDefault();
-  }
-}, { passive: true });
-
-// 写真のタッチ終了
-photo.addEventListener('touchend', function(e) {
-  const touchTime = Date.now() - photoTouchStartTime;
-  const touch = e.changedTouches[0];
-  const touchMoveX = Math.abs(touch.clientX - photoTouchStartX);
-  const touchMoveY = Math.abs(touch.clientY - photoTouchStartY);
-  
-  // 短時間でほとんど動かず、スクロール中でなければ拡大表示
-  if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && !photoIsScrolling) {
-    e.preventDefault();
-    openPhoto();
-  }
-}, { passive: false });
-
-// 写真クリックで拡大表示（PC用とフォールバック）
-photo.addEventListener('click', function(e) {
-  // タッチデバイスではタッチイベントで処理するので、ここではPC用
-  if (!('ontouchstart' in window)) {
-    openPhoto();
-  }
-});
-
-// 拡大表示を開く関数
 function openPhoto() {
   overlayImg.src = photo.src;
   overlay.style.display = "block";
   
-  // スマホの場合はbodyにクラスを追加してスクロールを制御
   if (isMobile) {
     document.body.classList.add("photo-expanded");
     document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
-    document.body.style.height = "100%";
   }
   
-  // 初期状態に完全リセット
   resetZoomAndPosition();
   
-  // 操作説明を表示（5秒後にフェードアウト）
   instruction.style.opacity = "1";
   instruction.style.display = "block";
   setTimeout(() => {
@@ -794,91 +661,29 @@ function openPhoto() {
   }, 5000);
 }
 
-// ズーム状態と位置を完全リセット
-function resetZoomAndPosition() {
-  scale = 1;
-  posX = 0;
-  posY = 0;
-  isDragging = false;
-  isPinching = false;
-  
-  // CSS変数もリセット
-  overlayImg.style.transform = "";
-  overlayImg.style.transformOrigin = "center center";
-  overlayImg.style.transition = "transform 0.1s ease";
-  
-  // 縦向きの場合は横向きに調整
-  if (isPortrait()) {
-    overlayImg.style.transform = "rotate(90deg) translate(0px, 0px) scale(1)";
-  } else {
-    overlayImg.style.transform = "translate(0px, 0px) scale(1)";
-  }
-}
-
-// 拡大画像を閉じる
 function closePhoto() {
-  // まず完全にリセット
   resetZoomAndPosition();
-  
-  // オーバーレイを非表示
   overlay.style.display = "none";
   
-  // スマホの場合はbodyの状態を完全にリセット
   if (isMobile) {
-    // bodyの状態を完全リセット
     document.body.classList.remove("photo-expanded");
     document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    document.body.style.position = "";
-    document.body.style.width = "";
-    document.body.style.height = "";
-    
-    // 強制的にviewportをリセット
-    resetViewport();
-    
-    // スクロール位置をリセット
     setTimeout(() => {
       window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
     }, 10);
-  } else {
-    // PCの場合
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
   }
   
   instruction.style.display = "none";
 }
 
-// スマホ用viewportリセット
-function resetViewport() {
-  // viewport metaタグを一時的に変更してズームをリセット
-  const viewport = document.querySelector('meta[name="viewport"]');
-  if (viewport) {
-    const originalContent = viewport.getAttribute("content");
-    
-    // viewportを一時的に変更
-    viewport.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes");
-    
-    // 少し遅らせて元に戻す
-    setTimeout(() => {
-      viewport.setAttribute("content", originalContent);
-    }, 100);
-  }
-}
-
-// 閉じるボタンのイベント
 closeBtn.onclick = closePhoto;
 
-// オーバーレイクリックでも閉じる
 overlay.addEventListener('click', function(e) {
   if (e.target === overlay || e.target.classList.contains('instruction')) {
     closePhoto();
   }
 });
 
-// ESCキーでも閉じられるように
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && overlay.style.display === 'block') {
     closePhoto();
@@ -886,10 +691,40 @@ document.addEventListener('keydown', function(e) {
 });
 
 /* =====================
-   拡大写真のタッチイベント（修正版 - 直感的な操作）
+   写真タップで拡大
 ===================== */
-let lastTouchX = 0;
-let lastTouchY = 0;
+let photoTouchStartTime = 0;
+let photoTouchStartX = 0;
+let photoTouchStartY = 0;
+
+photo.addEventListener('touchstart', function(e) {
+  const touch = e.touches[0];
+  photoTouchStartTime = Date.now();
+  photoTouchStartX = touch.clientX;
+  photoTouchStartY = touch.clientY;
+}, { passive: true });
+
+photo.addEventListener('touchend', function(e) {
+  const touchTime = Date.now() - photoTouchStartTime;
+  const touch = e.changedTouches[0];
+  const touchMoveX = Math.abs(touch.clientX - photoTouchStartX);
+  const touchMoveY = Math.abs(touch.clientY - photoTouchStartY);
+  
+  if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10) {
+    e.preventDefault();
+    openPhoto();
+  }
+}, { passive: false });
+
+photo.addEventListener('click', function(e) {
+  if (!('ontouchstart' in window)) {
+    openPhoto();
+  }
+});
+
+/* =====================
+   拡大写真のタッチ操作（修正版）
+===================== */
 let touchStartTime = 0;
 let touchStartX = 0;
 let touchStartY = 0;
@@ -901,29 +736,22 @@ overlayImg.addEventListener('touchstart', function(e) {
   const touches = Array.from(e.touches);
   
   if (touches.length === 1) {
-    // 1本指でのタッチ開始（ドラッグ開始）
     isDragging = true;
     isPinching = false;
     
     const touch = touches[0];
-    
-    // 現在の位置を保存
     lastPosX = posX;
     lastPosY = posY;
-    
-    // タッチ開始位置を保存
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
     
     overlayImg.style.cursor = 'grabbing';
     overlayImg.style.transition = 'none';
     
-    // シングルタップ判定用
     touchStartTime = Date.now();
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
   } else if (touches.length === 2) {
-    // 2本指でのタッチ開始（ピンチズーム開始）
     isPinching = true;
     isDragging = false;
   }
@@ -936,54 +764,25 @@ overlayImg.addEventListener('touchmove', function(e) {
   const touches = Array.from(e.touches);
   
   if (touches.length === 1 && isDragging) {
-    // 1本指での移動（ドラッグ） - 直感的な操作
+    // 1本指での移動（修正版：シンプルに）
     const touch = touches[0];
     
-    // 移動量を計算（指の移動に合わせて写真を動かす）
-    let deltaX = touch.clientX - lastTouchX;
-    let deltaY = touch.clientY - lastTouchY;
+    const deltaX = touch.clientX - lastTouchX;
+    const deltaY = touch.clientY - lastTouchY;
     
-    if (isPortrait()) {
-      // 【修正箇所】縦向きの場合：直感的な操作になるように修正
-      // 指を上に動かす（Y減少） → 写真を上に動かす（Y減少）
-      // 指を下に動かす（Y増加） → 写真を下に動かす（Y増加）
-      // 指を右に動かす（X増加） → 写真を右に動かす（X増加）
-      // 指を左に動かす（X減少） → 写真を左に動かす（X減少）
-      
-      // 写真は90度回転しているが、ユーザーには回転後の写真が見えている
-      // なので、指の動きをそのまま写真の動きにする（座標変換不要）
-      // 実際の写真は回転しているので、移動方向は直感的になる
-      
-      // 座標系の変換：
-      // 指のX移動（画面座標） → 写真のY移動（写真座標系）※写真は回転している
-      // 指のY移動（画面座標） → 写真のX移動（写真座標系）※符号反転が必要
-      
-      // 正しい変換：
-      // 指を右に動かす → 写真を下に動かす（Y増加）
-      // 指を左に動かす → 写真を上に動かす（Y減少）
-      // 指を上に動かす → 写真を右に動かす（X増加）
-      // 指を下に動かす → 写真を左に動かす（X減少）
-      
-      const tempDeltaX = deltaX;
-      const tempDeltaY = deltaY;
-      
-      // 変換を修正
-      deltaX = -tempDeltaY;  // 指の縦移動を写真の横移動に
-      deltaY = tempDeltaX;   // 指の横移動を写真の縦移動に
-    }
+    // シンプルに移動
+    posX += deltaX;
+    posY += deltaY;
     
-    // 写真を指の動きに合わせて移動
-    posX = lastPosX + deltaX;
-    posY = lastPosY + deltaY;
-    
-    // 移動範囲を制限
     clampPosition();
     updateTransform();
     
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
   } else if (touches.length === 2 && isPinching) {
-    // 2本指での移動（ピンチズーム）
+    // 2本指でのピンチズーム
     const touch1 = touches[0];
     const touch2 = touches[1];
     
@@ -992,27 +791,15 @@ overlayImg.addEventListener('touchmove', function(e) {
       Math.pow(touch1.clientY - touch2.clientY, 2)
     );
     
-    // 中心点を計算
-    const centerX = (touch1.clientX + touch2.clientX) / 2;
-    const centerY = (touch1.clientY + touch2.clientY) / 2;
-    
-    // 初期距離が保存されていない場合は保存
     if (!window._initialPinchDistance) {
       window._initialPinchDistance = currentDistance;
-      window._initialPinchCenterX = centerX;
-      window._initialPinchCenterY = centerY;
       window._initialScale = scale;
-      window._initialPosX = posX;
-      window._initialPosY = posY;
     }
     
-    // スケール計算
     const newScale = Math.max(0.5, Math.min(5, 
       window._initialScale * (currentDistance / window._initialPinchDistance)));
     
     scale = newScale;
-    
-    // スケール変更に応じて位置を調整
     clampPosition();
     updateTransform();
   }
@@ -1025,24 +812,17 @@ overlayImg.addEventListener('touchend', function(e) {
   const remainingTouches = Array.from(e.touches);
   const changedTouches = Array.from(e.changedTouches);
   
-  // ピンチズーム終了時に初期値をリセット
   if (window._initialPinchDistance && remainingTouches.length < 2) {
     delete window._initialPinchDistance;
-    delete window._initialPinchCenterX;
-    delete window._initialPinchCenterY;
     delete window._initialScale;
-    delete window._initialPosX;
-    delete window._initialPosY;
   }
   
-  // シングルタップ判定
   if (remainingTouches.length === 0 && changedTouches.length === 1) {
     const touch = changedTouches[0];
     const touchTime = Date.now() - touchStartTime;
     const touchMoveX = Math.abs(touch.clientX - touchStartX);
     const touchMoveY = Math.abs(touch.clientY - touchStartY);
     
-    // 短時間でほとんど動かず、ズームしていなければ閉じる
     if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && scale <= 1.1) {
       setTimeout(() => {
         closePhoto();
@@ -1050,7 +830,6 @@ overlayImg.addEventListener('touchend', function(e) {
       return;
     }
     
-    // ズーム中で短時間タップなら元のサイズに戻る
     if (touchTime < 300 && touchMoveX < 10 && touchMoveY < 10 && scale > 1.1) {
       scale = 1;
       posX = 0;
@@ -1061,86 +840,51 @@ overlayImg.addEventListener('touchend', function(e) {
     }
   }
   
-  // 状態リセット
   if (remainingTouches.length === 0) {
     isDragging = false;
     isPinching = false;
     overlayImg.style.cursor = 'move';
   } else if (remainingTouches.length === 1) {
-    // 2本指から1本指になった場合
     isDragging = true;
     isPinching = false;
     const touch = remainingTouches[0];
     lastTouchX = touch.clientX;
     lastTouchY = touch.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
   }
 }, { passive: false });
 
 /* =====================
-   マウスイベント（PC用）
+   マウス操作（PC用）
 ===================== */
 let isMouseDown = false;
 let lastMouseX = 0;
 let lastMouseY = 0;
-let lastClickTime = 0;
 
 overlayImg.addEventListener('mousedown', function(e) {
   e.preventDefault();
-  e.stopPropagation();
-  
-  if (e.button === 0) { // 左クリックのみ
+  if (e.button === 0) {
     isMouseDown = true;
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
+    lastPosX = posX;
+    lastPosY = posY;
     overlayImg.style.cursor = 'grabbing';
-    
-    // ダブルクリック判定
-    const now = Date.now();
-    if (now - lastClickTime < 300) {
-      // ダブルクリック：ズームトグル
-      if (scale === 1) {
-        scale = 2;
-        posX = 0;
-        posY = 0;
-      } else {
-        scale = 1;
-        posX = 0;
-        posY = 0;
-      }
-      clampPosition();
-      updateTransform();
-      lastClickTime = 0;
-    } else {
-      lastClickTime = now;
-    }
   }
 });
 
 document.addEventListener('mousemove', function(e) {
   if (isMouseDown) {
     e.preventDefault();
-    e.stopPropagation();
-    
     const deltaX = e.clientX - lastMouseX;
     const deltaY = e.clientY - lastMouseY;
     
-    if (isPortrait() && overlay.style.display === 'block') {
-      // 縦向きの場合：座標変換を適用
-      const tempDeltaX = deltaX;
-      const tempDeltaY = deltaY;
-      posX += -tempDeltaY;
-      posY += tempDeltaX;
-    } else {
-      // 通常の場合
-      posX += deltaX;
-      posY += deltaY;
-    }
+    posX = lastPosX + deltaX;
+    posY = lastPosY + deltaY;
     
     clampPosition();
     updateTransform();
-    
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
   }
 });
 
@@ -1151,79 +895,19 @@ document.addEventListener('mouseup', function(e) {
   }
 });
 
-overlayImg.addEventListener('mouseleave', function() {
-  isMouseDown = false;
-  overlayImg.style.cursor = 'move';
-});
-
-// マウスホイールでズーム（PC用）
 overlayImg.addEventListener('wheel', function(e) {
   e.preventDefault();
-  e.stopPropagation();
   
   const zoomIntensity = 0.1;
   const wheelDelta = e.deltaY > 0 ? -zoomIntensity : zoomIntensity;
-  const newScale = Math.max(0.5, Math.min(5, scale + wheelDelta));
-  
-  // マウス位置を拡大中心にする
-  const rect = overlayImg.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-  
-  // 画像上の相対位置
-  const imgX = (mouseX - posX) / scale;
-  const imgY = (mouseY - posY) / scale;
-  
-  // 拡大中心を調整
-  posX = mouseX - imgX * newScale;
-  posY = mouseY - imgY * newScale;
-  scale = newScale;
+  scale = Math.max(0.5, Math.min(5, scale + wheelDelta));
   
   clampPosition();
   updateTransform();
 }, { passive: false });
 
-// 画像読み込み後にサイズ調整
-overlayImg.addEventListener('load', function() {
-  if (overlay.style.display === 'block') {
-    resetZoomAndPosition();
-    overlayImg.style.cursor = 'move';
-  }
-});
-
-// 写真画像読み込み後にスクロールヒントを調整
-photo.addEventListener('load', function() {
-  adjustScrollHint();
-});
-
-// スマホの回転イベントに対応
-window.addEventListener('orientationchange', function() {
-  setTimeout(() => {
-    if (overlay.style.display === 'block') {
-      resetZoomAndPosition();
-    } else {
-      // 拡大写真が表示されていない場合もリセット
-      if (isMobile) {
-        resetViewport();
-      }
-    }
-    // 画面回転後にスクロールヒントを再調整
-    adjustScrollHint();
-  }, 300);
-});
-
-// ウィンドウリサイズ時にズーム状態を確認
-window.addEventListener('resize', function() {
-  if (overlay.style.display === 'block') {
-    clampPosition();
-    updateTransform();
-  }
-  // リサイズ後にスクロールヒントを再調整
-  setTimeout(adjustScrollHint, 100);
-});
-
 /* =====================
-   文字サイズ切替（保存）
+   文字サイズ切替
 ===================== */
 const sizeButtons = document.querySelectorAll(".font-controls button");
 
@@ -1234,29 +918,18 @@ function applySize(size) {
     document.documentElement.style.setProperty("--font-base", "16px");
     document.documentElement.style.setProperty("--btn-font", "16px");
     document.documentElement.style.setProperty("--btn-padding", "8px 14px");
-    document.documentElement.style.setProperty("--btn-border", "3px");
-    document.documentElement.style.setProperty("--title-weight", "700");
-    document.documentElement.style.setProperty("--photo-max-width", "95vw");
   } else if (size === "medium") {
     document.documentElement.style.setProperty("--font-base", "18px");
     document.documentElement.style.setProperty("--btn-font", "18px");
     document.documentElement.style.setProperty("--btn-padding", "10px 16px");
-    document.documentElement.style.setProperty("--btn-border", "4px");
-    document.documentElement.style.setProperty("--title-weight", "800");
-    document.documentElement.style.setProperty("--photo-max-width", "90vw");
   } else if (size === "large") {
     document.documentElement.style.setProperty("--font-base", "20px");
     document.documentElement.style.setProperty("--btn-font", "20px");
     document.documentElement.style.setProperty("--btn-padding", "12px 18px");
-    document.documentElement.style.setProperty("--btn-border", "5px");
-    document.documentElement.style.setProperty("--title-weight", "900");
-    document.documentElement.style.setProperty("--photo-max-width", "85vw");
   }
   
   localStorage.setItem("fontSize", size);
   document.querySelector(`.font-controls button[data-size="${size}"]`).classList.add("active");
-  
-  // 文字サイズ変更後にスクロールヒントを再調整
   setTimeout(adjustScrollHint, 100);
 }
 
@@ -1266,7 +939,6 @@ sizeButtons.forEach(btn => {
   };
 });
 
-// 保存された設定を適用（デフォルトは「大」）
 const saved = localStorage.getItem("fontSize") || "large";
 applySize(saved);
 
@@ -1274,38 +946,11 @@ applySize(saved);
    初期化
 ===================== */
 window.addEventListener('load', function() {
-  // 初期画像の存在をチェック
-  const img = new Image();
-  img.onload = function() {
-    console.log('✅ 初期画像が正常に読み込まれました');
-    
-    // 初期画像読み込み後にスクロールヒントを調整
-    setTimeout(adjustScrollHint, 500);
-  };
-  img.onerror = function() {
-    console.error('❌ 初期画像が見つかりません');
-  };
-  img.src = sections.battery.img;
-  
-  // スマホ向けの初期設定
-  if (isMobile) {
-    console.log('📱 スマホデバイスを検出しました');
-    
-    // スマホ向けヒントを表示
-    setTimeout(() => {
-      const hint = document.querySelector('.scroll-hint');
-      if (hint) {
-        hint.style.display = 'block';
-        setTimeout(() => {
-          hint.style.transition = 'opacity 1s';
-          hint.style.opacity = '0';
-          setTimeout(() => {
-            hint.style.display = 'none';
-          }, 1000);
-        }, 5000);
-      }
-    }, 1000);
-  }
+  setTimeout(adjustScrollHint, 500);
+});
+
+photo.addEventListener('load', function() {
+  adjustScrollHint();
 });
 </script>
 
