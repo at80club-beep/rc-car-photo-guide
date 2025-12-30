@@ -80,7 +80,6 @@ main{
   padding:14px;
 }
 
-/* ⑤専用 危険（実験）表示 */
 .photo-box.danger{
   border-color:var(--danger);
   background:#fff0f0;
@@ -89,7 +88,7 @@ main{
 .danger-label{
   display:none;
   text-align:center;
-  font-size:1.2em;
+  font-size:1.1em;
   font-weight:900;
   color:var(--danger);
   margin-bottom:6px;
@@ -128,6 +127,14 @@ main{
   font-size:1em;
 }
 
+/* 操作ヒント（初回用） */
+.hint{
+  font-size:0.95em;
+  color:#555;
+  margin-top:6px;
+  text-align:center;
+}
+
 /* ⑤用 戻りボタン */
 .retry-box{
   display:none;
@@ -163,15 +170,22 @@ main{
   inset:0;
   background:rgba(0,0,0,0.95);
   z-index:999;
+  touch-action:none;
+}
+
+.overlay-inner{
+  width:100%;
+  height:100%;
+  display:flex;
   align-items:center;
   justify-content:center;
-  touch-action:none;
+  overflow:hidden;
 }
 
 .overlay img{
   max-width:95%;
   max-height:95%;
-  border-radius:12px;
+  transform-origin:center center;
 }
 
 .close{
@@ -186,6 +200,17 @@ main{
   font-size:32px;
   line-height:48px;
   text-align:center;
+  z-index:1000;
+}
+
+.overlay-hint{
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  text-align:center;
+  color:#fff;
+  font-size:0.95em;
+  opacity:0.9;
 }
 </style>
 </head>
@@ -215,12 +240,21 @@ main{
     <div class="complete-mark" id="completeMark">🌟 ほんとうの完成！ 🌟</div>
 
     <div class="note" id="note"></div>
+
+    <div class="hint" id="hint">
+      👆写真タップで拡大 ／ 🤏2本指で拡大縮小 ／ 🖐動かす
+    </div>
   </div>
 </main>
 
 <div class="overlay" id="overlay">
   <div class="close" onclick="closeOverlay()">×</div>
-  <img id="overlayImg">
+  <div class="overlay-inner">
+    <img id="overlayImg">
+  </div>
+  <div class="overlay-hint">
+    🤏 拡大縮小　🖐 移動　👆 タップで戻る　↔ 工程切替
+  </div>
 </div>
 
 <script>
@@ -229,24 +263,24 @@ const steps = [
     ok:"電池の向きOK！", note:"＋と－を確認します。" },
 
   { nav:"② 電池の線", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
-    ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+    ok:"線がつながった！", note:"磁石がしっかり付いているか確認。" },
 
   { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
-    ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
+    ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。" },
 
   { nav:"④ 回る？", title:"④ モーターは回る？", img:"images/motor_test.jpg",
-    ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
+    ok:"回れば OK"（又は、LEDチェッカーで調べる）, note:"指を近づけないよう注意。　回らない（つかない）場合は配線を確認。" },
 
   { nav:"⑤ 見た目完成", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
     ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
 
-  { nav:"⑥ ほんとうの完成", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
+  { nav:"⑥ ほんとうの完成", title:"⑥ ほんとうの完成！", img:"images/car_complete.jpg",
     ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
 let current=0;
-let startX=0;
 
+/* ナビ生成 */
 const nav=document.getElementById("nav");
 steps.forEach((s,i)=>{
   const b=document.createElement("button");
@@ -266,37 +300,85 @@ function showStep(i){
   photo.src=s.img;
   ok.textContent=s.ok;
   note.textContent=s.note;
-
   photoBox.classList.toggle("danger",!!s.danger);
   retryBox.style.display=s.danger?"block":"none";
   completeMark.style.display=s.final?"block":"none";
 }
 
+/* ===== 拡大・ジェスチャー ===== */
+let scale=1, startScale=1;
+let offsetX=0, offsetY=0, startX=0, startY=0;
+let startDist=0;
+
 photo.onclick=()=>{
-  overlay.style.display="flex";
+  overlay.style.display="block";
   overlayImg.src=photo.src;
-  if(window.innerHeight>window.innerWidth){
-    overlayImg.style.transform="rotate(90deg)";
-  }else{
-    overlayImg.style.transform="none";
-  }
+  resetTransform();
 };
+
+overlay.onclick=()=>closeOverlay();
 
 function closeOverlay(){
   overlay.style.display="none";
 }
 
+function resetTransform(){
+  scale=1;
+  offsetX=0;
+  offsetY=0;
+  applyTransform();
+}
+
+function applyTransform(){
+  overlayImg.style.transform=
+    `translate(${offsetX}px,${offsetY}px) scale(${scale})`;
+}
+
 overlay.addEventListener("touchstart",e=>{
-  startX=e.touches[0].clientX;
+  if(e.touches.length===1){
+    startX=e.touches[0].clientX-offsetX;
+    startY=e.touches[0].clientY-offsetY;
+  }
+  if(e.touches.length===2){
+    startDist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    startScale=scale;
+  }
+});
+
+overlay.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  if(e.touches.length===1){
+    offsetX=e.touches[0].clientX-startX;
+    offsetY=e.touches[0].clientY-startY;
+    applyTransform();
+  }
+  if(e.touches.length===2){
+    const dist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    scale=Math.min(5,Math.max(1,startScale*(dist/startDist)));
+    applyTransform();
+  }
+},{passive:false});
+
+/* スワイプで工程切替 */
+let swipeStartX=0;
+overlay.addEventListener("touchstart",e=>{
+  swipeStartX=e.touches[0].clientX;
 });
 
 overlay.addEventListener("touchend",e=>{
-  const dx=e.changedTouches[0].clientX-startX;
-  if(Math.abs(dx)>50){
+  const dx=e.changedTouches[0].clientX-swipeStartX;
+  if(Math.abs(dx)>80){
     if(dx<0 && current<steps.length-1) current++;
     if(dx>0 && current>0) current--;
     showStep(current);
     overlayImg.src=steps[current].img;
+    resetTransform();
   }
 });
 
