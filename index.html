@@ -205,4 +205,48 @@ const steps = [
   { nav:"③ スイッチ", title:"③ スイッチ", img:"images/switch.jpg",
     ok:"前後が切り替わる！", note:"向きを確認します。" },
 
-  { nav:"④ 回る？", title:"④ モーターは回
+  { nav:"④ 回る？", title:"④ モーターは回る？", img:"images/motor.jpg",
+    ok:"モーターOK！", note:"指を近づけないよう注意。" },
+
+  { nav:"⑤ 見た目完成", title:"⑤ 見た目完成（実験中）", img:"images/wire_test.jpg",
+    ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
+
+  { nav:"⑥ ほんとうの完成", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
+    ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+];
+
+let current=0;
+
+const nav=document.getElementById("nav");
+steps.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=s.nav;
+  if(i===0) b.classList.add("active");
+  b.onclick=()=>show(i);
+  nav.appendChild(b);
+});
+
+function show(i){
+  current=i;
+  document.querySelectorAll("nav button").forEach((b,idx)=>{
+    b.classList.toggle("active",idx===i);
+  });
+
+  const s=steps[i];
+  title.textContent=s.title;
+  photo.src=s.img;
+  ok.textContent=s.ok;
+  note.textContent=s.note;
+
+  // ⑤だけ特別UI
+  photoBox.classList.toggle("danger",!!s.danger);
+  retryBox.style.display=s.danger?"block":"none";
+
+  completeMark.style.display=s.final?"block":"none";
+}
+
+show(0);
+</script>
+
+</body>
+</html>
