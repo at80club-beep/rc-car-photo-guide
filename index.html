@@ -2,129 +2,172 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>リモコンカー作り 写真で確認シート（指導員用）</title>
+<title>リモコンカー作り 写真で確認シート（超初心者指導員用）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
 <style>
+:root{
+  --bg:#faf7f2;
+  --main:#f0b344;
+  --border:#e0cfa0;
+  --ok:#4caf50;
+  --note:#a6842c;
+}
+
 body{
   margin:0;
   font-family:"Hiragino Sans","メイリオ",sans-serif;
-  background:#faf7f2;
+  background:var(--bg);
   color:#333;
+  line-height:1.7;
 }
 
-
+/* ===== ヘッダー ===== */
 header{
   position:sticky;
   top:0;
   background:#fff7dd;
-  border-bottom:4px solid #e0cfa0;
+  border-bottom:4px solid var(--border);
   padding:10px;
   z-index:100;
 }
 
+.header-top{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+}
 
-.title{
+h1{
   font-size:1.3em;
-  font-weight:900;
   margin:0;
+  font-weight:900;
 }
 
-
-.subtitle{
-  font-size:0.6em;
-  color:#555;
+.mode-switch{
+  margin-left:auto;
+  display:flex;
+  gap:6px;
 }
 
+.mode-switch button{
+  padding:6px 14px;
+  font-size:14px;
+  border-radius:20px;
+  border:2px solid #999;
+  background:#fff;
+  cursor:pointer;
+}
 
+.mode-switch button.active{
+  background:#333;
+  color:#fff;
+}
+
+/* ===== ナビ ===== */
 nav{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:6px;
   margin-top:8px;
 }
 
-
 nav button{
-  flex:1;
-  min-height:48px;
-  font-size:18px;
-  font-weight:700;
-  border:4px solid #a6842c;
-  background:#fff;
+  flex:1 1 auto;
+  min-width:120px;
+  padding:10px;
+  font-size:16px;
+  font-weight:800;
   border-radius:12px;
+  border:3px solid var(--note);
+  background:#fff;
+  cursor:pointer;
 }
 
-
 nav button.active{
-  background:#f0b344;
+  background:var(--main);
   border-color:#000;
 }
 
-
+/* ===== メイン ===== */
 main{
   padding:12px;
 }
 
-
 .section-title{
-  font-size:1.3em;
-  font-weight:800;
-  border-bottom:3px solid #f0b344;
+  font-size:1.4em;
+  font-weight:900;
+  border-bottom:3px solid var(--main);
   margin-bottom:12px;
 }
 
-
 .photo-box{
   background:#fff;
-  border:4px solid #e0cfa0;
+  border:4px solid var(--border);
   border-radius:14px;
   padding:14px;
 }
 
-
 .photo-img{
   width:100%;
   max-width:640px;
-  display:block;
   margin:0 auto 10px;
+  display:block;
   border-radius:12px;
-  border:4px solid #e0cfa0;
+  border:4px solid var(--border);
   cursor:pointer;
 }
 
-
-.photo-hint{
-  text-align:center;
-  font-size:0.9em;
-  color:#666;
-  background:#f0f0f0;
-  padding:8px;
-  border-radius:8px;
-}
-
-
 .ok-box{
   background:#e8f6e8;
-  border:3px solid #4caf50;
+  border:3px solid var(--ok);
   border-radius:10px;
-  padding:12px;
-  margin:12px 0;
-  font-weight:800;
+  padding:10px;
+  font-weight:900;
   text-align:center;
+  margin:10px 0;
 }
-
 
 .note{
   background:#f5efe4;
-  padding:12px;
+  border-left:4px solid var(--note);
+  padding:10px;
   border-radius:8px;
-  border-left:4px solid #a6842c;
+  margin-top:8px;
 }
 
+/* ===== 完成演出 ===== */
+.complete-mark{
+  display:none;
+  text-align:center;
+  font-size:2em;
+  font-weight:900;
+  color:#ff9800;
+  margin:15px 0;
+}
 
-/* ===== 拡大表示（横向き固定） ===== */
+/* ===== 戻るボタン ===== */
+.back-btn{
+  display:none;
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  font-weight:900;
+  border-radius:14px;
+  border:4px solid #e53935;
+  background:#fff3f3;
+  color:#e53935;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+/* ===== かんたんモード ===== */
+.simple .note{display:none;}
+.simple .section-title{font-size:1.5em;}
+.simple .ok-box{font-size:1.3em;}
+
+/* ===== 写真拡大 ===== */
 .overlay{
   display:none;
   position:fixed;
@@ -133,181 +176,165 @@ main{
   z-index:999;
   align-items:center;
   justify-content:center;
-  touch-action:none;
 }
 
-
 .overlay img{
-  max-height:90vw;
-  max-width:90vh;
+  max-width:95%;
+  max-height:95%;
   transform:rotate(90deg);
   border-radius:12px;
 }
 
-
-.close-btn{
+.close{
   position:absolute;
   top:20px;
   right:20px;
-  width:56px;
-  height:56px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
   background:#000;
   color:#fff;
-  font-size:36px;
+  font-size:32px;
+  line-height:50px;
   text-align:center;
-  line-height:56px;
-  border-radius:50%;
-  border:3px solid #fff;
-}
-
-
-.swipe-hint{
-  position:absolute;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  color:#fff;
-  background:rgba(0,0,0,0.7);
-  padding:8px 20px;
-  border-radius:20px;
-  font-size:14px;
-}
-
-
-/* 横向きでは回転解除 */
-@media (orientation:landscape){
-  .overlay img{
-    transform:none;
-    max-width:95%;
-    max-height:95%;
-  }
 }
 </style>
 </head>
 
-
-<body>
-
+<body class="detail">
 
 <header>
-  <h1 class="title">
-    リモコンカー作り 写真で確認シート
-    <span class="subtitle">（指導員用）</span>
-  </h1>
-
-
-  <nav id="nav">
-    <button data-target="battery" class="active">電池BOX</button>
-    <button data-target="wire">電線</button>
-    <button data-target="switch">スイッチ</button>
-    <button data-target="test">テスト</button>
-    <button data-target="complete">完成</button>
-  </nav>
+  <div class="header-top">
+    <h1>リモコンカー作り 写真で確認シート</h1>
+    <div class="mode-switch">
+      <button id="btnDetail" class="active">くわしく</button>
+      <button id="btnSimple">かんたん</button>
+    </div>
+  </div>
+  <nav id="nav"></nav>
 </header>
 
-
 <main>
-  <div class="section-title" id="sectionTitle">電池BOX完成</div>
-
-
+  <div class="section-title" id="title"></div>
   <div class="photo-box">
-    <img id="photo" src="images/battery_box.jpg" class="photo-img">
-    <div class="photo-hint">📱 タップで拡大／スワイプで切り替え</div>
-    <div class="ok-box" id="okMessage">✅ この写真と同じなら OK</div>
-    <div class="note" id="note">電池の＋－向きを確認します。</div>
+    <img id="photo" class="photo-img">
+    <div class="ok-box" id="ok"></div>
+    <div class="complete-mark" id="completeMark">🌟 ほんとうの完成！ 🌟</div>
+    <button class="back-btn" id="backBtn">🔁 ③ 回る？に戻る</button>
+    <div class="note" id="note"></div>
   </div>
 </main>
 
-
-<!-- 拡大表示 -->
-<div id="overlay" class="overlay">
-  <div class="close-btn" onclick="closePhoto()">×</div>
-  <div class="swipe-hint">← → スワイプで写真切り替え</div>
+<div class="overlay" id="overlay">
+  <div class="close" onclick="closePhoto()">×</div>
   <img id="overlayImg">
 </div>
 
-
 <script>
-/* ===== 工程データ ===== */
-const order=["battery","wire","switch","test","complete"];
+const steps = [
+  {
+    nav:"① 電池",
+    title:"① 電池を入れる",
+    simpleTitle:"でんち",
+    img:"images/battery_box.jpg",
+    ok:"電池の向きが合っていればOK！",
+    simpleOk:"むきOK？",
+    note:"＋と－をよく見て入れます。"
+  },
+  {
+    nav:"② 線つなぎ",
+    title:"② 線をつなぐ",
+    simpleTitle:"せん つなぎ",
+    img:"images/wire_magnet.jpg",
+    ok:"線が外れていなければOK！",
+    simpleOk:"ついてる？",
+    note:"磁石・金具がしっかり付いているか確認。"
+  },
+  {
+    nav:"③ 回る？",
+    title:"③ モーターは回る？",
+    simpleTitle:"まわる？",
+    img:"images/motor_test.jpg",
+    ok:"くるくる回ればOK！",
+    simpleOk:"まわった！",
+    note:"指を近づけすぎないよう注意。"
+  },
+  {
+    nav:"④ 見た目完成",
+    title:"④ 見た目は完成",
+    simpleTitle:"できた！",
+    img:"images/car_shape.jpg",
+    ok:"形はできた！",
+    simpleOk:"かたちOK！",
+    note:"まだ動作確認はこれからです。"
+  },
+  {
+    nav:"⑤ ほんとうの完成",
+    title:"⑤ 動いたら完成！",
+    simpleTitle:"うごいた！",
+    img:"images/car_complete.jpg",
+    ok:"リモコンで動けば大成功！",
+    simpleOk:"せいこう！",
+    note:"安全に走らせて遊びましょう。",
+    final:true
+  }
+];
 
+let current=0;
+let simpleMode=false;
 
-const sections={
-  battery:{title:"電池BOX完成",img:"images/battery_box.jpg",ok:"この写真と同じなら OK",note:"電池の＋－向きを確認します。"},
-  wire:{title:"電池につける電線",img:"images/wire_magnet.jpg",ok:"この形なら OK",note:"磁石が端子に付いているか確認。"},
-  switch:{title:"前後切り替えスイッチ",img:"images/switch_complete.jpg",ok:"固定できていれば OK",note:"左右に倒して切り替え確認。"},
-  test:{title:"モーターのテスト",img:"images/motor_test.jpg",ok:"回れば OK",note:"回らない場合は配線確認。"},
-  complete:{title:"完成品",img:"images/car_complete.jpg",ok:"完成です！",note:"安全に走らせましょう。"}
-};
-
-
-let currentIndex=0;
-
-
-const photo=document.getElementById("photo");
-const overlay=document.getElementById("overlay");
-const overlayImg=document.getElementById("overlayImg");
-const sectionTitle=document.getElementById("sectionTitle");
-const okMessage=document.getElementById("okMessage");
-const note=document.getElementById("note");
-const navButtons=document.querySelectorAll("#nav button");
-
-
-function showSection(index){
-  currentIndex=index;
-  const key=order[index];
-  const d=sections[key];
-  sectionTitle.textContent=d.title;
-  photo.src=d.img;
-  overlayImg.src=d.img;
-  okMessage.textContent="✅ "+d.ok;
-  note.textContent=d.note;
-
-
-  navButtons.forEach(b=>b.classList.remove("active"));
-  navButtons[index].classList.add("active");
-}
-
-
-navButtons.forEach((btn,i)=>{
-  btn.onclick=()=>showSection(i);
+const nav=document.getElementById("nav");
+steps.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=s.nav;
+  if(i===0) b.classList.add("active");
+  b.onclick=()=>show(i);
+  nav.appendChild(b);
 });
 
+function show(i){
+  current=i;
+  document.querySelectorAll("nav button").forEach((b,idx)=>{
+    b.classList.toggle("active",idx===i);
+  });
+  const s=steps[i];
+  title.textContent=simpleMode ? s.simpleTitle : s.title;
+  photo.src=s.img;
+  ok.textContent=simpleMode ? s.simpleOk : s.ok;
+  note.textContent=s.note;
+
+  completeMark.style.display=s.final?"block":"none";
+  backBtn.style.display=s.final?"block":"none";
+}
+
+backBtn.onclick=()=>show(2);
+
+btnSimple.onclick=()=>{
+  simpleMode=true;
+  document.body.classList.add("simple");
+  btnSimple.classList.add("active");
+  btnDetail.classList.remove("active");
+  show(current);
+};
+
+btnDetail.onclick=()=>{
+  simpleMode=false;
+  document.body.classList.remove("simple");
+  btnDetail.classList.add("active");
+  btnSimple.classList.remove("active");
+  show(current);
+};
 
 photo.onclick=()=>{
   overlay.style.display="flex";
   overlayImg.src=photo.src;
 };
 
+overlay.onclick=closePhoto;
+function closePhoto(){overlay.style.display="none";}
 
-function closePhoto(){
-  overlay.style.display="none";
-}
-
-
-/* ===== スワイプ処理 ===== */
-let startX=0;
-
-
-overlay.addEventListener("touchstart",e=>{
-  startX=e.touches[0].clientX;
-});
-
-
-overlay.addEventListener("touchend",e=>{
-  const diffX=e.changedTouches[0].clientX-startX;
-  if(Math.abs(diffX)>50){
-    if(diffX<0 && currentIndex<order.length-1){
-      showSection(currentIndex+1);
-    }
-    if(diffX>0 && currentIndex>0){
-      showSection(currentIndex-1);
-    }
-  }
-});
+show(0);
 </script>
-
 
 </body>
 </html>
-
