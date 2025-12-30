@@ -4,242 +4,106 @@
   <meta charset="UTF-8">
   <title>リモコンカー作り 写真で確認シート</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-
   <style>
-    :root {
-      --bg-main: #f6f7fb;
-      --bg-card: #ffffff;
-      --accent: #3a7bd5;
-      --accent-soft: #e4f0ff;
-      --ok-bg: #e6f8ea;
-      --ok-border: #30a14e;
-      --ok-text: #187338;
-      --note-bg: #fff8e6;
-      --note-border: #ffb74d;
-      --note-text: #8a5b00;
-      --danger-bg: #ffe9e9;
-      --danger-border: #f44336;
-      --danger-text: #b02121;
-      --final-bg: #e9f7ff;
-      --final-border: #2196f3;
-      --final-text: #0b558f;
-      --text-main: #222;
-      --text-sub: #555;
-      --nav-bg: #ffffff;
-      --nav-border: #d4d7e0;
-      --shadow-soft: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg-main);
-      color: var(--text-main);
+      font-family: sans-serif;
+      background: #f6f7fb;
+      color: #222;
     }
-
-    .app {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 8px 8px 24px;
+    header {
+      padding: 12px;
+      text-align: center;
     }
-
     header h1 {
       margin: 0;
       font-size: 1.2rem;
-      line-height: 1.4;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
-    header p {
-      margin: 4px 0 0;
-      font-size: 0.8rem;
-      color: var(--text-sub);
-    }
-
-    /* ナビ */
-    .nav-wrapper {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      background: linear-gradient(to bottom, #f6f7fb 70%, rgba(246,247,251,0));
-      padding: 6px 0 6px;
-    }
-
-    .nav-scroll {
+    .nav {
       display: flex;
-      gap: 4px;
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 4px 2px 8px;
+      padding: 8px;
+      gap: 6px;
       scrollbar-width: none;
     }
-    .nav-scroll::-webkit-scrollbar { display: none; }
-
-    .nav-button {
-      flex: 0 0 auto;
-      border-radius: 999px;
-      border: 1px solid var(--nav-border);
-      background: var(--nav-bg);
-      padding: 6px 12px;
-      font-size: 0.85rem;
+    .nav::-webkit-scrollbar {
+      display: none;
+    }
+    .nav button {
+      flex: 1;
       font-weight: bold;
+      font-size: 0.85rem;
+      padding: 6px 4px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
       white-space: nowrap;
-      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
-      box-shadow: var(--shadow-soft);
-      color: var(--text-sub);
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
     }
-
-    .nav-button.active {
-      background: var(--accent);
+    .nav button.active {
+      background: #3a7bd5;
       color: #fff;
-      border-color: var(--accent);
+      border-color: #3a7bd5;
     }
-
-    .nav-button:active { transform: scale(0.97); }
-
-    /* カード */
     .card {
-      margin-top: 4px;
-      background: var(--bg-card);
-      border-radius: 16px;
-      box-shadow: var(--shadow-soft);
-      padding: 12px 12px 14px;
+      background: #fff;
+      margin: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
-    .step-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.78rem;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-radius: 999px;
-      padding: 3px 8px 3px 6px;
-      margin-bottom: 6px;
-    }
-
-    .step-label-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .step-title {
+    .card h2 {
       margin: 0 0 6px;
       font-size: 1.1rem;
-      line-height: 1.35;
     }
-
-    .step-subtitle {
-      margin: 0 0 10px;
-      font-size: 0.8rem;
-      color: var(--text-sub);
+    .card p {
+      margin: 4px 0;
+      font-size: 0.85rem;
+      color: #555;
     }
-
-    .img-wrapper {
-      margin: 0 0 10px;
-      border-radius: 12px;
+    .img-box {
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       overflow: hidden;
-      border: 1px solid #ddd;
-      background: #000;
-      position: relative;
       cursor: pointer;
     }
-
-    .step-image {
+    .img-box img {
       width: 100%;
       display: block;
-      object-fit: cover;
-      max-height: 260px;
     }
-
-    .img-hint {
-      position: absolute;
-      right: 6px;
-      bottom: 4px;
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .ok-box, .note-box {
-      border-radius: 10px;
-      padding: 8px 10px;
+    .ok {
+      background: #e6f8ea;
+      border: 1px solid #30a14e;
+      color: #187338;
+      padding: 8px;
+      border-radius: 8px;
       margin-bottom: 8px;
-      font-size: 0.86rem;
-      line-height: 1.4;
+      font-size: 0.85rem;
     }
-
-    .ok-box {
-      background: var(--ok-bg);
-      border: 1px solid var(--ok-border);
-      color: var(--ok-text);
+    .note {
+      background: #fff8e6;
+      border: 1px solid #ffb74d;
+      color: #8a5b00;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.85rem;
     }
-
-    .note-box {
-      background: var(--note-bg);
-      border: 1px solid var(--note-border);
-      color: var(--note-text);
+    .danger {
+      background: #ffe9e9;
+      border-color: #f44336;
+      color: #b02121;
     }
-
-    .ok-label, .note-label {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 999px;
-      margin-bottom: 3px;
+    .final {
+      background: #e9f7ff;
+      border-color: #2196f3;
+      color: #0b558f;
     }
-
-    .ok-label { background: #30a14e; color: #fff; }
-    .note-label { background: #ffb74d; color: #4a3000; }
-
-    .danger-tag {
-      display: inline-block;
-      margin-top: 3px;
-      font-size: 0.7rem;
-      background: var(--danger-bg);
-      border-radius: 999px;
-      padding: 2px 8px;
-      border: 1px solid var(--danger-border);
-      color: var(--danger-text);
-      font-weight: 600;
-    }
-
-    .final-tag {
-      display: inline-block;
-      margin-top: 3px;
-      font-size: 0.7rem;
-      background: var(--final-bg);
-      border-radius: 999px;
-      padding: 2px 8px;
-      border: 1px solid var(--final-border);
-      color: var(--final-text);
-      font-weight: 600;
-    }
-
-    .footer-note {
-      margin-top: 6px;
-      font-size: 0.72rem;
-      color: var(--text-sub);
-      text-align: right;
-    }
-
-    /* 拡大ビュー */
     .overlay {
       position: fixed;
       inset: 0;
@@ -249,203 +113,93 @@
       justify-content: center;
       z-index: 999;
     }
-
-    .overlay.visible { display: flex; }
-
-    .overlay-inner {
-      position: relative;
+    .overlay.visible {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
     }
-
-    /* PCだけ横向き */
-    @media (min-width: 800px) {
-      .overlay-inner {
-        transform: rotate(90deg);
-        width: 100vh;
-        height: 100vw;
-      }
-    }
-
-    .overlay-img {
+    .overlay img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      background: #000;
     }
-
-    .overlay-info {
-      position: fixed;
-      bottom: 10px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: #fff;
-      font-size: 0.8rem;
-      pointer-events: none;
-      text-shadow: 0 0 4px rgba(0,0,0,0.9);
+    @media (max-width: 799px) {
+      .overlay img {
+        transform: rotate(90deg);
+      }
     }
   </style>
 </head>
-
 <body>
-<div class="app">
   <header>
     <h1>リモコンカー作り 写真で確認シート</h1>
-    <p>指導員用：子どもと一緒に写真を見て、ゆっくり一工程ずつ確認します。</p>
   </header>
-
-  <div class="nav-wrapper">
-    <div class="nav-scroll" id="navScroll"></div>
+  <div class="nav" id="nav"></div>
+  <div class="card" id="card">
+    <h2 id="title"></h2>
+    <p id="subtitle"></p>
+    <div class="img-box" id="imgBox">
+      <img id="mainImg" src="" alt="">
+    </div>
+    <div class="ok" id="okText"></div>
+    <div class="note" id="noteText"></div>
+  </div>
+  <div class="overlay" id="overlay">
+    <img id="overlayImg" src="" alt="">
   </div>
 
-  <main>
-    <section class="card" id="stepCard">
-      <div class="step-label">
-        <span class="step-label-dot"></span>
-        <span id="stepNavText"></span>
-      </div>
+  <script>
+    const steps = [
+      { nav:"① 電池", title:"① 電池（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－を確認します。" },
+      { nav:"② 電池の線", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+      { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
+      { nav:"④ 回る？", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
+      { nav:"⑤ 見た目完成", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
+      { nav:"⑥ ほんとうの完成", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+    ];
 
-      <h2 class="step-title" id="stepTitle"></h2>
-      <p class="step-subtitle" id="stepSubtitle"></p>
+    const nav = document.getElementById('nav');
+    const title = document.getElementById('title');
+    const subtitle = document.getElementById('subtitle');
+    const mainImg = document.getElementById('mainImg');
+    const okText = document.getElementById('okText');
+    const noteText = document.getElementById('noteText');
+    const imgBox = document.getElementById('imgBox');
+    const overlay = document.getElementById('overlay');
+    const overlayImg = document.getElementById('overlayImg');
 
-      <div class="img-wrapper" id="imgWrapper">
-        <img src="" alt="" class="step-image" id="stepImage">
-        <div class="img-hint">タップで大きく</div>
-      </div>
+    let current = 0;
 
-      <div class="ok-box">
-        <div class="ok-label">できているポイント（OK）</div>
-        <div id="okText"></div>
-      </div>
-
-      <div class="note-box" id="noteBox">
-        <div class="note-label">注意・ヒント</div>
-        <div id="noteText"></div>
-        <div id="extraTagContainer"></div>
-      </div>
-
-      <div class="footer-note">写真をタップ → 拡大（PCは横向き）</div>
-    </section>
-  </main>
-</div>
-
-<!-- 拡大オーバーレイ -->
-<div class="overlay" id="overlay">
-  <div class="overlay-inner">
-    <img src="" alt="" id="overlayImg" class="overlay-img">
-  </div>
-  <div class="overlay-info" id="overlayTitle"></div>
-</div>
-
-<script>
-  const steps = [
-    { nav:"① 電池", title:"① 電池（BOX）", img:"images/battery_box.jpg",
-      ok:"電池の向きOK！", note:"＋と－を確認します。" },
-
-    { nav:"② 電池の線", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
-      ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
-
-    { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
-      ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
-
-    { nav:"④ 回る？", title:"④ モーターは回る？", img:"images/motor_test.jpg",
-      ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
-
-    { nav:"⑤ 見た目完成", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
-      ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
-
-    { nav:"⑥ ほんとうの完成", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
-      ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
-  ];
-
-  const navScroll = document.getElementById('navScroll');
-  const stepLabelText = document.getElementById('stepNavText');
-  const stepTitle = document.getElementById('stepTitle');
-  const stepSubtitle = document.getElementById('stepSubtitle');
-  const stepImage = document.getElementById('stepImage');
-  const imgWrapper = document.getElementById('imgWrapper');
-  const okText = document.getElementById('okText');
-  const noteText = document.getElementById('noteText');
-  const noteBox = document.getElementById('noteBox');
-  const extraTagContainer = document.getElementById('extraTagContainer');
-
-  const overlay = document.getElementById('overlay');
-  const overlayImg = document.getElementById('overlayImg');
-  const overlayTitle = document.getElementById('overlayTitle');
-
-  let currentIndex = 0;
-  let navButtons = [];
-
-  function createNavButtons() {
-    steps.forEach((step, index) => {
+    steps.forEach((step, i) => {
       const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'nav-button';
       btn.textContent = step.nav;
-      btn.addEventListener('click', () => setStep(index));
-      navScroll.appendChild(btn);
-      navButtons.push(btn);
+      btn.onclick = () => showStep(i);
+      nav.appendChild(btn);
     });
-  }
 
-  function setStep(index) {
-    currentIndex = index;
-    const step = steps[index];
-
-    stepLabelText.textContent = step.nav;
-    stepTitle.textContent = step.title;
-    stepSubtitle.textContent = `工程 ${index + 1} / ${steps.length}`;
-
-    stepImage.src = step.img;
-    okText.textContent = step.ok;
-    noteText.textContent = step.note;
-
-    extraTagContainer.innerHTML = "";
-    noteBox.style.backgroundColor = "var(--note-bg)";
-    noteBox.style.borderColor = "var(--note-border)";
-
-    if (step.danger) {
-      const tag = document.createElement('div');
-      tag.className = 'danger-tag';
-      tag.textContent = "※ 実験中：安全に気をつけてためそう";
-      extraTagContainer.appendChild(tag);
-      noteBox.style.backgroundColor = "var(--danger-bg)";
-      noteBox.style.borderColor = "var(--danger-border)";
+    function showStep(i) {
+      current = i;
+      const step = steps[i];
+      title.textContent = step.title;
+      subtitle.textContent = `工程 ${i + 1} / ${steps.length}`;
+      mainImg.src = step.img;
+      overlayImg.src = step.img;
+      okText.textContent = step.ok;
+      noteText.textContent = step.note;
+      noteText.className = 'note';
+      if (step.danger) noteText.classList.add('danger');
+      if (step.final) noteText.classList.add('final');
+      [...nav.children].forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === i);
+      });
     }
 
-    if (step.final) {
-      const tag = document.createElement('div');
-      tag.className = 'final-tag';
-      tag.textContent = "ゴール：ここまで来たら完成！";
-      extraTagContainer.appendChild(tag);
-      noteBox.style.backgroundColor = "var(--final-bg)";
-      noteBox.style.borderColor = "var(--final-border)";
-    }
+    imgBox.onclick = () => {
+      overlay.classList.add('visible');
+    };
+    overlay.onclick = () => {
+      overlay.classList.remove('visible');
+    };
 
-    navButtons.forEach((btn, i) => {
-      btn.classList.toggle('active', i === index);
-    });
-  }
-
-  imgWrapper.addEventListener('click', () => {
-    const step = steps[currentIndex];
-    overlayImg.src = step.img;
-    overlayTitle.textContent = step.title;
-    overlay.classList.add('visible');
-  });
-
-  overlay.addEventListener('click', () => {
-    overlay.classList.remove('visible');
-  });
-
-  createNavButtons();
-  setStep(0);
-</script>
-
+    showStep(0);
+  </script>
 </body>
 </html>
