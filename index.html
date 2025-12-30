@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>リモコンカー作り 写真で確認シート</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+
   <style>
     :root {
       --bg-main: #f6f7fb;
@@ -29,9 +30,7 @@
       --shadow-soft: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -46,14 +45,13 @@
       padding: 8px 8px 24px;
     }
 
-    header {
-      padding: 8px 8px 4px;
-    }
-
     header h1 {
       margin: 0;
       font-size: 1.2rem;
       line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     header p {
@@ -79,22 +77,20 @@
       padding: 4px 2px 8px;
       scrollbar-width: none;
     }
-
-    .nav-scroll::-webkit-scrollbar {
-      display: none;
-    }
+    .nav-scroll::-webkit-scrollbar { display: none; }
 
     .nav-button {
       flex: 0 0 auto;
       border-radius: 999px;
       border: 1px solid var(--nav-border);
       background: var(--nav-bg);
-      padding: 6px 10px;
-      font-size: 0.8rem;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
       white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
       box-shadow: var(--shadow-soft);
       color: var(--text-sub);
       cursor: pointer;
@@ -107,11 +103,9 @@
       border-color: var(--accent);
     }
 
-    .nav-button:active {
-      transform: scale(0.97);
-    }
+    .nav-button:active { transform: scale(0.97); }
 
-    /* カード本体 */
+    /* カード */
     .card {
       margin-top: 4px;
       background: var(--bg-card);
@@ -182,28 +176,7 @@
       gap: 4px;
     }
 
-    .img-hint-icon {
-      width: 10px;
-      height: 10px;
-      border: 2px solid #fff;
-      border-radius: 2px;
-      box-sizing: border-box;
-      position: relative;
-    }
-    .img-hint-icon::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 6px;
-      height: 3px;
-      border-top: 2px solid #fff;
-      border-right: 2px solid #fff;
-      transform: translate(-70%, -10%) rotate(45deg);
-    }
-
-    .ok-box,
-    .note-box {
+    .ok-box, .note-box {
       border-radius: 10px;
       padding: 8px 10px;
       margin-bottom: 8px;
@@ -223,8 +196,7 @@
       color: var(--note-text);
     }
 
-    .ok-label,
-    .note-label {
+    .ok-label, .note-label {
       display: inline-block;
       font-size: 0.72rem;
       font-weight: bold;
@@ -233,15 +205,8 @@
       margin-bottom: 3px;
     }
 
-    .ok-label {
-      background: #30a14e;
-      color: #fff;
-    }
-
-    .note-label {
-      background: #ffb74d;
-      color: #4a3000;
-    }
+    .ok-label { background: #30a14e; color: #fff; }
+    .note-label { background: #ffb74d; color: #4a3000; }
 
     .danger-tag {
       display: inline-block;
@@ -274,7 +239,7 @@
       text-align: right;
     }
 
-    /* 拡大ビュー（横向き表示） */
+    /* 拡大ビュー */
     .overlay {
       position: fixed;
       inset: 0;
@@ -283,24 +248,27 @@
       align-items: center;
       justify-content: center;
       z-index: 999;
-      touch-action: none;
     }
 
-    .overlay.visible {
-      display: flex;
-    }
+    .overlay.visible { display: flex; }
 
     .overlay-inner {
       position: relative;
-      width: 100vh;
-      max-width: 100vw;
-      height: 100vw;
-      max-height: 100vh;
-      transform: rotate(90deg);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* PCだけ横向き */
+    @media (min-width: 800px) {
+      .overlay-inner {
+        transform: rotate(90deg);
+        width: 100vh;
+        height: 100vw;
+      }
     }
 
     .overlay-img {
@@ -321,67 +289,33 @@
       pointer-events: none;
       text-shadow: 0 0 4px rgba(0,0,0,0.9);
     }
-
-    .overlay-info span {
-      display: inline-block;
-      margin: 0 6px;
-    }
-
-    /* 矢印（視覚ガイドのみ、タップ範囲は全体） */
-    .overlay-arrow {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,255,255,0.5);
-      font-size: 1.6rem;
-      pointer-events: none;
-      user-select: none;
-    }
-    .overlay-arrow.left {
-      left: 10px;
-    }
-    .overlay-arrow.right {
-      right: 10px;
-    }
-
-    @media (min-width: 600px) {
-      header h1 {
-        font-size: 1.25rem;
-      }
-      .step-image {
-        max-height: 320px;
-      }
-    }
   </style>
 </head>
+
 <body>
 <div class="app">
   <header>
-    <h1>リモコンカー作り<br>写真で確認シート</h1>
+    <h1>リモコンカー作り 写真で確認シート</h1>
     <p>指導員用：子どもと一緒に写真を見て、ゆっくり一工程ずつ確認します。</p>
   </header>
 
   <div class="nav-wrapper">
-    <div class="nav-scroll" id="navScroll">
-      <!-- JSでボタンを生成 -->
-    </div>
+    <div class="nav-scroll" id="navScroll"></div>
   </div>
 
   <main>
     <section class="card" id="stepCard">
-      <div class="step-label" id="stepLabel">
+      <div class="step-label">
         <span class="step-label-dot"></span>
         <span id="stepNavText"></span>
       </div>
+
       <h2 class="step-title" id="stepTitle"></h2>
       <p class="step-subtitle" id="stepSubtitle"></p>
 
       <div class="img-wrapper" id="imgWrapper">
         <img src="" alt="" class="step-image" id="stepImage">
-        <div class="img-hint">
-          <span class="img-hint-icon"></span>
-          <span>タップで大きく</span>
-        </div>
+        <div class="img-hint">タップで大きく</div>
       </div>
 
       <div class="ok-box">
@@ -395,9 +329,7 @@
         <div id="extraTagContainer"></div>
       </div>
 
-      <div class="footer-note">
-        写真をタップ → 横向きで拡大、左右スワイプで前後の工程へ
-      </div>
+      <div class="footer-note">写真をタップ → 拡大（PCは横向き）</div>
     </section>
   </main>
 </div>
@@ -407,13 +339,7 @@
   <div class="overlay-inner">
     <img src="" alt="" id="overlayImg" class="overlay-img">
   </div>
-  <div class="overlay-arrow left">&#9664;</div>
-  <div class="overlay-arrow right">&#9654;</div>
-  <div class="overlay-info">
-    <span id="overlayTitle"></span>
-    <span>｜</span>
-    <span>タップで戻る／左右スワイプで移動</span>
-  </div>
+  <div class="overlay-info" id="overlayTitle"></div>
 </div>
 
 <script>
@@ -438,7 +364,6 @@
   ];
 
   const navScroll = document.getElementById('navScroll');
-  const stepCard = document.getElementById('stepCard');
   const stepLabelText = document.getElementById('stepNavText');
   const stepTitle = document.getElementById('stepTitle');
   const stepSubtitle = document.getElementById('stepSubtitle');
@@ -462,153 +387,65 @@
       btn.type = 'button';
       btn.className = 'nav-button';
       btn.textContent = step.nav;
-      btn.addEventListener('click', () => {
-        setStep(index);
-      });
+      btn.addEventListener('click', () => setStep(index));
       navScroll.appendChild(btn);
       navButtons.push(btn);
     });
   }
 
   function setStep(index) {
-    if (index < 0 || index >= steps.length) return;
     currentIndex = index;
     const step = steps[index];
 
     stepLabelText.textContent = step.nav;
     stepTitle.textContent = step.title;
-    stepSubtitle.textContent = (index === 0)
-      ? "まずは電池から。むきが合っているか、いっしょにチェックします。"
-      : `工程 ${index + 1} / ${steps.length} を確認中`;
+    stepSubtitle.textContent = `工程 ${index + 1} / ${steps.length}`;
 
     stepImage.src = step.img;
-    stepImage.alt = step.title;
     okText.textContent = step.ok;
     noteText.textContent = step.note;
 
     extraTagContainer.innerHTML = "";
-    noteBox.style.borderColor = "var(--note-border)";
     noteBox.style.backgroundColor = "var(--note-bg)";
+    noteBox.style.borderColor = "var(--note-border)";
+
     if (step.danger) {
       const tag = document.createElement('div');
       tag.className = 'danger-tag';
       tag.textContent = "※ 実験中：安全に気をつけてためそう";
       extraTagContainer.appendChild(tag);
-      noteBox.style.borderColor = "var(--danger-border)";
       noteBox.style.backgroundColor = "var(--danger-bg)";
+      noteBox.style.borderColor = "var(--danger-border)";
     }
+
     if (step.final) {
       const tag = document.createElement('div');
       tag.className = 'final-tag';
-      tag.textContent = "ゴール：ここまで来たらリモコンカー完成！";
+      tag.textContent = "ゴール：ここまで来たら完成！";
       extraTagContainer.appendChild(tag);
-      noteBox.style.borderColor = "var(--final-border)";
       noteBox.style.backgroundColor = "var(--final-bg)";
+      noteBox.style.borderColor = "var(--final-border)";
     }
 
     navButtons.forEach((btn, i) => {
       btn.classList.toggle('active', i === index);
     });
-
-    const activeBtn = navButtons[index];
-    if (activeBtn && activeBtn.scrollIntoView) {
-      activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
   }
 
-  // 画像タップで拡大
   imgWrapper.addEventListener('click', () => {
-    openOverlay(currentIndex);
-  });
-
-  function openOverlay(index) {
-    const step = steps[index];
+    const step = steps[currentIndex];
     overlayImg.src = step.img;
-    overlayImg.alt = step.title;
     overlayTitle.textContent = step.title;
     overlay.classList.add('visible');
-  }
-
-  function closeOverlay() {
-    overlay.classList.remove('visible');
-  }
-
-  function showNext(delta) {
-    let nextIndex = currentIndex + delta;
-    if (nextIndex < 0) nextIndex = 0;
-    if (nextIndex >= steps.length) nextIndex = steps.length - 1;
-    if (nextIndex === currentIndex) return;
-    currentIndex = nextIndex;
-    setStep(currentIndex);
-    openOverlay(currentIndex);
-  }
-
-  // オーバーレイ操作
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchEndX = 0;
-  let touchEndY = 0;
-  const SWIPE_THRESHOLD = 40;
-  const TAP_THRESHOLD = 10;
-
-  overlay.addEventListener('touchstart', (e) => {
-    const touch = e.changedTouches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-    touchEndX = touch.clientX;
-    touchEndY = touch.clientY;
-  }, { passive: true });
-
-  overlay.addEventListener('touchmove', (e) => {
-    const touch = e.changedTouches[0];
-    touchEndX = touch.clientX;
-    touchEndY = touch.clientY;
-  }, { passive: true });
-
-  overlay.addEventListener('touchend', (e) => {
-    const dx = touchEndX - touchStartX;
-    const dy = touchEndY - touchStartY;
-
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (absDx < TAP_THRESHOLD && absDy < TAP_THRESHOLD) {
-      // タップ → 閉じる
-      closeOverlay();
-      return;
-    }
-
-    if (absDx > SWIPE_THRESHOLD && absDx > absDy) {
-      if (dx < 0) {
-        // 左にスワイプ → 次へ
-        showNext(1);
-      } else {
-        // 右にスワイプ → 前へ
-        showNext(-1);
-      }
-    }
   });
 
-  // PC用クリックでも閉じる
   overlay.addEventListener('click', () => {
-    closeOverlay();
+    overlay.classList.remove('visible');
   });
 
-  // キーボード操作（PCデモ用）
-  document.addEventListener('keydown', (e) => {
-    if (!overlay.classList.contains('visible')) return;
-    if (e.key === 'Escape') {
-      closeOverlay();
-    } else if (e.key === 'ArrowRight') {
-      showNext(1);
-    } else if (e.key === 'ArrowLeft') {
-      showNext(-1);
-    }
-  });
-
-  // 初期化
   createNavButtons();
   setStep(0);
 </script>
+
 </body>
 </html>
