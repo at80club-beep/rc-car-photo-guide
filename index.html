@@ -7,18 +7,22 @@
 
 <style>
 :root{
-  --ok:#2e8b57;
-  --note:#f39c12;
-  --danger:#e74c3c;
-  --bg:#f6f7f8;
+  --bg:#f7f9fb;
+  --main:#2b7cff;
+  --ok:#2fa84f;
+  --note:#f5a623;
+  --danger:#e5533d;
+  --final:#7a4cff;
   --card:#ffffff;
+  --text:#222;
 }
 
+*{box-sizing:border-box;}
 body{
   margin:0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   background:var(--bg);
-  color:#222;
+  color:var(--text);
 }
 
 header{
@@ -36,24 +40,23 @@ h1{
   font-size:1.3em;
 }
 
-nav{
+.nav{
   display:flex;
   overflow-x:auto;
-  border-top:1px solid #eee;
 }
 
-nav button{
-  flex:1;
-  padding:10px 6px;
-  font-size:0.85em;
+.nav button{
+  flex:1 0 auto;
   border:none;
-  background:#fafafa;
-  border-right:1px solid #eee;
+  padding:10px 8px;
+  background:#eef3ff;
+  font-size:0.9em;
   cursor:pointer;
 }
 
-nav button.active{
-  background:#e3f2fd;
+.nav button.active{
+  background:var(--main);
+  color:#fff;
   font-weight:bold;
 }
 
@@ -63,50 +66,41 @@ main{
 
 .card{
   background:var(--card);
-  border-radius:10px;
-  padding:12px;
+  border-radius:12px;
+  padding:14px;
   box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
 
 .step-title{
-  font-size:1.1em;
+  font-size:1.2em;
   margin-bottom:8px;
-}
-
-.photo-wrap{
-  text-align:center;
-}
-
-.photo-wrap img{
-  max-width:100%;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.ok{
-  margin-top:10px;
-  padding:8px;
-  background:#eaf7ef;
-  border-left:6px solid var(--ok);
-  border-radius:6px;
   font-weight:bold;
 }
 
-.note{
-  margin-top:8px;
-  padding:8px;
-  background:#fff7e6;
-  border-left:6px solid var(--note);
-  border-radius:6px;
+.photo{
+  margin:10px 0;
+  text-align:center;
 }
 
-.note.danger{
-  background:#fdecea;
-  border-left-color:var(--danger);
+.photo img{
+  max-width:100%;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-/* fullscreen image */
-#overlay{
+.box{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  font-size:0.95em;
+}
+
+.box.ok{background:#eaf7ee; color:var(--ok);}
+.box.note{background:#fff4dd; color:#7a5a00;}
+.box.danger{background:#fdecea; color:var(--danger);}
+.box.final{background:#f1ecff; color:var(--final); font-weight:bold;}
+
+.overlay{
   position:fixed;
   inset:0;
   background:#000;
@@ -116,68 +110,61 @@ main{
   z-index:100;
 }
 
-#overlay img{
-  max-width:100%;
-  max-height:100%;
+.overlay img{
+  max-width:100vw;
+  max-height:100vh;
 }
-
 </style>
 </head>
-
 <body>
+
 <header>
   <h1>👀みてつくるシート🚗</h1>
-  <nav id="nav"></nav>
+  <div class="nav" id="nav"></div>
 </header>
 
 <main>
   <div class="card">
     <div class="step-title" id="stepTitle"></div>
-    <div class="photo-wrap">
-      <img id="photo" src="" alt="">
+    <div class="photo">
+      <img id="stepImg" src="" alt="">
     </div>
-    <div class="ok" id="okText"></div>
-    <div class="note" id="noteText"></div>
+    <div class="box ok" id="okBox"></div>
+    <div class="box note" id="noteBox"></div>
   </div>
 </main>
 
-<div id="overlay">
-  <img id="overlayImg" src="" alt="">
+<div class="overlay" id="overlay">
+  <img id="overlayImg" src="">
 </div>
 
 <script>
 const steps = [
-  { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
-    ok:"電池の向きOK！", note:"＋と－を確認します。" },
+ { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－を確認します。" },
 
-  { nav:"② せん", title:"② でんちにつける せん", img:"images/wire_magnet.jpg",
-    ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+ { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
 
-  { nav:"③ スイッチ", title:"③ 前後切りかえスイッチ", img:"images/switch_complete.jpg",
-    ok:"前後が切りかわる！", note:"左右SWを押して切りかわるか確認。向きを見ます。" },
+ { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
 
-  { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
-    ok:"回ればOK（またはLEDでチェック）", note:"指を近づけない。回らない時は配線を見直そう。" },
+ { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
 
-  { nav:"⑤ みため", title:"⑤ みため完成（実験中）", img:"images/car_complete.jpg",
-    ok:"つなぎ方をためそう！", note:"前後が逆なら入れかえてみよう。", danger:true },
+ { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
 
-  { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
-    ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+ { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
+
+const nav = document.getElementById("nav");
+const titleEl = document.getElementById("stepTitle");
+const imgEl = document.getElementById("stepImg");
+const okBox = document.getElementById("okBox");
+const noteBox = document.getElementById("noteBox");
 
 let current = 0;
 
-const nav = document.getElementById("nav");
-const stepTitle = document.getElementById("stepTitle");
-const photo = document.getElementById("photo");
-const okText = document.getElementById("okText");
-const noteText = document.getElementById("noteText");
-
 steps.forEach((s,i)=>{
-  const b=document.createElement("button");
-  b.textContent=s.nav;
-  b.onclick=()=>showStep(i);
+  const b = document.createElement("button");
+  b.textContent = s.nav;
+  b.onclick = ()=>showStep(i);
   nav.appendChild(b);
 });
 
@@ -185,30 +172,35 @@ function showStep(i){
   current=i;
   [...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
   const s=steps[i];
-  stepTitle.textContent=s.title;
-  photo.src=s.img;
-  okText.textContent="✔ "+s.ok;
-  noteText.textContent="💡 "+s.note;
-  noteText.classList.toggle("danger",!!s.danger);
+  titleEl.textContent=s.title;
+  imgEl.src=s.img;
+  okBox.textContent="✔ "+s.ok;
+  noteBox.textContent="💡 "+s.note;
+
+  noteBox.className="box note";
+  if(s.danger) noteBox.classList.add("danger");
+  if(s.final) noteBox.classList.add("final");
+
+  window.scrollTo({top:0});
 }
 
-showStep(0);
-
-/* fullscreen */
 const overlay=document.getElementById("overlay");
 const overlayImg=document.getElementById("overlayImg");
 
-photo.addEventListener("click",()=>{
-  overlayImg.src=photo.src;
+imgEl.onclick=()=>{
+  overlayImg.src=imgEl.src;
   overlay.style.display="flex";
-  screen.orientation?.lock("landscape").catch(()=>{});
-});
+  document.documentElement.requestFullscreen?.();
+};
 
-overlay.addEventListener("click",()=>{
+overlay.onclick=()=>{
   overlay.style.display="none";
-  overlayImg.src="";
-  screen.orientation?.unlock?.();
-});
+  document.exitFullscreen?.();
+  window.scrollTo({top:0});
+};
+
+showStep(0);
 </script>
+
 </body>
 </html>
