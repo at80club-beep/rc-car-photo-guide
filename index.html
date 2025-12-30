@@ -6,25 +6,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-:root{
-  --bg:#f7f9fb;
-  --main:#2b7cff;
-  --ok:#2fa84f;
-  --note:#f5a623;
-  --danger:#e5533d;
-  --final:#7a4cff;
-  --card:#ffffff;
-  --text:#222;
-}
-
-*{box-sizing:border-box;}
+/* ===== 基本設定 ===== */
+*{ box-sizing:border-box; }
 body{
   margin:0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  background:#f6f8fb;
+  color:#222;
+  font-size:18px;
 }
 
+/* ===== ヘッダー ===== */
 header{
   position:sticky;
   top:0;
@@ -32,74 +24,89 @@ header{
   z-index:10;
   border-bottom:1px solid #ddd;
 }
-
-h1{
+header h1{
   margin:0;
-  padding:10px;
+  padding:12px;
   text-align:center;
-  font-size:1.3em;
+  font-size:1.4em;
 }
 
+/* ===== ナビ ===== */
 .nav{
   display:flex;
+  gap:8px;
+  padding:8px;
   overflow-x:auto;
 }
-
 .nav button{
-  flex:1 0 auto;
   border:none;
-  padding:10px 8px;
-  background:#eef3ff;
+  border-radius:999px;
+  padding:10px 14px;
   font-size:0.9em;
+  background:#e5edff;
+  color:#003a8f;
+  white-space:nowrap;
   cursor:pointer;
 }
-
 .nav button.active{
-  background:var(--main);
+  background:#2b6cff;
   color:#fff;
   font-weight:bold;
 }
 
+/* ===== メイン ===== */
 main{
   padding:12px;
 }
-
 .card{
-  background:var(--card);
-  border-radius:12px;
-  padding:14px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+.step-title{
+  font-size:1.3em;
+  font-weight:bold;
+  margin-bottom:10px;
 }
 
-.step-title{
-  font-size:1.2em;
-  margin-bottom:8px;
+/* ===== 画像 ===== */
+.photo{
+  text-align:center;
+  margin:10px 0;
+}
+.photo img{
+  max-width:100%;
+  border-radius:12px;
+  cursor:pointer;
+}
+.photo .tap-label{
+  margin-top:6px;
+  font-size:0.85em;
+  color:#555;
+}
+
+/* ===== メッセージ ===== */
+.box{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+}
+.box.ok{
+  background:#e7f6ec;
+  color:#0a6b2f;
+}
+.box.note{
+  background:#fdecec;
+  color:#9a1b1b;
+}
+.box.final{
+  background:#fff1db;
+  color:#a14f00;
   font-weight:bold;
 }
 
-.photo{
-  margin:10px 0;
-  text-align:center;
-}
-
-.photo img{
-  max-width:100%;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.box{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  font-size:0.95em;
-}
-
-.box.ok{background:#eaf7ee; color:var(--ok);}
-.box.note{background:#fff4dd; color:#7a5a00;}
-.box.danger{background:#fdecea; color:var(--danger);}
-.box.final{background:#f1ecff; color:var(--final); font-weight:bold;}
-
+/* ===== オーバーレイ ===== */
 .overlay{
   position:fixed;
   inset:0;
@@ -109,13 +116,17 @@ main{
   justify-content:center;
   z-index:100;
 }
-
 .overlay img{
-  max-width:100vw;
-  max-height:100vh;
+  max-width:100vh;
+  max-height:100vw;
+  transform:rotate(90deg);
+}
+body.no-scroll{
+  overflow:hidden;
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -126,9 +137,12 @@ main{
 <main>
   <div class="card">
     <div class="step-title" id="stepTitle"></div>
+
     <div class="photo">
       <img id="stepImg" src="" alt="">
+      <div class="tap-label">👆 タップで大きく見る</div>
     </div>
+
     <div class="box ok" id="okBox"></div>
     <div class="box note" id="noteBox"></div>
   </div>
@@ -140,65 +154,77 @@ main{
 
 <script>
 const steps = [
- { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg", ok:"電池の向きOK！", note:"＋と－を確認します。" },
+  { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
+    ok:"電池の向きOK！", note:"＋と－を確認します。" },
 
- { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg", ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+  { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
+    ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
 
- { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg", ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
+  { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
+    ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
 
- { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg", ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
+  { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
+    ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
 
- { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg", ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
+  { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
+    ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
 
- { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg", ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+  { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
+    ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
 const nav = document.getElementById("nav");
-const titleEl = document.getElementById("stepTitle");
-const imgEl = document.getElementById("stepImg");
+const stepTitle = document.getElementById("stepTitle");
+const stepImg = document.getElementById("stepImg");
 const okBox = document.getElementById("okBox");
 const noteBox = document.getElementById("noteBox");
 
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+
 let current = 0;
 
+/* ナビ生成 */
 steps.forEach((s,i)=>{
-  const b = document.createElement("button");
-  b.textContent = s.nav;
-  b.onclick = ()=>showStep(i);
-  nav.appendChild(b);
+  const btn = document.createElement("button");
+  btn.textContent = s.nav;
+  btn.addEventListener("click",()=>showStep(i));
+  nav.appendChild(btn);
 });
 
+/* 工程表示 */
 function showStep(i){
-  current=i;
+  current = i;
   [...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-  const s=steps[i];
-  titleEl.textContent=s.title;
-  imgEl.src=s.img;
-  okBox.textContent="✔ "+s.ok;
-  noteBox.textContent="💡 "+s.note;
 
-  noteBox.className="box note";
-  if(s.danger) noteBox.classList.add("danger");
-  if(s.final) noteBox.classList.add("final");
+  const s = steps[i];
+  stepTitle.textContent = s.title;
+  stepImg.src = s.img;
+  okBox.textContent = "✔ " + s.ok;
+  noteBox.textContent = "⚠ " + s.note;
 
-  window.scrollTo({top:0});
+  noteBox.className = "box note";
+  if(s.final){
+    noteBox.classList.add("final");
+  }
+  window.scrollTo({ top:0 });
 }
 
-const overlay=document.getElementById("overlay");
-const overlayImg=document.getElementById("overlayImg");
+/* 拡大表示 */
+stepImg.addEventListener("click",()=>{
+  overlayImg.src = stepImg.src;
+  overlay.style.display = "flex";
+  document.body.classList.add("no-scroll");
+});
 
-imgEl.onclick=()=>{
-  overlayImg.src=imgEl.src;
-  overlay.style.display="flex";
-  document.documentElement.requestFullscreen?.();
-};
+/* 閉じる */
+overlay.addEventListener("click",()=>{
+  overlay.style.display = "none";
+  document.body.classList.remove("no-scroll");
+  window.scrollTo({ top:0 });
+});
 
-overlay.onclick=()=>{
-  overlay.style.display="none";
-  document.exitFullscreen?.();
-  window.scrollTo({top:0});
-};
-
+/* 初期表示 */
 showStep(0);
 </script>
 
