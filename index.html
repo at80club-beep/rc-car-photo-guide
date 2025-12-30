@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>リモコンカー作り 写真で確認シート</title>
+<title>リモコンカー工作｜写真で工程確認</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -11,7 +11,7 @@
   --main:#f0b344;
   --border:#e0cfa0;
   --ok:#4caf50;
-  --note:#a6842c;
+  --note:#8a6d1d;
   --danger:#e53935;
 }
 
@@ -20,7 +20,6 @@ body{
   font-family:"Hiragino Sans","メイリオ",sans-serif;
   background:var(--bg);
   color:#333;
-  line-height:1.7;
 }
 
 /* ===== ヘッダー ===== */
@@ -33,16 +32,9 @@ header{
   z-index:100;
 }
 
-.header-top{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:10px;
-}
-
 h1{
-  font-size:1.3em;
-  margin:0;
+  font-size:1.2em;
+  margin:0 0 8px;
   font-weight:900;
 }
 
@@ -51,19 +43,17 @@ nav{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  margin-top:8px;
 }
 
 nav button{
   flex:1 1 auto;
-  min-width:120px;
+  min-width:110px;
   padding:10px;
-  font-size:16px;
+  font-size:15px;
   font-weight:800;
   border-radius:12px;
   border:3px solid var(--note);
   background:#fff;
-  cursor:pointer;
 }
 
 nav button.active{
@@ -90,7 +80,7 @@ main{
   padding:14px;
 }
 
-/* ⚠⑤専用 赤枠 */
+/* ⑤専用 危険（実験）表示 */
 .photo-box.danger{
   border-color:var(--danger);
   background:#fff0f0;
@@ -98,10 +88,10 @@ main{
 
 .danger-label{
   display:none;
+  text-align:center;
   font-size:1.2em;
   font-weight:900;
   color:var(--danger);
-  text-align:center;
   margin-bottom:6px;
 }
 
@@ -112,8 +102,8 @@ main{
 .photo-img{
   width:100%;
   max-width:640px;
-  margin:0 auto 10px;
   display:block;
+  margin:0 auto 10px;
   border-radius:12px;
   border:4px solid var(--border);
 }
@@ -123,12 +113,22 @@ main{
   border:3px solid var(--ok);
   border-radius:10px;
   padding:10px;
+  font-size:1.1em;
   font-weight:900;
   text-align:center;
   margin:10px 0;
 }
 
-/* ===== 戻るボタン（⑤用） ===== */
+.note{
+  background:#f5efe4;
+  border-left:4px solid var(--note);
+  padding:10px;
+  border-radius:8px;
+  margin-top:8px;
+  font-size:1em;
+}
+
+/* ⑤用 戻りボタン */
 .retry-box{
   display:none;
   margin-top:10px;
@@ -136,18 +136,17 @@ main{
 
 .retry-box button{
   width:100%;
-  padding:12px;
+  padding:14px;
   font-size:16px;
   font-weight:900;
   border-radius:14px;
   border:4px solid var(--danger);
   background:#fff3f3;
   color:var(--danger);
-  cursor:pointer;
   margin-top:8px;
 }
 
-/* ===== 完成マーク ===== */
+/* 完成マーク */
 .complete-mark{
   display:none;
   text-align:center;
@@ -157,12 +156,36 @@ main{
   margin:15px 0;
 }
 
-.note{
-  background:#f5efe4;
-  border-left:4px solid var(--note);
-  padding:10px;
-  border-radius:8px;
-  margin-top:8px;
+/* ===== 写真拡大 ===== */
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  z-index:999;
+  align-items:center;
+  justify-content:center;
+  touch-action:none;
+}
+
+.overlay img{
+  max-width:95%;
+  max-height:95%;
+  border-radius:12px;
+}
+
+.close{
+  position:absolute;
+  top:20px;
+  right:20px;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:#000;
+  color:#fff;
+  font-size:32px;
+  line-height:48px;
+  text-align:center;
 }
 </style>
 </head>
@@ -170,7 +193,7 @@ main{
 <body>
 
 <header>
-  <h1>リモコンカー作り 写真で確認シート</h1>
+  <h1>リモコンカー作り 写真で確認</h1>
   <nav id="nav"></nav>
 </header>
 
@@ -178,21 +201,27 @@ main{
   <div class="section-title" id="title"></div>
 
   <div class="photo-box" id="photoBox">
-    <div class="danger-label">⚠ ここは ためすところ（失敗OK）</div>
+    <div class="danger-label">⚠ ここはためすところ（失敗OK）</div>
 
     <img id="photo" class="photo-img">
+
     <div class="ok-box" id="ok"></div>
 
-    <!-- ⑤専用：戻り導線 -->
     <div class="retry-box" id="retryBox">
-      <button onclick="show(2)">🔁 ③ 回る？に戻る</button>
-      <button onclick="show(3)">🔁 ④ 回る？をもう一度</button>
+      <button onclick="showStep(2)">🔁 ③ スイッチに戻る</button>
+      <button onclick="showStep(3)">🔁 ④ 回る？をもう一度</button>
     </div>
 
     <div class="complete-mark" id="completeMark">🌟 ほんとうの完成！ 🌟</div>
+
     <div class="note" id="note"></div>
   </div>
 </main>
+
+<div class="overlay" id="overlay">
+  <div class="close" onclick="closeOverlay()">×</div>
+  <img id="overlayImg">
+</div>
 
 <script>
 const steps = [
@@ -216,36 +245,62 @@ const steps = [
 ];
 
 let current=0;
+let startX=0;
 
 const nav=document.getElementById("nav");
 steps.forEach((s,i)=>{
   const b=document.createElement("button");
   b.textContent=s.nav;
   if(i===0) b.classList.add("active");
-  b.onclick=()=>show(i);
+  b.onclick=()=>showStep(i);
   nav.appendChild(b);
 });
 
-function show(i){
+function showStep(i){
   current=i;
   document.querySelectorAll("nav button").forEach((b,idx)=>{
     b.classList.toggle("active",idx===i);
   });
-
   const s=steps[i];
   title.textContent=s.title;
   photo.src=s.img;
   ok.textContent=s.ok;
   note.textContent=s.note;
 
-  // ⑤だけ特別UI
   photoBox.classList.toggle("danger",!!s.danger);
   retryBox.style.display=s.danger?"block":"none";
-
   completeMark.style.display=s.final?"block":"none";
 }
 
-show(0);
+photo.onclick=()=>{
+  overlay.style.display="flex";
+  overlayImg.src=photo.src;
+  if(window.innerHeight>window.innerWidth){
+    overlayImg.style.transform="rotate(90deg)";
+  }else{
+    overlayImg.style.transform="none";
+  }
+};
+
+function closeOverlay(){
+  overlay.style.display="none";
+}
+
+overlay.addEventListener("touchstart",e=>{
+  startX=e.touches[0].clientX;
+});
+
+overlay.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(Math.abs(dx)>50){
+    if(dx<0 && current<steps.length-1) current++;
+    if(dx>0 && current>0) current--;
+    showStep(current);
+    overlayImg.src=steps[current].img;
+  }
+});
+
+showStep(0);
 </script>
 
 </body>
