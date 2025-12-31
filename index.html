@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>👀みてつくるシート🚗</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<style>
+:root{
+  --bg:#f5f6f8;
+  --card:#ffffff;
+  --ok:#e6f7ec;
+  --danger:#fff3cd;
+  --final:#e8f0ff;
+  --accent:#2b7cff;
+  --text:#222;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:18px;
+}
+
+.wrapper{
+  max-width:960px;
+  margin:0 auto;
+  padding:12px 12px 32px;
+}
+
+header{
+  text-align:center;
+  font-size:1.6em;
+  font-weight:700;
+  margin:8px 0 16px;
+}
+
+/* ナビ */
+.nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:8px 4px 12px;
+  -webkit-overflow-scrolling:touch;
+}
+.nav::-webkit-scrollbar{display:none;}
+
+.nav button{
+  flex:0 0 auto;
+  padding:10px 14px;
+  border-radius:999px;
+  border:2px solid var(--accent);
+  background:#fff;
+  font-size:0.9em;
+  cursor:pointer;
+}
+.nav button.active{
+  background:var(--accent);
+  color:#fff;
+}
+
+@media(min-width:768px){
+  .nav{
+    overflow-x:visible;
+    justify-content:space-between;
+  }
+}
+
+/* カード */
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.card.ok{background:var(--ok);}
+.card.danger{background:var(--danger);}
+.card.final{background:var(--final);}
+
+.card h2{
+  margin:0 0 12px;
+  font-size:1.3em;
+}
+
+.photo-wrap{
+  position:relative;
+  margin-bottom:12px;
+}
+
+.photo-wrap img{
+  width:100%;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+.photo-label{
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  background:rgba(0,0,0,.6);
+  color:#fff;
+  padding:4px 8px;
+  border-radius:8px;
+  font-size:0.8em;
+}
+
+.ok-msg{
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.note{
+  font-size:0.95em;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <header>👀みてつくるシート🚗</header>
+  <div class="nav" id="nav"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+const steps = [
+  { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
+    ok:"電池の向きOK！", note:"＋と－を確認します。" },
+
+  { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
+    ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
+
+  { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
+    ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
+
+  { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
+    ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
+
+  { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
+    ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
+
+  { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
+    ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
+];
+
+const navEl = document.getElementById("nav");
+const contentEl = document.getElementById("content");
+let current = 0;
+
+steps.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=s.nav;
+  b.onclick=()=>showStep(i);
+  navEl.appendChild(b);
+});
+
+function showStep(i){
+  current=i;
+  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
+  const s=steps[i];
+  const cls = s.final ? "final" : s.danger ? "danger" : "ok";
+  contentEl.innerHTML=`
+    <div class="card ${cls}">
+      <h2>${s.title}</h2>
+      <div class="photo-wrap">
+        <img src="${s.img}" alt="" id="mainPhoto">
+        <div class="photo-label">タップで拡大</div>
+      </div>
+      <div class="ok-msg">✔ ${s.ok}</div>
+      <div class="note">${s.note}</div>
+    </div>
+  `;
+  document.getElementById("mainPhoto").onclick = ()=>openOverlay(s.img);
+}
+
+function openOverlay(src){
+  document.body.style.overflow="hidden";
+
+  const overlay=document.createElement("div");
+  overlay.style.position="fixed";
+  overlay.style.inset="0";
+  overlay.style.background="rgba(0,0,0,.85)";
+  overlay.style.display="flex";
+  overlay.style.alignItems="center";
+  overlay.style.justifyContent="center";
+  overlay.style.zIndex="9999";
+  overlay.style.touchAction="none";
+
+  const img=document.createElement("img");
+  img.src=src;
+  img.style.maxWidth="90vw";
+  img.style.maxHeight="90vh";
+  img.style.transform="none";
+
+  if(window.innerWidth<768){
+    img.style.transform="rotate(90deg)";
+  }
+
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+
+  overlay.onclick=()=>{
+    document.body.style.overflow="";
+    window.scrollTo(0,0);
+    img.style.transform="none";
+    overlay.remove();
+  };
+}
+
+showStep(0);
+</script>
+
+</body>
+</html>
