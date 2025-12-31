@@ -6,124 +6,124 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <style>
-:root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --primary:#2d7ff9;
-  --ok:#e6f6ea;
-  --note:#fff6e0;
-  --danger:#ffe6e6;
-  --final:#e6f0ff;
-  --text:#222;
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-.container{
-  max-width:960px;
-  margin:0 auto;
-  padding:12px;
-}
-h1{
-  text-align:center;
-  font-size:1.8rem;
-  margin:10px 0 16px;
-}
-.nav{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding-bottom:8px;
-}
-.nav::-webkit-scrollbar{display:none;}
-.nav button{
-  flex:0 0 auto;
-  border:none;
-  border-radius:999px;
-  padding:10px 14px;
-  font-size:1rem;
-  background:#ddd;
-  cursor:pointer;
-}
-.nav button.active{
-  background:var(--primary);
-  color:#fff;
-}
-@media(min-width:768px){
-  .nav{overflow-x:visible; justify-content:space-between;}
-}
-.card{
-  background:var(--card);
-  border-radius:16px;
-  padding:16px;
-  margin-top:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-.card.ok{background:var(--ok);}
-.card.note{background:var(--note);}
-.card.danger{background:var(--danger);}
-.card.final{background:var(--final);}
-.card h2{
-  font-size:1.4rem;
-  margin:0 0 12px;
-}
-.photo-wrap{
-  position:relative;
-}
-.photo-wrap img{
-  width:100%;
-  border-radius:12px;
-  cursor:pointer;
-}
-.photo-label{
-  position:absolute;
-  bottom:8px;
-  right:8px;
-  background:rgba(0,0,0,0.6);
-  color:#fff;
-  font-size:0.85rem;
-  padding:4px 8px;
-  border-radius:999px;
-}
-.msg{
-  font-size:1.1rem;
-  margin-top:10px;
-}
-.small{
-  font-size:0.95rem;
-  opacity:0.9;
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+  background: #f4f6f8;
+  color: #222;
 }
 
-/* overlay */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  touch-action:none;
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 16px 40px;
 }
-.overlay img{
-  max-width:90vw;
-  max-height:90vh;
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  margin: 12px 0 16px;
 }
-.overlay .close{
-  position:absolute;
-  top:16px;
-  right:16px;
-  background:#fff;
-  border:none;
-  border-radius:50%;
-  width:44px;
-  height:44px;
-  font-size:1.5rem;
-  cursor:pointer;
+
+/* ナビ */
+.nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.nav button {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  font-size: 1rem;
+  background: #ddd;
+  cursor: pointer;
+}
+.nav button.active {
+  background: #2a7cff;
+  color: #fff;
+}
+
+/* カード */
+.card {
+  margin-top: 16px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.card.ok { background: #e8f6ec; }
+.card.note { background: #fffbe8; }
+.card.final { background: #e8f0ff; }
+
+.card h2 {
+  font-size: 1.3rem;
+  margin-top: 0;
+}
+
+/* 写真 */
+.photo-wrap {
+  margin: 12px 0;
+  text-align: center;
+}
+.photo-wrap img {
+  max-width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.photo-hint {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* テキスト */
+.ok-text {
+  font-weight: bold;
+  margin: 8px 0;
+}
+.note-text {
+  font-size: 0.95rem;
+}
+
+/* オーバーレイ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  touch-action: none;
+}
+.overlay img {
+  max-width: 100%;
+  max-height: 100%;
+  touch-action: manipulation;
+}
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #fff;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+}
+@media (min-width: 768px) {
+  .nav { overflow-x: visible; }
 }
 </style>
 </head>
@@ -158,70 +158,90 @@ const steps = [
 
 const navEl = document.getElementById("nav");
 const contentEl = document.getElementById("content");
+let current = 0;
 
-steps.forEach((s,i)=>{
-  const b=document.createElement("button");
-  b.textContent=s.nav;
-  if(i===0)b.classList.add("active");
-  b.onclick=()=>selectStep(i);
-  navEl.appendChild(b);
+steps.forEach((s, i) => {
+  const btn = document.createElement("button");
+  btn.textContent = s.nav;
+  btn.addEventListener("pointerdown", () => showStep(i));
+  navEl.appendChild(btn);
 });
 
-function selectStep(i){
-  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-  renderStep(i);
-  window.scrollTo(0,0);
-}
+function showStep(i){
+  current = i;
+  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active", idx===i));
 
-function renderStep(i){
-  const s=steps[i];
-  const card=document.createElement("div");
-  card.className="card";
-  if(s.danger)card.classList.add("danger");
-  if(s.final)card.classList.add("final");
-  card.innerHTML=`
-    <h2>${s.title}</h2>
-    <div class="photo-wrap">
-      <img src="${s.img}" alt="">
-      <div class="photo-label">タップで拡大</div>
-    </div>
-    <div class="msg">✅ ${s.ok}</div>
-    <div class="msg small">⚠️ ${s.note}</div>
-  `;
-  card.querySelector("img").onclick=()=>openOverlay(s.img);
-  contentEl.innerHTML="";
+  const s = steps[i];
+  contentEl.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "card" + (s.final ? " final" : s.danger ? " note" : " ok");
+
+  const h2 = document.createElement("h2");
+  h2.textContent = s.title;
+
+  const photoWrap = document.createElement("div");
+  photoWrap.className = "photo-wrap";
+  const img = document.createElement("img");
+  img.src = s.img;
+  img.alt = s.title;
+  img.addEventListener("pointerdown", () => openOverlay(s.img));
+  const hint = document.createElement("div");
+  hint.className = "photo-hint";
+  hint.textContent = "タップで拡大";
+
+  photoWrap.appendChild(img);
+  photoWrap.appendChild(hint);
+
+  const ok = document.createElement("div");
+  ok.className = "ok-text";
+  ok.textContent = s.ok;
+
+  const note = document.createElement("div");
+  note.className = "note-text";
+  note.textContent = s.note;
+
+  card.append(h2, photoWrap, ok, note);
   contentEl.appendChild(card);
 }
 
 function openOverlay(src){
-  document.body.style.overflow="hidden";
+  document.body.style.overflow = "hidden";
 
-  const overlay=document.createElement("div");
-  overlay.className="overlay";
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
 
-  const img=document.createElement("img");
-  img.src=src;
+  const img = document.createElement("img");
+  img.src = src;
 
-  const close=document.createElement("button");
-  close.className="close";
-  close.textContent="×";
-
-  if(window.innerHeight>window.innerWidth){
-    img.style.transform="rotate(90deg)";
+  if (window.innerWidth < window.innerHeight) {
+    img.style.transform = "rotate(90deg)";
   }
 
-  close.onclick=()=>{
-    document.body.style.overflow="";
+  img.addEventListener("pointerdown", closeOverlay);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "close-btn";
+  closeBtn.textContent = "×";
+  closeBtn.addEventListener("pointerdown", closeOverlay);
+
+  overlay.addEventListener("pointerdown", (e)=>{
+    if(e.target === overlay){
+      closeOverlay();
+    }
+  });
+
+  overlay.append(img, closeBtn);
+  document.body.appendChild(overlay);
+
+  function closeOverlay(){
+    document.body.style.overflow = "";
     window.scrollTo(0,0);
     overlay.remove();
-  };
-
-  overlay.appendChild(img);
-  overlay.appendChild(close);
-  document.body.appendChild(overlay);
+  }
 }
 
-renderStep(0);
+showStep(0);
 </script>
 </body>
 </html>
