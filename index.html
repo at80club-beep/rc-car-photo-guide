@@ -6,249 +6,220 @@
 <title>👀みてつくるシート🚗</title>
 <style>
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  padding: 0;
-  overflow-x: hidden;
+  font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f0f4f8;
+  line-height: 1.8;
+  font-size: 18px;
 }
 
 .container {
   max-width: 960px;
   margin: 0 auto;
-  background: #fff;
-  min-height: 100vh;
-  box-shadow: 0 0 40px rgba(0,0,0,0.2);
+  padding: 16px;
 }
 
-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  padding: 24px 16px;
+.header {
   text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-h1 {
+  padding: 24px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-bottom: 24px;
+  border-radius: 12px;
   font-size: 28px;
   font-weight: bold;
-  letter-spacing: 1px;
 }
 
 .nav-container {
-  background: #f8f9fa;
-  border-bottom: 3px solid #e9ecef;
-  position: sticky;
-  top: 76px;
-  z-index: 99;
   overflow-x: auto;
+  margin-bottom: 24px;
   -webkit-overflow-scrolling: touch;
 }
 
-.nav-scroll {
+.nav-buttons {
   display: flex;
-  padding: 12px 8px;
-  gap: 8px;
+  gap: 12px;
   min-width: min-content;
+  padding-bottom: 8px;
 }
 
 .nav-btn {
-  flex-shrink: 0;
-  background: #fff;
-  border: 2px solid #dee2e6;
-  border-radius: 24px;
-  padding: 10px 20px;
-  font-size: 16px;
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 16px 20px;
+  background: white;
+  border: 3px solid #ddd;
+  border-radius: 12px;
+  font-size: 20px;
   font-weight: bold;
-  color: #495057;
   cursor: pointer;
+  transition: all 0.3s;
   white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.nav-btn:hover {
-  background: #e9ecef;
-  transform: translateY(-1px);
 }
 
 .nav-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+  background: #667eea;
+  color: white;
   border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.content {
-  padding: 20px 16px;
+  transform: scale(1.05);
 }
 
 .step-card {
-  background: #fff;
+  background: white;
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: 3px solid #e9ecef;
 }
 
-.step-card.ok-step {
-  background: #d4edda;
-  border-color: #28a745;
-}
-
-.step-card.danger-step {
+.step-card.danger {
   background: #fff3cd;
-  border-color: #ffc107;
+  border: 3px solid #ffc107;
 }
 
-.step-card.final-step {
+.step-card.final {
   background: #d1ecf1;
-  border-color: #17a2b8;
+  border: 3px solid #17a2b8;
 }
 
 .step-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
-  color: #212529;
   margin-bottom: 20px;
-  text-align: center;
+  color: #333;
 }
 
 .photo-wrap {
   position: relative;
-  margin: 20px 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  cursor: pointer;
-  background: #f8f9fa;
-}
-
-.photo-wrap::after {
-  content: "📱 タップで拡大";
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  pointer-events: none;
+  margin-bottom: 20px;
 }
 
 .photo-wrap img {
   width: 100%;
   height: auto;
-  display: block;
+  border-radius: 12px;
+  cursor: pointer;
   touch-action: manipulation;
 }
 
-.ok-badge {
-  background: #28a745;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin: 16px 0;
-}
-
-.note-text {
-  background: #f8f9fa;
-  border-left: 4px solid #667eea;
-  padding: 16px;
+.tap-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 8px 16px;
   border-radius: 8px;
   font-size: 16px;
-  line-height: 1.6;
-  color: #495057;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.ok-box {
+  background: #d4edda;
+  border-left: 5px solid #28a745;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.note-box {
+  background: #f8f9fa;
+  border-left: 5px solid #6c757d;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 18px;
 }
 
 .overlay {
-  display: block;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background: rgba(0,0,0,0.95);
   z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   touch-action: none;
 }
 
 .overlay-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 100%;
-  max-height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
 .overlay img {
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 90%;
+  max-height: 70%;
   object-fit: contain;
   touch-action: manipulation;
+  user-select: none;
 }
 
 .close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 48px;
-  height: 48px;
-  background: rgba(255,255,255,0.9);
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: white;
   border: none;
   border-radius: 50%;
   font-size: 28px;
   font-weight: bold;
-  color: #333;
   cursor: pointer;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 10000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-@media (max-width: 768px) {
+.zoom-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 10000;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .nav-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .overlay img {
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
+
+@media (max-width: 767px) {
   .overlay img {
     transform: rotate(90deg);
-    max-width: 90vh;
-    max-height: 90vw;
-  }
-}
-
-@media (min-width: 769px) {
-  .nav-scroll {
-    justify-content: center;
-  }
-  
-  .content {
-    padding: 32px 48px;
-  }
-  
-  .step-card {
-    padding: 32px;
-  }
-  
-  h1 {
-    font-size: 32px;
   }
 }
 </style>
@@ -256,15 +227,13 @@ h1 {
 <body>
 
 <div class="container">
-  <header>
-    <h1>👀みてつくるシート🚗</h1>
-  </header>
+  <div class="header">👀みてつくるシート🚗</div>
   
-  <nav class="nav-container">
-    <div class="nav-scroll" id="navScroll"></div>
-  </nav>
+  <div class="nav-container">
+    <div class="nav-buttons" id="navButtons"></div>
+  </div>
   
-  <main class="content" id="content"></main>
+  <div id="stepContent"></div>
 </div>
 
 <script>
@@ -290,86 +259,85 @@ const steps = [
 
 let currentStep = 0;
 
+function init() {
+  renderNav();
+  renderStep();
+}
+
 function renderNav() {
-  const nav = document.getElementById("navScroll");
-  nav.innerHTML = "";
-  steps.forEach((step, i) => {
-    const btn = document.createElement("button");
-    btn.className = "nav-btn" + (i === currentStep ? " active" : "");
-    btn.textContent = step.nav;
-    btn.addEventListener("pointerdown", () => {
-      currentStep = i;
-      render();
+  const navButtons = document.getElementById('navButtons');
+  navButtons.innerHTML = steps.map((step, idx) => 
+    `<button class="nav-btn ${idx === currentStep ? 'active' : ''}" data-idx="${idx}">${step.nav}</button>`
+  ).join('');
+  
+  const btns = navButtons.querySelectorAll('.nav-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      currentStep = parseInt(btn.dataset.idx);
+      renderNav();
+      renderStep();
     });
-    nav.appendChild(btn);
   });
 }
 
-function renderContent() {
-  const content = document.getElementById("content");
-  content.innerHTML = "";
-  
+function renderStep() {
   const step = steps[currentStep];
-  const card = document.createElement("div");
-  card.className = "step-card";
-  if (step.danger) card.classList.add("danger-step");
-  if (step.final) card.classList.add("final-step");
-  if (!step.danger && !step.final) card.classList.add("ok-step");
+  const content = document.getElementById('stepContent');
   
-  const title = document.createElement("h2");
-  title.className = "step-title";
-  title.textContent = step.title;
-  card.appendChild(title);
+  let cardClass = 'step-card';
+  if (step.danger) cardClass += ' danger';
+  if (step.final) cardClass += ' final';
   
-  const photoWrap = document.createElement("div");
-  photoWrap.className = "photo-wrap";
-  const img = document.createElement("img");
-  img.src = step.img;
-  img.alt = step.title;
-  photoWrap.appendChild(img);
-  photoWrap.addEventListener("pointerdown", () => openOverlay(step.img, step.title));
-  card.appendChild(photoWrap);
+  content.innerHTML = `
+    <div class="${cardClass}">
+      <div class="step-title">${step.title}</div>
+      <div class="photo-wrap">
+        <img src="${step.img}" alt="${step.title}" data-img="${step.img}">
+        <div class="tap-hint">📸 タップで拡大</div>
+      </div>
+      <div class="ok-box">✅ ${step.ok}</div>
+      <div class="note-box">📝 ${step.note}</div>
+    </div>
+  `;
   
-  const okBadge = document.createElement("div");
-  okBadge.className = "ok-badge";
-  okBadge.textContent = step.ok;
-  card.appendChild(okBadge);
-  
-  const note = document.createElement("div");
-  note.className = "note-text";
-  note.textContent = step.note;
-  card.appendChild(note);
-  
-  content.appendChild(card);
+  const img = content.querySelector('img');
+  img.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    openOverlay(img.dataset.img);
+  });
 }
 
-function render() {
-  renderNav();
-  renderContent();
-  window.scrollTo(0, 0);
-}
-
-function openOverlay(imgSrc, alt) {
+function openOverlay(imgSrc) {
   document.body.style.overflow = "hidden";
   
-  const overlay = document.createElement("div");
-  overlay.className = "overlay";
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
   
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "close-btn";
-  closeBtn.textContent = "×";
+  const content = document.createElement('div');
+  content.className = 'overlay-content';
   
-  const content = document.createElement("div");
-  content.className = "overlay-content";
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-btn';
+  closeBtn.textContent = '×';
   
-  const img = document.createElement("img");
+  const img = document.createElement('img');
   img.src = imgSrc;
-  img.alt = alt;
+  img.draggable = false;
+  
+  const hint = document.createElement('div');
+  hint.className = 'zoom-hint';
+  hint.textContent = '👆 指で広げて拡大できます';
   
   content.appendChild(img);
-  overlay.appendChild(closeBtn);
   overlay.appendChild(content);
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(hint);
   document.body.appendChild(overlay);
+  
+  let scale = 1;
+  let lastDistance = 0;
+  let pointers = {};
   
   function closeOverlay() {
     document.body.style.overflow = "";
@@ -377,16 +345,62 @@ function openOverlay(imgSrc, alt) {
     overlay.remove();
   }
   
-  closeBtn.addEventListener("pointerdown", closeOverlay);
+  closeBtn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeOverlay();
+  });
   
-  overlay.addEventListener("pointerdown", (e) => {
+  overlay.addEventListener('pointerdown', (e) => {
     if (e.target === overlay) {
+      e.preventDefault();
       closeOverlay();
+    }
+  });
+  
+  img.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    pointers[e.pointerId] = e;
+  });
+  
+  img.addEventListener('pointermove', (e) => {
+    e.preventDefault();
+    pointers[e.pointerId] = e;
+    
+    const ids = Object.keys(pointers);
+    if (ids.length === 2) {
+      const p1 = pointers[ids[0]];
+      const p2 = pointers[ids[1]];
+      const distance = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
+      
+      if (lastDistance > 0) {
+        const delta = distance / lastDistance;
+        scale *= delta;
+        scale = Math.min(Math.max(scale, 1), 5);
+        img.style.transform = window.innerWidth < 768 
+          ? `rotate(90deg) scale(${scale})` 
+          : `scale(${scale})`;
+      }
+      lastDistance = distance;
+    }
+  });
+  
+  img.addEventListener('pointerup', (e) => {
+    delete pointers[e.pointerId];
+    if (Object.keys(pointers).length < 2) {
+      lastDistance = 0;
+    }
+  });
+  
+  img.addEventListener('pointercancel', (e) => {
+    delete pointers[e.pointerId];
+    if (Object.keys(pointers).length < 2) {
+      lastDistance = 0;
     }
   });
 }
 
-render();
+init();
 </script>
 
 </body>
