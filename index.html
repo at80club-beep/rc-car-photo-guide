@@ -6,104 +6,113 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* ===== 基本設定 ===== */
-*{ box-sizing:border-box; }
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-  background:#f6f8fb;
-  color:#222;
-  font-size:18px;
+:root{
+  --bg:#f6f7f8;
+  --card:#ffffff;
+  --ok:#e6f7ec;
+  --danger:#fff1f0;
+  --final:#e8f4ff;
+  --accent:#ff9800;
+  --text:#333;
 }
 
-/* ===== ヘッダー ===== */
-header{
-  position:sticky;
-  top:0;
-  background:#fff;
-  z-index:10;
-  border-bottom:1px solid #ddd;
-}
-header h1{
+*{ box-sizing:border-box; }
+
+body{
   margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+}
+
+.container{
+  max-width:960px;
+  margin:0 auto;
   padding:12px;
+}
+
+header{
   text-align:center;
-  font-size:1.4em;
+  font-size:1.6rem;
+  font-weight:bold;
+  margin:8px 0 12px;
 }
 
 /* ===== ナビ ===== */
+.nav-wrap{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
 .nav{
   display:flex;
   gap:8px;
-  padding:8px;
-  overflow-x:auto;
+  padding:8px 0;
 }
 .nav button{
+  flex:0 0 auto;
   border:none;
-  border-radius:999px;
   padding:10px 14px;
-  font-size:0.9em;
-  background:#e5edff;
-  color:#003a8f;
-  white-space:nowrap;
+  border-radius:999px;
+  background:#ddd;
+  font-size:1rem;
   cursor:pointer;
 }
 .nav button.active{
-  background:#2b6cff;
+  background:var(--accent);
   color:#fff;
   font-weight:bold;
 }
-
-/* ===== メイン ===== */
-main{
-  padding:12px;
+@media(min-width:900px){
+  .nav-wrap{ overflow-x:visible; }
+  .nav{ justify-content:center; }
 }
+
+/* ===== カード ===== */
 .card{
-  background:#fff;
+  background:var(--card);
   border-radius:16px;
   padding:16px;
+  margin-top:12px;
   box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
-.step-title{
-  font-size:1.3em;
-  font-weight:bold;
-  margin-bottom:10px;
+.card.ok{ background:var(--ok); }
+.card.danger{ background:var(--danger); }
+.card.final{ background:var(--final); }
+
+.card h2{
+  margin:0 0 10px;
+  font-size:1.4rem;
 }
 
 /* ===== 画像 ===== */
-.photo{
-  text-align:center;
-  margin:10px 0;
+.photo-wrap{
+  position:relative;
 }
-.photo img{
-  max-width:100%;
+.photo-wrap img{
+  width:100%;
   border-radius:12px;
-  cursor:pointer;
 }
-.photo .tap-label{
-  margin-top:6px;
-  font-size:0.85em;
-  color:#555;
+.photo-label{
+  position:absolute;
+  bottom:8px;
+  right:8px;
+  background:rgba(0,0,0,0.6);
+  color:#fff;
+  font-size:0.85rem;
+  padding:4px 8px;
+  border-radius:999px;
 }
 
 /* ===== メッセージ ===== */
-.box{
+.ok-msg{
   margin-top:12px;
-  padding:12px;
-  border-radius:12px;
-}
-.box.ok{
-  background:#e7f6ec;
-  color:#0a6b2f;
-}
-.box.note{
-  background:#fdecec;
-  color:#9a1b1b;
-}
-.box.final{
-  background:#fff1db;
-  color:#a14f00;
+  font-size:1.1rem;
   font-weight:bold;
+}
+.note{
+  margin-top:6px;
+  font-size:1rem;
 }
 
 /* ===== オーバーレイ ===== */
@@ -114,39 +123,31 @@ main{
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:100;
+  z-index:999;
 }
 .overlay img{
-  max-width:100vh;
-  max-height:100vw;
-  transform:rotate(90deg);
+  max-width:100%;
+  max-height:100%;
 }
-body.no-scroll{
-  overflow:hidden;
+.overlay.show{ display:flex; }
+
+@media(min-width:900px){
+  .container{ padding:24px; }
+  header{ font-size:2rem; }
 }
 </style>
 </head>
 
 <body>
+<div class="container">
+  <header>👀みてつくるシート🚗</header>
 
-<header>
-  <h1>👀みてつくるシート🚗</h1>
-  <div class="nav" id="nav"></div>
-</header>
-
-<main>
-  <div class="card">
-    <div class="step-title" id="stepTitle"></div>
-
-    <div class="photo">
-      <img id="stepImg" src="" alt="">
-      <div class="tap-label">👆 タップで大きく見る</div>
-    </div>
-
-    <div class="box ok" id="okBox"></div>
-    <div class="box note" id="noteBox"></div>
+  <div class="nav-wrap">
+    <div class="nav" id="nav"></div>
   </div>
-</main>
+
+  <div id="content"></div>
+</div>
 
 <div class="overlay" id="overlay">
   <img id="overlayImg" src="">
@@ -173,60 +174,56 @@ const steps = [
     ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
-const nav = document.getElementById("nav");
-const stepTitle = document.getElementById("stepTitle");
-const stepImg = document.getElementById("stepImg");
-const okBox = document.getElementById("okBox");
-const noteBox = document.getElementById("noteBox");
+const navEl = document.getElementById("nav");
+const contentEl = document.getElementById("content");
+let current = 0;
+
+steps.forEach((s,i)=>{
+  const b = document.createElement("button");
+  b.textContent = s.nav;
+  b.onclick = ()=>showStep(i);
+  navEl.appendChild(b);
+});
+
+function showStep(i){
+  current = i;
+  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
+
+  const s = steps[i];
+  const cls = s.final ? "final" : s.danger ? "danger" : "ok";
+
+  contentEl.innerHTML = `
+    <div class="card ${cls}">
+      <h2>${s.title}</h2>
+      <div class="photo-wrap">
+        <img src="${s.img}" alt="" id="photo">
+        <div class="photo-label">タップで拡大</div>
+      </div>
+      <div class="ok-msg">${s.ok}</div>
+      <div class="note">${s.note}</div>
+    </div>
+  `;
+
+  document.getElementById("photo").onclick = ()=>openOverlay(s.img);
+}
 
 const overlay = document.getElementById("overlay");
 const overlayImg = document.getElementById("overlayImg");
 
-let current = 0;
-
-/* ナビ生成 */
-steps.forEach((s,i)=>{
-  const btn = document.createElement("button");
-  btn.textContent = s.nav;
-  btn.addEventListener("click",()=>showStep(i));
-  nav.appendChild(btn);
-});
-
-/* 工程表示 */
-function showStep(i){
-  current = i;
-  [...nav.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-
-  const s = steps[i];
-  stepTitle.textContent = s.title;
-  stepImg.src = s.img;
-  okBox.textContent = "✔ " + s.ok;
-  noteBox.textContent = "⚠ " + s.note;
-
-  noteBox.className = "box note";
-  if(s.final){
-    noteBox.classList.add("final");
-  }
-  window.scrollTo({ top:0 });
+function openOverlay(src){
+  overlayImg.src = src;
+  overlayImg.style.transform =
+    window.innerWidth < window.innerHeight ? "rotate(90deg)" : "none";
+  overlay.classList.add("show");
 }
 
-/* 拡大表示 */
-stepImg.addEventListener("click",()=>{
-  overlayImg.src = stepImg.src;
-  overlay.style.display = "flex";
-  document.body.classList.add("no-scroll");
-});
-
-/* 閉じる */
-overlay.addEventListener("click",()=>{
-  overlay.style.display = "none";
-  document.body.classList.remove("no-scroll");
+overlay.onclick = ()=>{
+  overlay.classList.remove("show");
+  overlayImg.style.transform = "none";
   window.scrollTo({ top:0 });
-});
+};
 
-/* 初期表示 */
 showStep(0);
 </script>
-
 </body>
 </html>
