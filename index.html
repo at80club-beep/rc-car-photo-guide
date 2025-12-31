@@ -7,122 +7,130 @@
 
 <style>
 :root{
-  --bg:#f5f6f8;
+  --bg:#f4f6f8;
   --card:#ffffff;
-  --ok:#e6f7ec;
-  --danger:#fff3cd;
-  --final:#e8f0ff;
-  --accent:#2b7cff;
+  --primary:#2d7ff9;
+  --ok:#e6f6ea;
+  --note:#fff6e0;
+  --danger:#ffe6e6;
+  --final:#e6f0ff;
   --text:#222;
 }
-
 *{box-sizing:border-box;}
-
 body{
   margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background:var(--bg);
   color:var(--text);
-  font-size:18px;
 }
-
-.wrapper{
+.container{
   max-width:960px;
   margin:0 auto;
-  padding:12px 12px 32px;
+  padding:12px;
 }
-
-header{
+h1{
   text-align:center;
-  font-size:1.6em;
-  font-weight:700;
-  margin:8px 0 16px;
+  font-size:1.8rem;
+  margin:10px 0 16px;
 }
-
-/* ナビ */
 .nav{
   display:flex;
   gap:8px;
   overflow-x:auto;
-  padding:8px 4px 12px;
-  -webkit-overflow-scrolling:touch;
+  padding-bottom:8px;
 }
 .nav::-webkit-scrollbar{display:none;}
-
 .nav button{
   flex:0 0 auto;
-  padding:10px 14px;
+  border:none;
   border-radius:999px;
-  border:2px solid var(--accent);
-  background:#fff;
-  font-size:0.9em;
+  padding:10px 14px;
+  font-size:1rem;
+  background:#ddd;
   cursor:pointer;
 }
 .nav button.active{
-  background:var(--accent);
+  background:var(--primary);
   color:#fff;
 }
-
 @media(min-width:768px){
-  .nav{
-    overflow-x:visible;
-    justify-content:space-between;
-  }
+  .nav{overflow-x:visible; justify-content:space-between;}
 }
-
-/* カード */
 .card{
   background:var(--card);
   border-radius:16px;
   padding:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
+  margin-top:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
-
 .card.ok{background:var(--ok);}
+.card.note{background:var(--note);}
 .card.danger{background:var(--danger);}
 .card.final{background:var(--final);}
-
 .card h2{
+  font-size:1.4rem;
   margin:0 0 12px;
-  font-size:1.3em;
 }
-
 .photo-wrap{
   position:relative;
-  margin-bottom:12px;
 }
-
 .photo-wrap img{
   width:100%;
   border-radius:12px;
   cursor:pointer;
 }
-
 .photo-label{
   position:absolute;
   bottom:8px;
   right:8px;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,0.6);
   color:#fff;
+  font-size:0.85rem;
   padding:4px 8px;
-  border-radius:8px;
-  font-size:0.8em;
+  border-radius:999px;
+}
+.msg{
+  font-size:1.1rem;
+  margin-top:10px;
+}
+.small{
+  font-size:0.95rem;
+  opacity:0.9;
 }
 
-.ok-msg{
-  font-weight:700;
-  margin-bottom:8px;
+/* overlay */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  touch-action:none;
 }
-
-.note{
-  font-size:0.95em;
+.overlay img{
+  max-width:90vw;
+  max-height:90vh;
+}
+.overlay .close{
+  position:absolute;
+  top:16px;
+  right:16px;
+  background:#fff;
+  border:none;
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  font-size:1.5rem;
+  cursor:pointer;
 }
 </style>
 </head>
-<body>
 
-<div class="wrapper">
-  <header>👀みてつくるシート🚗</header>
+<body>
+<div class="container">
+  <h1>👀みてつくるシート🚗</h1>
   <div class="nav" id="nav"></div>
   <div id="content"></div>
 </div>
@@ -150,70 +158,70 @@ const steps = [
 
 const navEl = document.getElementById("nav");
 const contentEl = document.getElementById("content");
-let current = 0;
 
 steps.forEach((s,i)=>{
   const b=document.createElement("button");
   b.textContent=s.nav;
-  b.onclick=()=>showStep(i);
+  if(i===0)b.classList.add("active");
+  b.onclick=()=>selectStep(i);
   navEl.appendChild(b);
 });
 
-function showStep(i){
-  current=i;
+function selectStep(i){
   [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
+  renderStep(i);
+  window.scrollTo(0,0);
+}
+
+function renderStep(i){
   const s=steps[i];
-  const cls = s.final ? "final" : s.danger ? "danger" : "ok";
-  contentEl.innerHTML=`
-    <div class="card ${cls}">
-      <h2>${s.title}</h2>
-      <div class="photo-wrap">
-        <img src="${s.img}" alt="" id="mainPhoto">
-        <div class="photo-label">タップで拡大</div>
-      </div>
-      <div class="ok-msg">✔ ${s.ok}</div>
-      <div class="note">${s.note}</div>
+  const card=document.createElement("div");
+  card.className="card";
+  if(s.danger)card.classList.add("danger");
+  if(s.final)card.classList.add("final");
+  card.innerHTML=`
+    <h2>${s.title}</h2>
+    <div class="photo-wrap">
+      <img src="${s.img}" alt="">
+      <div class="photo-label">タップで拡大</div>
     </div>
+    <div class="msg">✅ ${s.ok}</div>
+    <div class="msg small">⚠️ ${s.note}</div>
   `;
-  document.getElementById("mainPhoto").onclick = ()=>openOverlay(s.img);
+  card.querySelector("img").onclick=()=>openOverlay(s.img);
+  contentEl.innerHTML="";
+  contentEl.appendChild(card);
 }
 
 function openOverlay(src){
   document.body.style.overflow="hidden";
 
   const overlay=document.createElement("div");
-  overlay.style.position="fixed";
-  overlay.style.inset="0";
-  overlay.style.background="rgba(0,0,0,.85)";
-  overlay.style.display="flex";
-  overlay.style.alignItems="center";
-  overlay.style.justifyContent="center";
-  overlay.style.zIndex="9999";
-  overlay.style.touchAction="none";
+  overlay.className="overlay";
 
   const img=document.createElement("img");
   img.src=src;
-  img.style.maxWidth="90vw";
-  img.style.maxHeight="90vh";
-  img.style.transform="none";
 
-  if(window.innerWidth<768){
+  const close=document.createElement("button");
+  close.className="close";
+  close.textContent="×";
+
+  if(window.innerHeight>window.innerWidth){
     img.style.transform="rotate(90deg)";
   }
 
-  overlay.appendChild(img);
-  document.body.appendChild(overlay);
-
-  overlay.onclick=()=>{
+  close.onclick=()=>{
     document.body.style.overflow="";
     window.scrollTo(0,0);
-    img.style.transform="none";
     overlay.remove();
   };
+
+  overlay.appendChild(img);
+  overlay.appendChild(close);
+  document.body.appendChild(overlay);
 }
 
-showStep(0);
+renderStep(0);
 </script>
-
 </body>
 </html>
