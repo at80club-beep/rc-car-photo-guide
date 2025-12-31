@@ -12,83 +12,90 @@
 }
 
 body {
-  font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
-  background: #f0f4f8;
-  line-height: 1.8;
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
   font-size: 18px;
+  line-height: 1.8;
+  background: #f0f4f8;
+  padding-bottom: 40px;
 }
 
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 16px;
 }
 
-.header {
-  text-align: center;
-  padding: 24px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+header {
+  background: #2c5aa0;
   color: white;
-  margin-bottom: 24px;
-  border-radius: 12px;
-  font-size: 28px;
+  padding: 20px;
+  text-align: center;
+  font-size: 26px;
   font-weight: bold;
 }
 
 .nav-container {
+  background: white;
+  border-bottom: 3px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   overflow-x: auto;
-  margin-bottom: 24px;
   -webkit-overflow-scrolling: touch;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 12px;
-  min-width: min-content;
-  padding-bottom: 8px;
+  padding: 12px;
+  gap: 10px;
+  min-width: max-content;
 }
 
 .nav-btn {
   flex: 0 0 auto;
-  min-width: 120px;
-  padding: 16px 20px;
-  background: white;
-  border: 3px solid #ddd;
+  padding: 14px 20px;
+  background: #e8eef5;
+  border: 3px solid #ccc;
   border-radius: 12px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
   white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .nav-btn.active {
-  background: #667eea;
+  background: #2c5aa0;
   color: white;
-  border-color: #667eea;
-  transform: scale(1.05);
+  border-color: #1a3a70;
 }
 
 .step-card {
+  display: none;
   background: white;
-  border-radius: 16px;
+  margin: 20px;
   padding: 24px;
-  margin-bottom: 24px;
+  border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.step-card.danger {
-  background: #fff3cd;
-  border: 3px solid #ffc107;
+.step-card.active {
+  display: block;
 }
 
-.step-card.final {
-  background: #d1ecf1;
-  border: 3px solid #17a2b8;
+.step-card.ok-bg {
+  background: #e8f5e9;
+}
+
+.step-card.danger-bg {
+  background: #fff3e0;
+}
+
+.step-card.final-bg {
+  background: #e3f2fd;
 }
 
 .step-title {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;
   color: #333;
@@ -96,58 +103,59 @@ body {
 
 .photo-wrap {
   position: relative;
-  margin-bottom: 20px;
+  margin: 20px 0;
+  text-align: center;
 }
 
 .photo-wrap img {
-  width: 100%;
+  max-width: 100%;
   height: auto;
   border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   cursor: pointer;
   touch-action: manipulation;
 }
 
-.tap-hint {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0,0,0,0.7);
-  color: white;
+.tap-label {
+  display: inline-block;
+  margin-top: 12px;
   padding: 8px 16px;
+  background: #ff9800;
+  color: white;
   border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
-  pointer-events: none;
 }
 
-.ok-box {
-  background: #d4edda;
-  border-left: 5px solid #28a745;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  font-size: 20px;
+.ok-text {
+  font-size: 22px;
   font-weight: bold;
+  color: #2e7d32;
+  margin: 16px 0;
+  padding: 12px;
+  background: #c8e6c9;
+  border-radius: 8px;
 }
 
-.note-box {
-  background: #f8f9fa;
-  border-left: 5px solid #6c757d;
-  padding: 16px;
-  border-radius: 8px;
+.note-text {
   font-size: 18px;
+  color: #555;
+  margin: 16px 0;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  line-height: 1.8;
 }
 
 .overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0,0,0,0.95);
   z-index: 9999;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   touch-action: none;
@@ -158,17 +166,18 @@ body {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .overlay img {
   max-width: 90%;
-  max-height: 70%;
+  max-height: 90%;
   object-fit: contain;
   touch-action: manipulation;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .close-btn {
@@ -178,47 +187,59 @@ body {
   width: 50px;
   height: 50px;
   background: white;
+  color: #333;
   border: none;
   border-radius: 50%;
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 10000;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.zoom-hint {
+.help-label {
   position: absolute;
-  bottom: 30px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.9);
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,0.95);
   color: #333;
-  padding: 16px 24px;
+  padding: 20px 30px;
   border-radius: 12px;
   font-size: 20px;
   font-weight: bold;
-  z-index: 10000;
-  white-space: nowrap;
+  text-align: center;
+  z-index: 10002;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.help-label.fade-out {
+  opacity: 0;
 }
 
 @media (min-width: 768px) {
   .nav-buttons {
     justify-content: center;
-    flex-wrap: wrap;
   }
   
-  .overlay img {
-    max-width: 80%;
-    max-height: 80%;
+  .nav-btn {
+    flex: 0 0 auto;
+  }
+  
+  .step-card {
+    margin: 30px auto;
+    padding: 32px;
   }
 }
 
 @media (max-width: 767px) {
-  .overlay img {
+  .overlay img.rotated {
+    transform-origin: center center;
     transform: rotate(90deg);
   }
 }
@@ -226,14 +247,14 @@ body {
 </head>
 <body>
 
+<header>👀みてつくるシート🚗</header>
+
 <div class="container">
-  <div class="header">👀みてつくるシート🚗</div>
-  
-  <div class="nav-container">
+  <nav class="nav-container">
     <div class="nav-buttons" id="navButtons"></div>
-  </div>
+  </nav>
   
-  <div id="stepContent"></div>
+  <main id="stepContent"></main>
 </div>
 
 <script>
@@ -259,52 +280,50 @@ const steps = [
 
 let currentStep = 0;
 
-function init() {
-  renderNav();
-  renderStep();
-}
-
 function renderNav() {
   const navButtons = document.getElementById('navButtons');
-  navButtons.innerHTML = steps.map((step, idx) => 
-    `<button class="nav-btn ${idx === currentStep ? 'active' : ''}" data-idx="${idx}">${step.nav}</button>`
-  ).join('');
-  
-  const btns = navButtons.querySelectorAll('.nav-btn');
-  btns.forEach(btn => {
+  navButtons.innerHTML = '';
+  steps.forEach((step, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn' + (index === currentStep ? ' active' : '');
+    btn.textContent = step.nav;
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      currentStep = parseInt(btn.dataset.idx);
-      renderNav();
-      renderStep();
+      currentStep = index;
+      render();
     });
+    navButtons.appendChild(btn);
   });
 }
 
-function renderStep() {
-  const step = steps[currentStep];
-  const content = document.getElementById('stepContent');
-  
-  let cardClass = 'step-card';
-  if (step.danger) cardClass += ' danger';
-  if (step.final) cardClass += ' final';
-  
-  content.innerHTML = `
-    <div class="${cardClass}">
+function renderSteps() {
+  const stepContent = document.getElementById('stepContent');
+  stepContent.innerHTML = '';
+  steps.forEach((step, index) => {
+    const card = document.createElement('div');
+    card.className = 'step-card';
+    if (index === currentStep) card.classList.add('active');
+    if (step.final) card.classList.add('final-bg');
+    else if (step.danger) card.classList.add('danger-bg');
+    else card.classList.add('ok-bg');
+    
+    card.innerHTML = `
       <div class="step-title">${step.title}</div>
       <div class="photo-wrap">
-        <img src="${step.img}" alt="${step.title}" data-img="${step.img}">
-        <div class="tap-hint">📸 タップで拡大</div>
+        <img src="${step.img}" alt="${step.title}" data-index="${index}">
+        <div class="tap-label">📱 タップで拡大</div>
       </div>
-      <div class="ok-box">✅ ${step.ok}</div>
-      <div class="note-box">📝 ${step.note}</div>
-    </div>
-  `;
+      <div class="ok-text">✅ ${step.ok}</div>
+      <div class="note-text">📝 ${step.note}</div>
+    `;
+    stepContent.appendChild(card);
+  });
   
-  const img = content.querySelector('img');
-  img.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    openOverlay(img.dataset.img);
+  document.querySelectorAll('.photo-wrap img').forEach(img => {
+    img.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      openOverlay(img.src);
+    });
   });
 }
 
@@ -317,27 +336,125 @@ function openOverlay(imgSrc) {
   const content = document.createElement('div');
   content.className = 'overlay-content';
   
+  const img = document.createElement('img');
+  img.src = imgSrc;
+  
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    img.classList.add('rotated');
+  }
+  
   const closeBtn = document.createElement('button');
   closeBtn.className = 'close-btn';
   closeBtn.textContent = '×';
   
-  const img = document.createElement('img');
-  img.src = imgSrc;
-  img.draggable = false;
-  
-  const hint = document.createElement('div');
-  hint.className = 'zoom-hint';
-  hint.textContent = '👆 指で広げて拡大できます';
+  const helpLabel = document.createElement('div');
+  helpLabel.className = 'help-label';
+  helpLabel.textContent = '指で広げて拡大・1本指で動かせます';
   
   content.appendChild(img);
   overlay.appendChild(content);
   overlay.appendChild(closeBtn);
-  overlay.appendChild(hint);
+  overlay.appendChild(helpLabel);
   document.body.appendChild(overlay);
   
+  setTimeout(() => {
+    helpLabel.classList.add('fade-out');
+    setTimeout(() => helpLabel.remove(), 500);
+  }, 3000);
+  
   let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
   let lastDistance = 0;
-  let pointers = {};
+  let lastX = 0;
+  let lastY = 0;
+  let pointers = [];
+  let isDragging = false;
+  
+  function updateTransform() {
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+  
+  function getDistance(p1, p2) {
+    const dx = p2.clientX - p1.clientX;
+    const dy = p2.clientY - p1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  
+  function hideHelp() {
+    if (helpLabel.parentNode) {
+      helpLabel.classList.add('fade-out');
+      setTimeout(() => helpLabel.remove(), 100);
+    }
+  }
+  
+  img.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pointers.push(e);
+    
+    if (pointers.length === 2) {
+      lastDistance = getDistance(pointers[0], pointers[1]);
+      hideHelp();
+    } else if (pointers.length === 1) {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      isDragging = false;
+    }
+  });
+  
+  img.addEventListener('pointermove', (e) => {
+    e.preventDefault();
+    const index = pointers.findIndex(p => p.pointerId === e.pointerId);
+    if (index !== -1) pointers[index] = e;
+    
+    if (pointers.length === 2) {
+      const distance = getDistance(pointers[0], pointers[1]);
+      if (lastDistance > 0) {
+        const scaleChange = distance / lastDistance;
+        scale *= scaleChange;
+        scale = Math.max(1, Math.min(5, scale));
+      }
+      lastDistance = distance;
+      updateTransform();
+      hideHelp();
+    } else if (pointers.length === 1 && scale > 1) {
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        isDragging = true;
+        hideHelp();
+      }
+      
+      if (isDragging) {
+        translateX += dx;
+        translateY += dy;
+        
+        const maxMove = 300 * scale;
+        translateX = Math.max(-maxMove, Math.min(maxMove, translateX));
+        translateY = Math.max(-maxMove, Math.min(maxMove, translateY));
+        
+        updateTransform();
+      }
+      
+      lastX = e.clientX;
+      lastY = e.clientY;
+    }
+  });
+  
+  img.addEventListener('pointerup', (e) => {
+    pointers = pointers.filter(p => p.pointerId !== e.pointerId);
+    if (pointers.length < 2) lastDistance = 0;
+    isDragging = false;
+  });
+  
+  img.addEventListener('pointercancel', (e) => {
+    pointers = pointers.filter(p => p.pointerId !== e.pointerId);
+    if (pointers.length < 2) lastDistance = 0;
+    isDragging = false;
+  });
   
   function closeOverlay() {
     document.body.style.overflow = "";
@@ -357,50 +474,14 @@ function openOverlay(imgSrc) {
       closeOverlay();
     }
   });
-  
-  img.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    pointers[e.pointerId] = e;
-  });
-  
-  img.addEventListener('pointermove', (e) => {
-    e.preventDefault();
-    pointers[e.pointerId] = e;
-    
-    const ids = Object.keys(pointers);
-    if (ids.length === 2) {
-      const p1 = pointers[ids[0]];
-      const p2 = pointers[ids[1]];
-      const distance = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
-      
-      if (lastDistance > 0) {
-        const delta = distance / lastDistance;
-        scale *= delta;
-        scale = Math.min(Math.max(scale, 1), 5);
-        img.style.transform = window.innerWidth < 768 
-          ? `rotate(90deg) scale(${scale})` 
-          : `scale(${scale})`;
-      }
-      lastDistance = distance;
-    }
-  });
-  
-  img.addEventListener('pointerup', (e) => {
-    delete pointers[e.pointerId];
-    if (Object.keys(pointers).length < 2) {
-      lastDistance = 0;
-    }
-  });
-  
-  img.addEventListener('pointercancel', (e) => {
-    delete pointers[e.pointerId];
-    if (Object.keys(pointers).length < 2) {
-      lastDistance = 0;
-    }
-  });
 }
 
-init();
+function render() {
+  renderNav();
+  renderSteps();
+}
+
+render();
 </script>
 
 </body>
