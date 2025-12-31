@@ -328,6 +328,8 @@ function openOverlay(imgSrc) {
     }
   }
   
+  updateTransform();
+  
   function closeOverlay() {
     document.body.style.overflow = "";
     window.scrollTo(0, 0);
