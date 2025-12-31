@@ -7,150 +7,159 @@
 
 <style>
 :root{
-  --bg:#f6f7f8;
+  --bg:#f5f6f8;
   --card:#ffffff;
   --ok:#e6f7ec;
-  --danger:#fff1f0;
-  --final:#e8f4ff;
-  --accent:#ff9800;
-  --text:#333;
+  --danger:#fff3cd;
+  --final:#e8f0ff;
+  --accent:#2b7cff;
+  --text:#222;
 }
 
-*{ box-sizing:border-box; }
+*{box-sizing:border-box;}
 
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
   background:var(--bg);
   color:var(--text);
-  line-height:1.6;
+  font-size:18px;
 }
 
-.container{
+.wrapper{
   max-width:960px;
   margin:0 auto;
-  padding:12px;
+  padding:12px 12px 32px;
 }
 
 header{
   text-align:center;
-  font-size:1.6rem;
-  font-weight:bold;
-  margin:8px 0 12px;
+  font-size:1.6em;
+  font-weight:700;
+  margin:8px 0 16px;
 }
 
-/* ===== ナビ ===== */
-.nav-wrap{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-}
+/* ナビ */
 .nav{
   display:flex;
   gap:8px;
-  padding:8px 0;
+  overflow-x:auto;
+  padding:8px 4px 12px;
+  -webkit-overflow-scrolling:touch;
 }
+.nav::-webkit-scrollbar{display:none;}
+
 .nav button{
   flex:0 0 auto;
-  border:none;
   padding:10px 14px;
   border-radius:999px;
-  background:#ddd;
-  font-size:1rem;
+  border:2px solid var(--accent);
+  background:#fff;
+  font-size:0.9em;
   cursor:pointer;
 }
 .nav button.active{
   background:var(--accent);
   color:#fff;
-  font-weight:bold;
-}
-@media(min-width:900px){
-  .nav-wrap{ overflow-x:visible; }
-  .nav{ justify-content:center; }
 }
 
-/* ===== カード ===== */
+@media(min-width:768px){
+  .nav{
+    overflow-x:visible;
+    justify-content:space-between;
+  }
+}
+
+/* カード */
 .card{
   background:var(--card);
   border-radius:16px;
   padding:16px;
-  margin-top:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
-.card.ok{ background:var(--ok); }
-.card.danger{ background:var(--danger); }
-.card.final{ background:var(--final); }
+
+.card.ok{background:var(--ok);}
+.card.danger{background:var(--danger);}
+.card.final{background:var(--final);}
 
 .card h2{
-  margin:0 0 10px;
-  font-size:1.4rem;
+  margin:0 0 12px;
+  font-size:1.3em;
 }
 
-/* ===== 画像 ===== */
 .photo-wrap{
   position:relative;
+  margin-bottom:12px;
 }
+
 .photo-wrap img{
   width:100%;
   border-radius:12px;
+  cursor:pointer;
 }
+
 .photo-label{
   position:absolute;
   bottom:8px;
   right:8px;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,.6);
   color:#fff;
-  font-size:0.85rem;
   padding:4px 8px;
-  border-radius:999px;
+  border-radius:8px;
+  font-size:0.8em;
 }
 
-/* ===== メッセージ ===== */
 .ok-msg{
-  margin-top:12px;
-  font-size:1.1rem;
-  font-weight:bold;
-}
-.note{
-  margin-top:6px;
-  font-size:1rem;
+  font-weight:700;
+  margin-bottom:8px;
 }
 
-/* ===== オーバーレイ ===== */
+.note{
+  font-size:0.95em;
+}
+
+/* オーバーレイ */
 .overlay{
   position:fixed;
   inset:0;
-  background:#000;
+  background:rgba(0,0,0,.85);
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:999;
+  z-index:9999;
 }
-.overlay img{
-  max-width:100%;
-  max-height:100%;
-}
-.overlay.show{ display:flex; }
 
-@media(min-width:900px){
-  .container{ padding:24px; }
-  header{ font-size:2rem; }
+.overlay img{
+  max-width:90vh;
+  max-height:90vw;
+  transform:none;
+}
+
+.overlay.show{
+  display:flex;
+}
+
+@media(max-width:767px){
+  .overlay img.rotate{
+    transform:rotate(90deg);
+    max-width:90vw;
+    max-height:90vh;
+  }
 }
 </style>
 </head>
-
 <body>
-<div class="container">
+
+<div class="wrapper">
   <header>👀みてつくるシート🚗</header>
 
-  <div class="nav-wrap">
-    <div class="nav" id="nav"></div>
-  </div>
+  <div class="nav" id="nav"></div>
 
   <div id="content"></div>
 </div>
 
 <div class="overlay" id="overlay">
-  <img id="overlayImg" src="">
+  <img id="overlayImg" alt="">
 </div>
 
 <script>
@@ -176,54 +185,55 @@ const steps = [
 
 const navEl = document.getElementById("nav");
 const contentEl = document.getElementById("content");
+const overlay = document.getElementById("overlay");
+const overlayImg = document.getElementById("overlayImg");
+
 let current = 0;
 
 steps.forEach((s,i)=>{
-  const b = document.createElement("button");
-  b.textContent = s.nav;
-  b.onclick = ()=>showStep(i);
+  const b=document.createElement("button");
+  b.textContent=s.nav;
+  b.onclick=()=>showStep(i);
   navEl.appendChild(b);
 });
 
 function showStep(i){
-  current = i;
+  current=i;
   [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-
-  const s = steps[i];
+  const s=steps[i];
   const cls = s.final ? "final" : s.danger ? "danger" : "ok";
-
-  contentEl.innerHTML = `
+  contentEl.innerHTML=`
     <div class="card ${cls}">
       <h2>${s.title}</h2>
       <div class="photo-wrap">
-        <img src="${s.img}" alt="" id="photo">
+        <img src="${s.img}" alt="" id="mainPhoto">
         <div class="photo-label">タップで拡大</div>
       </div>
-      <div class="ok-msg">${s.ok}</div>
+      <div class="ok-msg">✔ ${s.ok}</div>
       <div class="note">${s.note}</div>
     </div>
   `;
-
-  document.getElementById("photo").onclick = ()=>openOverlay(s.img);
+  document.getElementById("mainPhoto").onclick = ()=>openOverlay(s.img);
 }
-
-const overlay = document.getElementById("overlay");
-const overlayImg = document.getElementById("overlayImg");
 
 function openOverlay(src){
   overlayImg.src = src;
-  overlayImg.style.transform =
-    window.innerWidth < window.innerHeight ? "rotate(90deg)" : "none";
+  overlayImg.classList.remove("rotate");
+  if(window.innerWidth < 768){
+    overlayImg.classList.add("rotate");
+  }
   overlay.classList.add("show");
 }
 
 overlay.onclick = ()=>{
   overlay.classList.remove("show");
-  overlayImg.style.transform = "none";
-  window.scrollTo({ top:0 });
+  overlayImg.src="";
+  overlayImg.className="";
+  window.scrollTo({top:0});
 };
 
 showStep(0);
 </script>
+
 </body>
 </html>
