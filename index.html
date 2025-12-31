@@ -2,137 +2,269 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>👀みてつくるシート🚗</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+<title>👀みてつくるシート🚗</title>
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-  background: #f4f6f8;
-  color: #222;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 12px 16px 40px;
+  background: #fff;
+  min-height: 100vh;
+  box-shadow: 0 0 40px rgba(0,0,0,0.2);
+}
+
+header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 24px 16px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 h1 {
-  text-align: center;
-  font-size: 1.6rem;
-  margin: 12px 0 16px;
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
-/* ナビ */
-.nav {
-  display: flex;
-  gap: 8px;
+.nav-container {
+  background: #f8f9fa;
+  border-bottom: 3px solid #e9ecef;
+  position: sticky;
+  top: 76px;
+  z-index: 99;
   overflow-x: auto;
-  padding-bottom: 8px;
-}
-.nav::-webkit-scrollbar { display: none; }
-
-.nav button {
-  flex: 0 0 auto;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: none;
-  font-size: 1rem;
-  background: #ddd;
-  cursor: pointer;
-}
-.nav button.active {
-  background: #2a7cff;
-  color: #fff;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* カード */
-.card {
-  margin-top: 16px;
+.nav-scroll {
+  display: flex;
+  padding: 12px 8px;
+  gap: 8px;
+  min-width: min-content;
+}
+
+.nav-btn {
+  flex-shrink: 0;
   background: #fff;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border: 2px solid #dee2e6;
+  border-radius: 24px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #495057;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
-.card.ok { background: #e8f6ec; }
-.card.note { background: #fffbe8; }
-.card.final { background: #e8f0ff; }
-
-.card h2 {
-  font-size: 1.3rem;
-  margin-top: 0;
+.nav-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
 }
 
-/* 写真 */
-.photo-wrap {
-  margin: 12px 0;
+.nav-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.content {
+  padding: 20px 16px;
+}
+
+.step-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border: 3px solid #e9ecef;
+}
+
+.step-card.ok-step {
+  background: #d4edda;
+  border-color: #28a745;
+}
+
+.step-card.danger-step {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.step-card.final-step {
+  background: #d1ecf1;
+  border-color: #17a2b8;
+}
+
+.step-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #212529;
+  margin-bottom: 20px;
   text-align: center;
 }
-.photo-wrap img {
-  max-width: 100%;
+
+.photo-wrap {
+  position: relative;
+  margin: 20px 0;
   border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   cursor: pointer;
+  background: #f8f9fa;
+}
+
+.photo-wrap::after {
+  content: "📱 タップで拡大";
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.photo-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
   touch-action: manipulation;
 }
-.photo-hint {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 4px;
-}
 
-/* テキスト */
-.ok-text {
+.ok-badge {
+  background: #28a745;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 18px;
   font-weight: bold;
-  margin: 8px 0;
-}
-.note-text {
-  font-size: 0.95rem;
+  text-align: center;
+  margin: 16px 0;
 }
 
-/* オーバーレイ */
+.note-text {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #495057;
+}
+
 .overlay {
+  display: block;
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
   z-index: 9999;
   touch-action: none;
 }
-.overlay img {
+
+.overlay-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: 100%;
   max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
   touch-action: manipulation;
 }
+
 .close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #fff;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 1.5rem;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.9);
   border: none;
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10000;
 }
-@media (min-width: 768px) {
-  .nav { overflow-x: visible; }
+
+@media (max-width: 768px) {
+  .overlay img {
+    transform: rotate(90deg);
+    max-width: 90vh;
+    max-height: 90vw;
+  }
+}
+
+@media (min-width: 769px) {
+  .nav-scroll {
+    justify-content: center;
+  }
+  
+  .content {
+    padding: 32px 48px;
+  }
+  
+  .step-card {
+    padding: 32px;
+  }
+  
+  h1 {
+    font-size: 32px;
+  }
 }
 </style>
 </head>
-
 <body>
+
 <div class="container">
-  <h1>👀みてつくるシート🚗</h1>
-  <div class="nav" id="nav"></div>
-  <div id="content"></div>
+  <header>
+    <h1>👀みてつくるシート🚗</h1>
+  </header>
+  
+  <nav class="nav-container">
+    <div class="nav-scroll" id="navScroll"></div>
+  </nav>
+  
+  <main class="content" id="content"></main>
 </div>
 
 <script>
@@ -156,92 +288,106 @@ const steps = [
     ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
-const navEl = document.getElementById("nav");
-const contentEl = document.getElementById("content");
-let current = 0;
+let currentStep = 0;
 
-steps.forEach((s, i) => {
-  const btn = document.createElement("button");
-  btn.textContent = s.nav;
-  btn.addEventListener("pointerdown", () => showStep(i));
-  navEl.appendChild(btn);
-});
+function renderNav() {
+  const nav = document.getElementById("navScroll");
+  nav.innerHTML = "";
+  steps.forEach((step, i) => {
+    const btn = document.createElement("button");
+    btn.className = "nav-btn" + (i === currentStep ? " active" : "");
+    btn.textContent = step.nav;
+    btn.addEventListener("pointerdown", () => {
+      currentStep = i;
+      render();
+    });
+    nav.appendChild(btn);
+  });
+}
 
-function showStep(i){
-  current = i;
-  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active", idx===i));
-
-  const s = steps[i];
-  contentEl.innerHTML = "";
-
+function renderContent() {
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+  
+  const step = steps[currentStep];
   const card = document.createElement("div");
-  card.className = "card" + (s.final ? " final" : s.danger ? " note" : " ok");
-
-  const h2 = document.createElement("h2");
-  h2.textContent = s.title;
-
+  card.className = "step-card";
+  if (step.danger) card.classList.add("danger-step");
+  if (step.final) card.classList.add("final-step");
+  if (!step.danger && !step.final) card.classList.add("ok-step");
+  
+  const title = document.createElement("h2");
+  title.className = "step-title";
+  title.textContent = step.title;
+  card.appendChild(title);
+  
   const photoWrap = document.createElement("div");
   photoWrap.className = "photo-wrap";
   const img = document.createElement("img");
-  img.src = s.img;
-  img.alt = s.title;
-  img.addEventListener("pointerdown", () => openOverlay(s.img));
-  const hint = document.createElement("div");
-  hint.className = "photo-hint";
-  hint.textContent = "タップで拡大";
-
+  img.src = step.img;
+  img.alt = step.title;
   photoWrap.appendChild(img);
-  photoWrap.appendChild(hint);
-
-  const ok = document.createElement("div");
-  ok.className = "ok-text";
-  ok.textContent = s.ok;
-
+  photoWrap.addEventListener("pointerdown", () => openOverlay(step.img, step.title));
+  card.appendChild(photoWrap);
+  
+  const okBadge = document.createElement("div");
+  okBadge.className = "ok-badge";
+  okBadge.textContent = step.ok;
+  card.appendChild(okBadge);
+  
   const note = document.createElement("div");
   note.className = "note-text";
-  note.textContent = s.note;
-
-  card.append(h2, photoWrap, ok, note);
-  contentEl.appendChild(card);
+  note.textContent = step.note;
+  card.appendChild(note);
+  
+  content.appendChild(card);
 }
 
-function openOverlay(src){
-  document.body.style.overflow = "hidden";
+function render() {
+  renderNav();
+  renderContent();
+  window.scrollTo(0, 0);
+}
 
+function openOverlay(imgSrc, alt) {
+  document.body.style.overflow = "hidden";
+  
   const overlay = document.createElement("div");
   overlay.className = "overlay";
-
-  const img = document.createElement("img");
-  img.src = src;
-
-  if (window.innerWidth < window.innerHeight) {
-    img.style.transform = "rotate(90deg)";
-  }
-
-  img.addEventListener("pointerdown", closeOverlay);
-
+  
   const closeBtn = document.createElement("button");
   closeBtn.className = "close-btn";
   closeBtn.textContent = "×";
+  
+  const content = document.createElement("div");
+  content.className = "overlay-content";
+  
+  const img = document.createElement("img");
+  img.src = imgSrc;
+  img.alt = alt;
+  
+  content.appendChild(img);
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+  
+  function closeOverlay() {
+    document.body.style.overflow = "";
+    window.scrollTo(0, 0);
+    overlay.remove();
+  }
+  
   closeBtn.addEventListener("pointerdown", closeOverlay);
-
-  overlay.addEventListener("pointerdown", (e)=>{
-    if(e.target === overlay){
+  
+  overlay.addEventListener("pointerdown", (e) => {
+    if (e.target === overlay) {
       closeOverlay();
     }
   });
-
-  overlay.append(img, closeBtn);
-  document.body.appendChild(overlay);
-
-  function closeOverlay(){
-    document.body.style.overflow = "";
-    window.scrollTo(0,0);
-    overlay.remove();
-  }
 }
 
-showStep(0);
+render();
 </script>
+
 </body>
 </html>
