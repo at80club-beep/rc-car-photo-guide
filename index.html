@@ -203,12 +203,6 @@ body {
     max-height: 80%;
   }
 }
-
-@media (max-width: 767px) {
-  .overlay img {
-    transform: rotate(90deg);
-  }
-}
 </style>
 </head>
 <body>
@@ -328,7 +322,7 @@ function openOverlay(imgSrc) {
   
   function updateTransform() {
     if (isMobile) {
-      img.style.transform = `rotate(90deg) translate(${posX}px, ${posY}px) scale(${scale})`;
+      img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(90deg)`;
     } else {
       img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     }
@@ -379,13 +373,8 @@ function openOverlay(imgSrc) {
         const deltaX = centerX - lastCenterX;
         const deltaY = centerY - lastCenterY;
         
-        if (isMobile) {
-          posX += deltaY;
-          posY -= deltaX;
-        } else {
-          posX += deltaX;
-          posY += deltaY;
-        }
+        posX += deltaX;
+        posY += deltaY;
         
         updateTransform();
       }
@@ -398,13 +387,8 @@ function openOverlay(imgSrc) {
         const deltaX = p.clientX - lastCenterX;
         const deltaY = p.clientY - lastCenterY;
         
-        if (isMobile) {
-          posX += deltaY;
-          posY -= deltaX;
-        } else {
-          posX += deltaX;
-          posY += deltaY;
-        }
+        posX += deltaX;
+        posY += deltaY;
         
         updateTransform();
       }
