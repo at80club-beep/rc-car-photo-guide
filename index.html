@@ -389,9 +389,10 @@ function openOverlay(imgSrc) {
     }
   }
   
-  img.addEventListener('pointerdown', (e) => {
+  overlay.addEventListener('pointerdown', (e) => {
+    if (e.target === closeBtn) return;
+    
     e.preventDefault();
-    e.stopPropagation();
     pointers.push(e);
     
     if (pointers.length === 2) {
@@ -404,7 +405,7 @@ function openOverlay(imgSrc) {
     }
   });
   
-  img.addEventListener('pointermove', (e) => {
+  overlay.addEventListener('pointermove', (e) => {
     e.preventDefault();
     const index = pointers.findIndex(p => p.pointerId === e.pointerId);
     if (index !== -1) pointers[index] = e;
@@ -419,7 +420,7 @@ function openOverlay(imgSrc) {
       lastDistance = distance;
       updateTransform();
       hideHelp();
-    } else if (pointers.length === 1 && scale > 1) {
+    } else if (pointers.length === 1) {
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
       
@@ -444,16 +445,16 @@ function openOverlay(imgSrc) {
     }
   });
   
-  img.addEventListener('pointerup', (e) => {
+  overlay.addEventListener('pointerup', (e) => {
     pointers = pointers.filter(p => p.pointerId !== e.pointerId);
     if (pointers.length < 2) lastDistance = 0;
-    isDragging = false;
+    if (pointers.length === 0) isDragging = false;
   });
   
-  img.addEventListener('pointercancel', (e) => {
+  overlay.addEventListener('pointercancel', (e) => {
     pointers = pointers.filter(p => p.pointerId !== e.pointerId);
     if (pointers.length < 2) lastDistance = 0;
-    isDragging = false;
+    if (pointers.length === 0) isDragging = false;
   });
   
   function closeOverlay() {
@@ -468,8 +469,8 @@ function openOverlay(imgSrc) {
     closeOverlay();
   });
   
-  overlay.addEventListener('pointerdown', (e) => {
-    if (e.target === overlay) {
+  content.addEventListener('pointerdown', (e) => {
+    if (e.target === content) {
       e.preventDefault();
       closeOverlay();
     }
