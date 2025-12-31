@@ -1,168 +1,66 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<title>👀みてつくるシート🚗</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+🧩 生成AIに送る依頼文（不具合防止を明記した改訂版）
+以下の要件を満たす 単一HTMLファイル（HTML/CSS/JavaScript を1ファイル内に記述） を生成してください。
+外部ライブラリは使用しないこと（純粋な HTML / CSS / JavaScript のみ）。
 
-<style>
-:root{
-  --bg:#f5f6f8;
-  --card:#ffffff;
-  --ok:#e6f7ec;
-  --danger:#fff3cd;
-  --final:#e8f0ff;
-  --accent:#2b7cff;
-  --text:#222;
-}
+■ プロダクト概要
+「リモコンカー作り・写真で確認シート」
+スマートフォン（縦持ち）を主用途としつつ、PCでも快適に閲覧できる工程確認UIを作成する。
+対象は 超初心者・主婦・高齢者の指導員。視認性・操作性・誤操作防止を最優先とする。
 
-*{box-sizing:border-box;}
+■ 機能要件（重要な不具合対策を含む）
+1. レスポンシブ対応
+- スマホ縦向きで最適化
+- PCでは横幅を最大 960px 程度まで拡張
+- PCでもスマホと同じ1カラム構造を維持（混乱防止）
 
-body{
-  margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  font-size:18px;
-}
+2. 写真拡大機能（不具合防止を必ず実装すること）
+● 拡大表示の仕様
+- 写真タップ → 全画面オーバーレイで拡大表示
+- スマホ縦向き時：拡大写真は横向き（CSS rotate）で表示
+- PC：拡大写真は横向き（横長）で表示（回転は不要）
+● 不具合防止（必須）
+以下の不具合が絶対に起きないように実装すること：
+❌ 不具合1：
+拡大写真を閉じたあと、
+画面が拡大された状態のまま残り、全体が大きく見えてしまう
+✔ 必須対策（この方式で実装すること）
+1. 拡大写真は position: fixed の専用オーバーレイで表示し、
+   通常画面とは完全に独立した DOM レイヤーにすること
 
-.wrapper{
-  max-width:960px;
-  margin:0 auto;
-  padding:12px 12px 32px;
-}
+2. 拡大中は body のスクロールを禁止すること
+   document.body.style.overflow = "hidden";
 
-header{
-  text-align:center;
-  font-size:1.6em;
-  font-weight:700;
-  margin:8px 0 16px;
-}
+3. 拡大オーバーレイを閉じるときは以下を必ず実行すること
+   - document.body.style.overflow = "";
+   - window.scrollTo(0, 0);
+   - overlay.remove();  // display:none ではなく remove() を必須とする
 
-/* ナビ */
-.nav{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:8px 4px 12px;
-  -webkit-overflow-scrolling:touch;
-}
-.nav::-webkit-scrollbar{display:none;}
+4. transform / rotate はオーバーレイ内の画像にのみ適用し、
+   通常画面には影響させないこと
 
-.nav button{
-  flex:0 0 auto;
-  padding:10px 14px;
-  border-radius:999px;
-  border:2px solid var(--accent);
-  background:#fff;
-  font-size:0.9em;
-  cursor:pointer;
-}
-.nav button.active{
-  background:var(--accent);
-  color:#fff;
-}
+❌ 不具合2：
+スマホでもPCでも、
+拡大写真の回転や拡大状態が通常画面に引き継がれてしまう
+✔ 必須対策
+- 拡大用の CSS（transform, rotate, scale）は
+オーバーレイ内の画像にのみ適用すること
+- オーバーレイを閉じるときに
+transform を必ず初期化すること
 
-@media(min-width:768px){
-  .nav{
-    overflow-x:visible;
-    justify-content:space-between;
-  }
-}
+3. 工程ナビゲーション
+- 画面上部に 6 個のナビボタンを横スクロールで配置（スマホ）
+- PCでは横スクロールを解除し、横並びで表示
+- ボタン名：
+- ① でんち
+- ② せん
+- ③ スイッチ
+- ④ まわる
+- ⑤ みため
+- ⑥ かんせい
+- 選択中のボタンには active スタイルを適用
 
-/* カード */
-.card{
-  background:var(--card);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
-}
-
-.card.ok{background:var(--ok);}
-.card.danger{background:var(--danger);}
-.card.final{background:var(--final);}
-
-.card h2{
-  margin:0 0 12px;
-  font-size:1.3em;
-}
-
-.photo-wrap{
-  position:relative;
-  margin-bottom:12px;
-}
-
-.photo-wrap img{
-  width:100%;
-  border-radius:12px;
-  cursor:pointer;
-}
-
-.photo-label{
-  position:absolute;
-  bottom:8px;
-  right:8px;
-  background:rgba(0,0,0,.6);
-  color:#fff;
-  padding:4px 8px;
-  border-radius:8px;
-  font-size:0.8em;
-}
-
-.ok-msg{
-  font-weight:700;
-  margin-bottom:8px;
-}
-
-.note{
-  font-size:0.95em;
-}
-
-/* オーバーレイ */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.85);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-.overlay img{
-  max-width:90vh;
-  max-height:90vw;
-  transform:none;
-}
-
-.overlay.show{
-  display:flex;
-}
-
-@media(max-width:767px){
-  .overlay img.rotate{
-    transform:rotate(90deg);
-    max-width:90vw;
-    max-height:90vh;
-  }
-}
-</style>
-</head>
-<body>
-
-<div class="wrapper">
-  <header>👀みてつくるシート🚗</header>
-
-  <div class="nav" id="nav"></div>
-
-  <div id="content"></div>
-</div>
-
-<div class="overlay" id="overlay">
-  <img id="overlayImg" alt="">
-</div>
-
-<script>
+4. 工程データ
+以下の steps 配列をそのまま使用すること：
 const steps = [
   { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
     ok:"電池の向きOK！", note:"＋と－を確認します。" },
@@ -183,57 +81,36 @@ const steps = [
     ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
-const navEl = document.getElementById("nav");
-const contentEl = document.getElementById("content");
-const overlay = document.getElementById("overlay");
-const overlayImg = document.getElementById("overlayImg");
 
-let current = 0;
+■ 表示要素
+- 工程タイトル
+- 工程写真
+- OKメッセージ（ok）
+- 注意・ヒント（note）
+- danger:true → 注意色
+- final:true → 最終工程色
 
-steps.forEach((s,i)=>{
-  const b=document.createElement("button");
-  b.textContent=s.nav;
-  b.onclick=()=>showStep(i);
-  navEl.appendChild(b);
-});
+■ 写真拡大機能
+- 写真タップ → 全画面オーバーレイで拡大表示
+- スマホ縦向き時は横向き表示（CSS rotate）
+- PCでは回転しない
+- 拡大中はスワイプによる写真切替を禁止
+- タップで閉じる
+- 閉じたら必ず window.scrollTo({ top: 0 }) でトップへ戻る
 
-function showStep(i){
-  current=i;
-  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
-  const s=steps[i];
-  const cls = s.final ? "final" : s.danger ? "danger" : "ok";
-  contentEl.innerHTML=`
-    <div class="card ${cls}">
-      <h2>${s.title}</h2>
-      <div class="photo-wrap">
-        <img src="${s.img}" alt="" id="mainPhoto">
-        <div class="photo-label">タップで拡大</div>
-      </div>
-      <div class="ok-msg">✔ ${s.ok}</div>
-      <div class="note">${s.note}</div>
-    </div>
-  `;
-  document.getElementById("mainPhoto").onclick = ()=>openOverlay(s.img);
-}
+5. UI / デザイン要件
+- タイトル：
+「👀みてつくるシート🚗」
+- 小学生〜高齢者が読める大きめフォント
+- カード型レイアウト
+- OK / 注意 / 最終工程で背景色を変える
+- ナビボタンは pill 型
+- 画像には「タップで拡大」などの誘導ラベルを表示
+- PCでは余白を広げて読みやすくする
 
-function openOverlay(src){
-  overlayImg.src = src;
-  overlayImg.classList.remove("rotate");
-  if(window.innerWidth < 768){
-    overlayImg.classList.add("rotate");
-  }
-  overlay.classList.add("show");
-}
-
-overlay.onclick = ()=>{
-  overlay.classList.remove("show");
-  overlayImg.src="";
-  overlayImg.className="";
-  window.scrollTo({top:0});
-};
-
-showStep(0);
-</script>
-
-</body>
-</html>
+6. コード要件
+- 1ファイルで完結
+- HTML 内に CSS と JS を記述
+- 外部ライブラリ禁止
+- 説明文は不要、コードのみ出力
+✨ 以上の要件を満たす HTML を生成してください。
