@@ -2,488 +2,199 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>👀みてつくるシート🚗</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+  background:#f4f6f8;
+  color:#222;
 }
-
-body {
-  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-  font-size: 18px;
-  line-height: 1.8;
-  background: #f0f4f8;
-  padding-bottom: 40px;
+.container{
+  max-width:960px;
+  margin:0 auto;
+  padding:12px 16px 40px;
 }
-
-.container {
-  max-width: 960px;
-  margin: 0 auto;
+h1{
+  text-align:center;
+  font-size:1.6rem;
+  margin:12px 0 16px;
 }
-
-header {
-  background: #2c5aa0;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-size: 26px;
-  font-weight: bold;
+.nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:8px;
 }
-
-.nav-container {
-  background: white;
-  border-bottom: 3px solid #ddd;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.nav::-webkit-scrollbar{display:none;}
+.nav button{
+  flex:0 0 auto;
+  padding:10px 16px;
+  border-radius:999px;
+  border:none;
+  background:#ddd;
+  font-size:1rem;
 }
-
-.nav-buttons {
-  display: flex;
-  padding: 12px;
-  gap: 10px;
-  min-width: max-content;
+.nav button.active{
+  background:#2a7cff;
+  color:#fff;
 }
-
-.nav-btn {
-  flex: 0 0 auto;
-  padding: 14px 20px;
-  background: #e8eef5;
-  border: 3px solid #ccc;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
+.card{
+  margin-top:16px;
+  padding:16px;
+  border-radius:14px;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  background:#fff;
 }
-
-.nav-btn.active {
-  background: #2c5aa0;
-  color: white;
-  border-color: #1a3a70;
+.card.ok{background:#e8f6ec;}
+.card.note{background:#fffbe8;}
+.card.final{background:#e8f0ff;}
+.card h2{
+  margin:0 0 8px;
+  font-size:1.3rem;
 }
-
-.step-card {
-  display: none;
-  background: white;
-  margin: 20px;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.photo-wrap{
+  text-align:center;
+  margin:12px 0;
 }
-
-.step-card.active {
-  display: block;
+.photo-wrap img{
+  max-width:100%;
+  border-radius:12px;
+  touch-action:manipulation;
 }
-
-.step-card.ok-bg {
-  background: #e8f5e9;
+.photo-hint{
+  font-size:.9rem;
+  color:#555;
+  margin-top:4px;
 }
-
-.step-card.danger-bg {
-  background: #fff3e0;
+.ok-text{
+  font-weight:bold;
+  margin:8px 0;
 }
-
-.step-card.final-bg {
-  background: #e3f2fd;
+.note-text{
+  font-size:.95rem;
 }
-
-.step-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  touch-action:none;
 }
-
-.photo-wrap {
-  position: relative;
-  margin: 20px 0;
-  text-align: center;
+.overlay img{
+  max-width:100%;
+  max-height:100%;
+  touch-action:manipulation;
 }
-
-.photo-wrap img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  cursor: pointer;
-  touch-action: manipulation;
+.close-btn{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:44px;
+  height:44px;
+  border:none;
+  border-radius:50%;
+  font-size:1.6rem;
 }
-
-.tap-label {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 8px 16px;
-  background: #ff9800;
-  color: white;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.ok-text {
-  font-size: 22px;
-  font-weight: bold;
-  color: #2e7d32;
-  margin: 16px 0;
-  padding: 12px;
-  background: #c8e6c9;
-  border-radius: 8px;
-}
-
-.note-text {
-  font-size: 18px;
-  color: #555;
-  margin: 16px 0;
-  padding: 12px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  line-height: 1.8;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.95);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: none;
-}
-
-.overlay-content {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.overlay img {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background: white;
-  color: #333;
-  border: none;
-  border-radius: 50%;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.help-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255,255,255,0.95);
-  color: #333;
-  padding: 20px 30px;
-  border-radius: 12px;
-  font-size: 20px;
-  font-weight: bold;
-  text-align: center;
-  z-index: 10002;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.5s;
-}
-
-.help-label.fade-out {
-  opacity: 0;
-}
-
-@media (min-width: 768px) {
-  .nav-buttons {
-    justify-content: center;
-  }
-  
-  .nav-btn {
-    flex: 0 0 auto;
-  }
-  
-  .step-card {
-    margin: 30px auto;
-    padding: 32px;
-  }
-}
-
-@media (max-width: 767px) {
-  .overlay img.rotated {
-    transform-origin: center center;
-    transform: rotate(90deg);
-  }
+@media(min-width:768px){
+  .nav{overflow-x:visible;}
 }
 </style>
 </head>
 <body>
-
-<header>👀みてつくるシート🚗</header>
-
 <div class="container">
-  <nav class="nav-container">
-    <div class="nav-buttons" id="navButtons"></div>
-  </nav>
-  
-  <main id="stepContent"></main>
+  <h1>👀みてつくるシート🚗</h1>
+  <div class="nav" id="nav"></div>
+  <div id="content"></div>
 </div>
 
 <script>
 const steps = [
   { nav:"① でんち", title:"① でんち（BOX）", img:"images/battery_box.jpg",
     ok:"電池の向きOK！", note:"＋と－を確認します。" },
-
   { nav:"② せん", title:"② 電池につける電線", img:"images/wire_magnet.jpg",
     ok:"線がつながった！", note:"磁石がしっかり付いているか確認。外れていないか見ます。" },
-
   { nav:"③ スイッチ", title:"③ 前後切り替えスイッチ", img:"images/switch_complete.jpg",
     ok:"前後が切り替わる！", note:"左右SWを押して切り替わるか確認。向きを確認します。" },
-
   { nav:"④ まわる", title:"④ モーターは回る？", img:"images/motor_test.jpg",
     ok:"回れば OK（又は、LEDチェッカーで調べる）", note:"指を近づけないよう注意。回らない（つかない）場合は配線を確認。" },
-
   { nav:"⑤ みため", title:"⑤ 見た目完成（実験中）", img:"images/car_complete.jpg",
     ok:"つなぎ方をためそう！", note:"前後が逆なら入れ替えてみよう。", danger:true },
-
   { nav:"⑥ かんせい", title:"⑥ ほんとうの完成！", img:"images/complete.jpg",
     ok:"前後に動いたら大成功！", note:"安全に走らせよう。", final:true }
 ];
 
-let currentStep = 0;
+const navEl=document.getElementById("nav");
+const contentEl=document.getElementById("content");
 
-function renderNav() {
-  const navButtons = document.getElementById('navButtons');
-  navButtons.innerHTML = '';
-  steps.forEach((step, index) => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-btn' + (index === currentStep ? ' active' : '');
-    btn.textContent = step.nav;
-    btn.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      currentStep = index;
-      render();
-    });
-    navButtons.appendChild(btn);
-  });
+steps.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.textContent=s.nav;
+  b.addEventListener("pointerdown",()=>showStep(i));
+  navEl.appendChild(b);
+});
+
+function showStep(i){
+  [...navEl.children].forEach((b,idx)=>b.classList.toggle("active",idx===i));
+  const s=steps[i];
+  contentEl.innerHTML="";
+  const card=document.createElement("div");
+  card.className="card"+(s.final?" final":s.danger?" note":" ok");
+  const h2=document.createElement("h2");
+  h2.textContent=s.title;
+  const wrap=document.createElement("div");
+  wrap.className="photo-wrap";
+  const img=document.createElement("img");
+  img.src=s.img;
+  img.alt=s.title;
+  img.addEventListener("pointerdown",()=>openOverlay(s.img));
+  const hint=document.createElement("div");
+  hint.className="photo-hint";
+  hint.textContent="タップで拡大";
+  wrap.append(img,hint);
+  const ok=document.createElement("div");
+  ok.className="ok-text";
+  ok.textContent=s.ok;
+  const note=document.createElement("div");
+  note.className="note-text";
+  note.textContent=s.note;
+  card.append(h2,wrap,ok,note);
+  contentEl.appendChild(card);
 }
 
-function renderSteps() {
-  const stepContent = document.getElementById('stepContent');
-  stepContent.innerHTML = '';
-  steps.forEach((step, index) => {
-    const card = document.createElement('div');
-    card.className = 'step-card';
-    if (index === currentStep) card.classList.add('active');
-    if (step.final) card.classList.add('final-bg');
-    else if (step.danger) card.classList.add('danger-bg');
-    else card.classList.add('ok-bg');
-    
-    card.innerHTML = `
-      <div class="step-title">${step.title}</div>
-      <div class="photo-wrap">
-        <img src="${step.img}" alt="${step.title}" data-index="${index}">
-        <div class="tap-label">📱 タップで拡大</div>
-      </div>
-      <div class="ok-text">✅ ${step.ok}</div>
-      <div class="note-text">📝 ${step.note}</div>
-    `;
-    stepContent.appendChild(card);
-  });
-  
-  document.querySelectorAll('.photo-wrap img').forEach(img => {
-    img.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      openOverlay(img.src);
-    });
-  });
-}
-
-function openOverlay(imgSrc) {
-  document.body.style.overflow = "hidden";
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  
-  const content = document.createElement('div');
-  content.className = 'overlay-content';
-  
-  const img = document.createElement('img');
-  img.src = imgSrc;
-  
-  const isMobile = window.innerWidth < 768;
-  if (isMobile) {
-    img.classList.add('rotated');
+function openOverlay(src){
+  document.body.style.overflow="hidden";
+  const overlay=document.createElement("div");
+  overlay.className="overlay";
+  const img=document.createElement("img");
+  img.src=src;
+  if(window.innerWidth<window.innerHeight){
+    img.style.transform="rotate(90deg)";
   }
-  
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'close-btn';
-  closeBtn.textContent = '×';
-  
-  const helpLabel = document.createElement('div');
-  helpLabel.className = 'help-label';
-  helpLabel.textContent = '指で広げて拡大・1本指で動かせます';
-  
-  content.appendChild(img);
-  overlay.appendChild(content);
-  overlay.appendChild(closeBtn);
-  overlay.appendChild(helpLabel);
+  const closeBtn=document.createElement("button");
+  closeBtn.className="close-btn";
+  closeBtn.textContent="×";
+  closeBtn.addEventListener("pointerdown",closeOverlay);
+  overlay.addEventListener("pointerdown",(e)=>{
+    if(e.target===overlay){closeOverlay();}
+  });
+  overlay.append(img,closeBtn);
   document.body.appendChild(overlay);
-  
-  setTimeout(() => {
-    helpLabel.classList.add('fade-out');
-    setTimeout(() => helpLabel.remove(), 500);
-  }, 3000);
-  
-  let scale = 1;
-  let translateX = 0;
-  let translateY = 0;
-  let lastDistance = 0;
-  let lastX = 0;
-  let lastY = 0;
-  let pointers = [];
-  let isDragging = false;
-  
-  function updateTransform() {
-    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-  }
-  
-  function getDistance(p1, p2) {
-    const dx = p2.clientX - p1.clientX;
-    const dy = p2.clientY - p1.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-  
-  function hideHelp() {
-    if (helpLabel.parentNode) {
-      helpLabel.classList.add('fade-out');
-      setTimeout(() => helpLabel.remove(), 100);
-    }
-  }
-  
-  overlay.addEventListener('pointerdown', (e) => {
-    if (e.target === closeBtn) return;
-    
-    e.preventDefault();
-    pointers.push(e);
-    
-    if (pointers.length === 2) {
-      lastDistance = getDistance(pointers[0], pointers[1]);
-      hideHelp();
-    } else if (pointers.length === 1) {
-      lastX = e.clientX;
-      lastY = e.clientY;
-      isDragging = false;
-    }
-  });
-  
-  overlay.addEventListener('pointermove', (e) => {
-    e.preventDefault();
-    const index = pointers.findIndex(p => p.pointerId === e.pointerId);
-    if (index !== -1) pointers[index] = e;
-    
-    if (pointers.length === 2) {
-      const distance = getDistance(pointers[0], pointers[1]);
-      if (lastDistance > 0) {
-        const scaleChange = distance / lastDistance;
-        scale *= scaleChange;
-        scale = Math.max(1, Math.min(5, scale));
-      }
-      lastDistance = distance;
-      updateTransform();
-      hideHelp();
-    } else if (pointers.length === 1) {
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        isDragging = true;
-        hideHelp();
-      }
-      
-      if (isDragging) {
-        translateX += dx;
-        translateY += dy;
-        
-        const maxMove = 300 * scale;
-        translateX = Math.max(-maxMove, Math.min(maxMove, translateX));
-        translateY = Math.max(-maxMove, Math.min(maxMove, translateY));
-        
-        updateTransform();
-      }
-      
-      lastX = e.clientX;
-      lastY = e.clientY;
-    }
-  });
-  
-  overlay.addEventListener('pointerup', (e) => {
-    pointers = pointers.filter(p => p.pointerId !== e.pointerId);
-    if (pointers.length < 2) lastDistance = 0;
-    if (pointers.length === 0) isDragging = false;
-  });
-  
-  overlay.addEventListener('pointercancel', (e) => {
-    pointers = pointers.filter(p => p.pointerId !== e.pointerId);
-    if (pointers.length < 2) lastDistance = 0;
-    if (pointers.length === 0) isDragging = false;
-  });
-  
-  function closeOverlay() {
-    document.body.style.overflow = "";
-    window.scrollTo(0, 0);
+
+  function closeOverlay(){
+    document.body.style.overflow="";
+    window.scrollTo(0,0);
     overlay.remove();
   }
-  
-  closeBtn.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    closeOverlay();
-  });
-  
-  content.addEventListener('pointerdown', (e) => {
-    if (e.target === content) {
-      e.preventDefault();
-      closeOverlay();
-    }
-  });
 }
 
-function render() {
-  renderNav();
-  renderSteps();
-}
-
-render();
+showStep(0);
 </script>
-
 </body>
 </html>
