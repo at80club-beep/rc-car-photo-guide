@@ -161,14 +161,16 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .overlay img {
   max-width: 90%;
   max-height: 70%;
   object-fit: contain;
-  touch-action: manipulation;
+  touch-action: none;
   user-select: none;
+  position: absolute;
 }
 
 .close-btn {
@@ -188,21 +190,6 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.zoom-hint {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.9);
-  color: #333;
-  padding: 16px 24px;
-  border-radius: 12px;
-  font-size: 20px;
-  font-weight: bold;
-  z-index: 10000;
-  white-space: nowrap;
 }
 
 @media (min-width: 768px) {
@@ -325,19 +312,23 @@ function openOverlay(imgSrc) {
   img.src = imgSrc;
   img.draggable = false;
   
-  const hint = document.createElement('div');
-  hint.className = 'zoom-hint';
-  hint.textContent = '👆 指で広げて拡大できます';
-  
   content.appendChild(img);
   overlay.appendChild(content);
   overlay.appendChild(closeBtn);
-  overlay.appendChild(hint);
   document.body.appendChild(overlay);
   
   let scale = 1;
+  let posX = 0;
+  let posY = 0;
   let lastDistance = 0;
+  let lastCenterX = 0;
+  let lastCenterY = 0;
   let pointers = {};
+  
+  function updateTransform() {
+    const rotation = window.innerWidth < 768 ? 'rotate(90deg) ' : '';
+    img.style.transform = `${rotation}translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
   
   function closeOverlay() {
     document.body.style.overflow = "";
@@ -368,20 +359,40 @@ function openOverlay(imgSrc) {
     pointers[e.pointerId] = e;
     
     const ids = Object.keys(pointers);
+    
     if (ids.length === 2) {
       const p1 = pointers[ids[0]];
       const p2 = pointers[ids[1]];
       const distance = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
+      const centerX = (p1.clientX + p2.clientX) / 2;
+      const centerY = (p1.clientY + p2.clientY) / 2;
       
       if (lastDistance > 0) {
         const delta = distance / lastDistance;
         scale *= delta;
         scale = Math.min(Math.max(scale, 1), 5);
-        img.style.transform = window.innerWidth < 768 
-          ? `rotate(90deg) scale(${scale})` 
-          : `scale(${scale})`;
+        
+        const deltaX = centerX - lastCenterX;
+        const deltaY = centerY - lastCenterY;
+        posX += deltaX;
+        posY += deltaY;
+        
+        updateTransform();
       }
       lastDistance = distance;
+      lastCenterX = centerX;
+      lastCenterY = centerY;
+    } else if (ids.length === 1 && scale > 1) {
+      const p = pointers[ids[0]];
+      if (lastCenterX !== 0) {
+        const deltaX = p.clientX - lastCenterX;
+        const deltaY = p.clientY - lastCenterY;
+        posX += deltaX;
+        posY += deltaY;
+        updateTransform();
+      }
+      lastCenterX = p.clientX;
+      lastCenterY = p.clientY;
     }
   });
   
@@ -390,12 +401,20 @@ function openOverlay(imgSrc) {
     if (Object.keys(pointers).length < 2) {
       lastDistance = 0;
     }
+    if (Object.keys(pointers).length === 0) {
+      lastCenterX = 0;
+      lastCenterY = 0;
+    }
   });
   
   img.addEventListener('pointercancel', (e) => {
     delete pointers[e.pointerId];
     if (Object.keys(pointers).length < 2) {
       lastDistance = 0;
+    }
+    if (Object.keys(pointers).length === 0) {
+      lastCenterX = 0;
+      lastCenterY = 0;
     }
   });
 }
